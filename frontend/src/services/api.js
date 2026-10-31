@@ -316,12 +316,13 @@ export const api = {
   },
 
   // Problems
-  async getProblems({ search = '', difficulty = '', tag = '', topic = '', page = 0, size = 20 } = {}) {
+  async getProblems({ search = '', difficulty = '', tag = '', topic = '', status = '', page = 0, size = 20 } = {}) {
     let query = `?page=${page}&size=${size}`;
     if (search) query += `&search=${encodeURIComponent(search)}`;
     if (difficulty && difficulty !== 'ALL') query += `&difficulty=${difficulty}`;
     const effectiveTopic = topic || tag;
     if (effectiveTopic && effectiveTopic !== 'ALL') query += `&topic=${encodeURIComponent(effectiveTopic)}`;
+    if (status && status !== 'ALL') query += `&status=${encodeURIComponent(status)}`;
 
     const res = await request(`/problems${query}`);
     if (res && res.data && res.data.content) {
@@ -397,6 +398,23 @@ export const api = {
       SAMPLE_PROBLEMS.splice(index, 1);
     }
     return res || { success: true };
+  },
+
+  // Solved Tracking
+  async getSolvedProblems() {
+    const res = await request('/user/solved');
+    if (res && res.data && res.data.solvedIds) {
+      return res.data.solvedIds;
+    }
+    const saved = localStorage.getItem('codejudge_solved_problems');
+    return saved ? JSON.parse(saved) : [];
+  },
+
+  async markSolved(problemId) {
+    return request('/user/solved', {
+      method: 'POST',
+      body: JSON.stringify({ problemId })
+    });
   },
 
   // Submissions

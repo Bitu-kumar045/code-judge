@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useSolvedState } from '../utils/solvedManager';
 import { 
   User, 
   Mail, 
@@ -43,16 +44,19 @@ import {
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const { solvedCount } = useSolvedState();
   const [hoveredDay, setHoveredDay] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const toast = useToast();
 
-  const currentUser = user || {
-    username: 'alex_coder',
-    email: 'alex@codejudge.dev',
-    role: 'ROLE_USER',
-    rating: 1740,
-    solvedCount: 47,
+  const effectiveSolved = Math.max(solvedCount, user?.solvedCount || 47);
+
+  const currentUser = {
+    username: user?.username || 'alex_coder',
+    email: user?.email || 'alex@codejudge.dev',
+    role: user?.role || 'ROLE_USER',
+    rating: user?.rating || 1740,
+    solvedCount: effectiveSolved,
     streak: 12,
     college: 'Indian Institute of Technology',
     branch: 'Computer Science & Engineering'
@@ -69,11 +73,15 @@ export default function ProfilePage() {
     { contest: 'R7', rating: 1740 },
   ];
 
-  // Solved by Difficulty Breakdown
+  // Solved by Difficulty Breakdown (matches exact 1,000 question dataset)
+  const easySolved = Math.round(effectiveSolved * 0.52);
+  const medSolved = Math.round(effectiveSolved * 0.38);
+  const hardSolved = Math.max(0, effectiveSolved - easySolved - medSolved);
+
   const difficultyData = [
-    { name: 'Easy', value: 24, color: '#10B981', total: 150 },
-    { name: 'Medium', value: 18, color: '#F59E0B', total: 300 },
-    { name: 'Hard', value: 5, color: '#EF4444', total: 100 },
+    { name: 'Easy', value: easySolved, color: '#10B981', total: 298 },
+    { name: 'Moderate', value: medSolved, color: '#F59E0B', total: 447 },
+    { name: 'Difficult', value: hardSolved, color: '#EF4444', total: 255 },
   ];
 
   // Topic Strength Radar Data

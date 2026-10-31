@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { ProblemTableSkeleton } from '../components/Skeleton';
+import { useSolvedState } from '../utils/solvedManager';
 import { 
   Search, 
   Filter, 
   CheckCircle2, 
+  CircleDashed,
   ChevronRight, 
   ChevronLeft,
   ChevronsLeft,
@@ -20,7 +22,9 @@ import {
   ArrowUpDown,
   Edit2,
   Trash2,
-  RotateCcw
+  RotateCcw,
+  CheckCircle,
+  Trophy
 } from 'lucide-react';
 
 const ALL_TOPICS = [
@@ -48,12 +52,15 @@ const ALL_TOPICS = [
 
 export default function ProblemListPage() {
   const { isAdmin } = useAuth();
+  const { isSolved, solvedCount } = useSolvedState();
+
   const [problems, setProblems] = useState([]);
   const [stats, setStats] = useState({ total: 1000, easy: 298, medium: 447, hard: 255 });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('ALL');
   const [selectedTopic, setSelectedTopic] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'SOLVED' | 'UNSOLVED'
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(50);
@@ -66,6 +73,7 @@ export default function ProblemListPage() {
         search, 
         difficulty, 
         topic: selectedTopic,
+        status: statusFilter,
         page,
         size: pageSize 
       });
@@ -87,7 +95,7 @@ export default function ProblemListPage() {
 
   useEffect(() => {
     fetchProblems();
-  }, [search, difficulty, selectedTopic, page, pageSize]);
+  }, [search, difficulty, selectedTopic, statusFilter, page, pageSize]);
 
   // Reset page when filters change
   const handleDifficultyChange = (diff) => {
@@ -100,6 +108,11 @@ export default function ProblemListPage() {
     setPage(0);
   };
 
+  const handleStatusChange = (status) => {
+    setStatusFilter(status);
+    setPage(0);
+  };
+
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(0);
@@ -109,6 +122,7 @@ export default function ProblemListPage() {
     setSearch('');
     setDifficulty('ALL');
     setSelectedTopic('ALL');
+    setStatusFilter('ALL');
     setPage(0);
   };
 
@@ -132,13 +146,13 @@ export default function ProblemListPage() {
       case 'MEDIUM':
         return (
           <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            Medium
+            Moderate
           </span>
         );
       case 'HARD':
         return (
           <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-            Hard
+            Difficult
           </span>
         );
       default:
@@ -165,6 +179,9 @@ export default function ProblemListPage() {
     return pages;
   };
 
+  const effectiveSolved = Math.max(solvedCount, stats.solvedCount || 0);
+  const solvedPercent = Math.min(100, Math.round((effectiveSolved / (stats.total || 1000)) * 100));
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#0B0F19] text-slate-100 min-h-screen">
       {/* Hero Header & Quick Stats */}
@@ -172,10 +189,17 @@ export default function ProblemListPage() {
         <div className="lg:col-span-3 bg-[#111827] border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-500/15 via-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 space-y-3">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-300">
-              <Flame className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Full 1,000 Questions Dataset Loaded & Verified</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-300">
+                <Flame className="h-3.5 w-3.5 text-indigo-400" />
+                <span>1,000 Questions Dataset</span>
+              </div>
+              <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>{effectiveSolved} Solved</span>
+              </div>
             </div>
+
             <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
               <span>Problem Archive</span>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-300 font-mono font-medium">
@@ -185,6 +209,23 @@ export default function ProblemListPage() {
             <p className="text-slate-400 text-sm max-w-2xl leading-relaxed">
               Master algorithms and data structures across 19 curated topics and 3 skill levels. Complete with instant test feedback, multiple languages, and Dockerized sandboxing.
             </p>
+
+            {/* Solved Progress Bar */}
+            <div className="pt-2 max-w-lg space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                <span className="flex items-center gap-1.5 text-slate-300 font-sans font-medium">
+                  <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                  <span>Your Overall Progress:</span>
+                </span>
+                <span className="text-emerald-400 font-bold">{effectiveSolved} / 1,000 ({solvedPercent}%)</span>
+              </div>
+              <div className="h-2 w-full bg-slate-950 rounded-full border border-slate-800 overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.max(2, solvedPercent)}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -235,6 +276,7 @@ export default function ProblemListPage() {
       {/* Level-Wise Tabs & Search Controls */}
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          
           {/* Level Tabs */}
           <div className="flex items-center space-x-1.5 bg-[#111827] border border-slate-800 p-1.5 rounded-xl text-xs overflow-x-auto scrollbar-none">
             <button
@@ -245,7 +287,7 @@ export default function ProblemListPage() {
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
-              <span>All Problems</span>
+              <span>All Levels</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-900/60 text-slate-300 font-mono">
                 {stats.total}
               </span>
@@ -291,6 +333,42 @@ export default function ProblemListPage() {
             </button>
           </div>
 
+          {/* Status Tabs (All / Solved / Unsolved) */}
+          <div className="flex items-center space-x-1 bg-[#111827] border border-slate-800 p-1.5 rounded-xl text-xs">
+            <button
+              onClick={() => handleStatusChange('ALL')}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+                statusFilter === 'ALL'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              All Status
+            </button>
+            <button
+              onClick={() => handleStatusChange('SOLVED')}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 ${
+                statusFilter === 'SOLVED'
+                  ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                  : 'text-emerald-400 hover:bg-emerald-500/10'
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Solved</span>
+            </button>
+            <button
+              onClick={() => handleStatusChange('UNSOLVED')}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 ${
+                statusFilter === 'UNSOLVED'
+                  ? 'bg-slate-800 text-slate-200 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <CircleDashed className="h-3.5 w-3.5" />
+              <span>Unsolved</span>
+            </button>
+          </div>
+
           {/* Search Input & Reset */}
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative flex-1">
@@ -303,7 +381,7 @@ export default function ProblemListPage() {
                 className="w-full pl-10 pr-4 py-2 bg-[#111827] border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
               />
             </div>
-            {(search || difficulty !== 'ALL' || selectedTopic !== 'ALL') && (
+            {(search || difficulty !== 'ALL' || selectedTopic !== 'ALL' || statusFilter !== 'ALL') && (
               <button
                 onClick={handleResetFilters}
                 className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
@@ -348,7 +426,8 @@ export default function ProblemListPage() {
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950/70 border-b border-slate-800 text-xs font-mono uppercase text-slate-400">
                 <tr>
-                  <th className="py-3.5 px-4 w-16 text-center">#</th>
+                  <th className="py-3.5 px-3 w-14 text-center">#</th>
+                  <th className="py-3.5 px-4 w-28 text-center">Status</th>
                   <th className="py-3.5 px-6">Title & Problem</th>
                   <th className="py-3.5 px-4 w-32">Level</th>
                   <th className="py-3.5 px-6 hidden sm:table-cell w-48">Topic</th>
@@ -359,12 +438,12 @@ export default function ProblemListPage() {
               <tbody className="divide-y divide-slate-800/60 font-sans">
                 {problems.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-16 text-center text-slate-500">
+                    <td colSpan="7" className="py-16 text-center text-slate-500">
                       <div className="max-w-md mx-auto space-y-3">
                         <Layers className="h-10 w-10 text-slate-600 mx-auto" />
                         <div className="text-base font-medium text-slate-300">No problems found</div>
                         <p className="text-xs text-slate-500">
-                          Try adjusting your search criteria, level filter, or topic selection.
+                          Try adjusting your search criteria, level filter, status filter, or topic selection.
                         </p>
                         <button
                           onClick={handleResetFilters}
@@ -378,6 +457,7 @@ export default function ProblemListPage() {
                 ) : (
                   problems.map((problem) => {
                     const probNo = problem.no || (problem.id ? problem.id.replace('prob-', '') : '');
+                    const solved = Boolean(problem.isSolved || isSolved(problem));
                     const acceptance = problem.acceptanceRate || 
                       (problem.totalSubmissions 
                         ? Math.round((problem.solvedCount / problem.totalSubmissions) * 100) 
@@ -388,15 +468,40 @@ export default function ProblemListPage() {
                         key={problem.id || problem.slug} 
                         className="hover:bg-slate-800/40 transition-colors group cursor-pointer"
                       >
-                        <td className="py-4 px-4 text-center font-mono text-xs text-slate-400">
+                        {/* Problem Number */}
+                        <td className="py-4 px-3 text-center font-mono text-xs text-slate-400">
                           {probNo}
                         </td>
+
+                        {/* Status Column */}
+                        <td className="py-4 px-4 text-center">
+                          {solved ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                              <span>Solved</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium text-slate-500 bg-slate-900 border border-slate-800">
+                              <CircleDashed className="h-3 w-3 text-slate-600" />
+                              <span>Todo</span>
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Title & Statement */}
                         <td className="py-4 px-6">
                           <Link 
                             to={`/problems/${problem.slug || problem.id}`} 
                             className="block font-medium text-slate-100 group-hover:text-indigo-400 transition-colors"
                           >
-                            <div className="text-sm font-semibold">{problem.title}</div>
+                            <div className="text-sm font-semibold flex items-center gap-2">
+                              <span>{problem.title}</span>
+                              {solved && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 font-mono border border-emerald-800">
+                                  ✓ Solved
+                                </span>
+                              )}
+                            </div>
                             {problem.statement && (
                               <div className="text-xs text-slate-400 line-clamp-1 mt-0.5">
                                 {problem.statement}
@@ -404,14 +509,20 @@ export default function ProblemListPage() {
                             )}
                           </Link>
                         </td>
+
+                        {/* Level / Difficulty */}
                         <td className="py-4 px-4">
                           {getDifficultyBadge(problem.difficulty)}
                         </td>
+
+                        {/* Topic */}
                         <td className="py-4 px-6 hidden sm:table-cell">
                           <span className="px-2.5 py-1 rounded text-xs bg-slate-900 text-slate-300 border border-slate-800 font-mono">
                             {problem.topic || 'General'}
                           </span>
                         </td>
+
+                        {/* Acceptance Rate */}
                         <td className="py-4 px-4 text-center hidden md:table-cell font-mono text-xs text-slate-400">
                           <div className="flex items-center justify-center space-x-1.5">
                             <div className="w-12 bg-slate-800 rounded-full h-1.5 overflow-hidden">
@@ -423,6 +534,8 @@ export default function ProblemListPage() {
                             <span>{acceptance}%</span>
                           </div>
                         </td>
+
+                        {/* Action Button */}
                         <td className="py-4 px-4 text-right">
                           <div className="flex items-center justify-end space-x-2">
                             {isAdmin && (
@@ -445,10 +558,18 @@ export default function ProblemListPage() {
                             )}
                             <Link 
                               to={`/problems/${problem.slug || problem.id}`}
-                              className="px-3 py-1.5 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-indigo-600 group-hover:text-white transition-all text-xs font-medium flex items-center gap-1 shadow-sm"
+                              className={`px-3 py-1.5 rounded-lg transition-all text-xs font-medium flex items-center gap-1 shadow-sm ${
+                                solved
+                                  ? 'bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-600 hover:text-white'
+                                  : 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-indigo-600 group-hover:text-white'
+                              }`}
                             >
-                              <span>Solve</span>
-                              <ChevronRight className="h-3.5 w-3.5" />
+                              <span>{solved ? 'Solved' : 'Solve'}</span>
+                              {solved ? (
+                                <CheckCircle className="h-3.5 w-3.5" />
+                              ) : (
+                                <ChevronRight className="h-3.5 w-3.5" />
+                              )}
                             </Link>
                           </div>
                         </td>

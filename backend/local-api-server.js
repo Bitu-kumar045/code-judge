@@ -38,6 +38,10 @@ const DB = {
     { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', role: 'ROLE_ADMIN', rating: 2150, solvedCount: 182 },
     { id: 'u-coder', username: 'coder', email: 'coder@example.com', role: 'ROLE_USER', rating: 1620, solvedCount: 47 }
   ],
+  solvedByUser: {
+    'coder': new Set(['prob-1']),
+    'admin': new Set(['prob-1', 'prob-2'])
+  },
   problems: loadedProblems.length > 0 ? loadedProblems : [
     {
       id: "e4a3b8d1-1234-4567-89ab-cdef01234567",
@@ -244,8 +248,10 @@ const server = http.createServer(async (req, res) => {
       const search = url.searchParams.get('search')?.toLowerCase() || '';
       const difficulty = url.searchParams.get('difficulty')?.toUpperCase() || '';
       const topic = url.searchParams.get('topic') || url.searchParams.get('tag') || '';
+      const status = url.searchParams.get('status')?.toUpperCase() || '';
       const page = Math.max(0, parseInt(url.searchParams.get('page') || '0', 10));
       const size = Math.min(100, Math.max(1, parseInt(url.searchParams.get('size') || '20', 10)));
+      const coderSolved = DB.solvedByUser['coder'] || new Set();
 
       let filtered = [...DB.problems];
       if (search) {
@@ -266,17 +272,26 @@ const server = http.createServer(async (req, res) => {
           (p.tags && p.tags.some(t => t.toLowerCase() === topic.toLowerCase()))
         );
       }
+      if (status === 'SOLVED') {
+        filtered = filtered.filter(p => coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no))));
+      } else if (status === 'UNSOLVED') {
+        filtered = filtered.filter(p => !coderSolved.has(p.id) && !coderSolved.has(p.slug) && (!p.no || !coderSolved.has(String(p.no))));
+      }
 
       const totalElements = filtered.length;
       const totalPages = Math.ceil(totalElements / size);
       const startIdx = page * size;
-      const paginatedContent = filtered.slice(startIdx, startIdx + size);
+      const paginatedContent = filtered.slice(startIdx, startIdx + size).map(p => ({
+        ...p,
+        isSolved: coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no))) || false
+      }));
 
       const stats = {
         total: DB.problems.length,
         easy: DB.problems.filter(p => p.difficulty === 'EASY').length,
         medium: DB.problems.filter(p => p.difficulty === 'MEDIUM').length,
         hard: DB.problems.filter(p => p.difficulty === 'HARD').length,
+        solvedCount: Array.from(coderSolved).filter(s => s.startsWith('prob-')).length || coderSolved.size,
         topics: Array.from(new Set(DB.problems.map(p => p.topic).filter(Boolean)))
       };
 
@@ -303,7 +318,9 @@ const server = http.createServer(async (req, res) => {
       if (!prob) {
         return sendJson(res, 404, { success: false, message: 'Problem not found' });
       }
-      return sendJson(res, 200, { success: true, data: prob });
+      const coderSolved = DB.solvedByUser['coder'] || new Set();
+      const isSolved = coderSolved.has(prob.id) || coderSolved.has(prob.slug) || (prob.no && coderSolved.has(String(prob.no))) || false;
+      return sendJson(res, 200, { success: true, data: { ...prob, isSolved } });
     }
 
     // Create problem (Admin)
@@ -401,6 +418,22 @@ const server = http.createServer(async (req, res) => {
 
       DB.submissions.unshift(submission);
 
+      // Track solved problem on AC verdict
+      if (finalVerdict === 'AC') {
+        const username = 'coder';
+        if (!DB.solvedByUser[username]) {
+          DB.solvedByUser[username] = new Set();
+        }
+        DB.solvedByUser[username].add(prob.id);
+        DB.solvedByUser[username].add(prob.slug);
+        if (prob.no) DB.solvedByUser[username].add(String(prob.no));
+
+        const userObj = DB.users.find(u => u.username === username);
+        if (userObj) {
+          userObj.solvedCount = Array.from(DB.solvedByUser[username]).filter(s => s.startsWith('prob-')).length || 1;
+        }
+      }
+
       return sendJson(res, 201, {
         success: true,
         message: 'Submission evaluated',
@@ -417,6 +450,44 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === '/api/v1/submissions' && method === 'GET') {
       return sendJson(res, 200, { success: true, data: DB.submissions });
+    }
+
+    // User Solved Problems API
+    if (pathname === '/api/v1/user/solved' && method === 'GET') {
+      const username = 'coder';
+      const solvedList = Array.from(DB.solvedByUser[username] || []);
+      return sendJson(res, 200, {
+        success: true,
+        data: {
+          solvedIds: solvedList,
+          count: solvedList.filter(s => s.startsWith('prob-')).length
+        }
+      });
+    }
+
+    if (pathname === '/api/v1/user/solved' && method === 'POST') {
+      const body = await parseBody(req);
+      const username = 'coder';
+      const { problemId } = body;
+      if (!DB.solvedByUser[username]) {
+        DB.solvedByUser[username] = new Set();
+      }
+      if (problemId) {
+        DB.solvedByUser[username].add(String(problemId));
+        const prob = DB.problems.find(p => p.id === problemId || p.slug === problemId || String(p.no) === String(problemId));
+        if (prob) {
+          DB.solvedByUser[username].add(prob.id);
+          DB.solvedByUser[username].add(prob.slug);
+          if (prob.no) DB.solvedByUser[username].add(String(prob.no));
+        }
+      }
+      return sendJson(res, 200, {
+        success: true,
+        data: {
+          solvedIds: Array.from(DB.solvedByUser[username]),
+          count: Array.from(DB.solvedByUser[username]).filter(s => s.startsWith('prob-')).length
+        }
+      });
     }
 
     // 4. Multiple Judge Workers & System Telemetry

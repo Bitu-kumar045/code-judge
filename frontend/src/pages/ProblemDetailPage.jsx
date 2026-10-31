@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { fireAcceptedConfetti } from '../utils/confetti';
 import { ProblemDetailSkeleton } from '../components/Skeleton';
+import { markProblemSolved, isProblemSolved } from '../utils/solvedManager';
 import { 
   Play, 
   Send, 
@@ -17,6 +18,7 @@ import {
   Clock, 
   Database, 
   CheckCircle2, 
+  CircleDashed,
   XCircle, 
   AlertTriangle, 
   Layers, 
@@ -55,6 +57,7 @@ export default function ProblemDetailPage() {
 
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSolved, setIsSolved] = useState(false);
   
   // Mobile active panel toggle ('statement' or 'editor')
   const [mobileActivePanel, setMobileActivePanel] = useState('statement');
@@ -112,6 +115,7 @@ export default function ProblemDetailPage() {
       const data = await api.getProblemBySlug(slug);
       if (data) {
         setProblem(data);
+        setIsSolved(data.isSolved || isProblemSolved(data));
         const starter = data.starterCode?.[selectedLang] || data.starterCode?.PYTHON || "// Write your solution here";
         setCode(starter);
       }
@@ -301,20 +305,29 @@ export default function ProblemDetailPage() {
         clearInterval(testInterval);
         setIsEvaluating(false);
         setEvaluationStage('');
+        const isAc = !sub?.verdict || sub.verdict === 'AC';
         const acResult = {
           status: 'COMPLETED',
-          verdict: 'AC',
-          runtimeMs: 14,
-          memoryKb: 3480,
+          verdict: sub?.verdict || 'AC',
+          runtimeMs: sub?.runtimeMs || 14,
+          memoryKb: sub?.memoryKb || 3480,
           beatsRuntime: 88,
           beatsMemory: 92,
-          actualOutput: problem.sampleCases[0]?.output || '0 1',
-          expectedOutput: problem.sampleCases[0]?.output || '0 1',
-          message: 'Accepted! 10/10 hidden test cases passed.'
+          actualOutput: sub?.actualOutput || problem.sampleCases[0]?.output || '0 1',
+          expectedOutput: sub?.expectedOutput || problem.sampleCases[0]?.output || '0 1',
+          message: isAc 
+            ? 'Accepted! All 10/10 hidden test cases passed.' 
+            : (sub?.errorMessage || `Execution finished with verdict: ${sub?.verdict}`)
         };
         setJudgeVerdict(acResult);
-        fireAcceptedConfetti();
-        toast.success('Accepted! All 10/10 test cases passed (Beats 88% runtime)!', 'Accepted 🎉');
+        if (isAc) {
+          markProblemSolved(problem);
+          setIsSolved(true);
+          fireAcceptedConfetti();
+          toast.success('Accepted! Problem marked as SOLVED! 🎉', 'Solved 🎉');
+        } else {
+          toast.error(`Verdict: ${sub?.verdict || 'WA'}. Try debugging your code.`, 'Not Accepted');
+        }
       }, 1500);
     } catch (err) {
       clearInterval(testInterval);
@@ -373,6 +386,17 @@ export default function ProblemDetailPage() {
           }`}>
             {problem.difficulty}
           </span>
+          {isSolved ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)] shrink-0">
+              <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+              <span>SOLVED</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800/80 text-slate-400 border border-slate-700/60 shrink-0">
+              <CircleDashed className="h-3 w-3 text-slate-500" />
+              <span>UNSOLVED</span>
+            </span>
+          )}
         </div>
 
         {/* Center: Pomodoro Practice Timer */}
@@ -487,7 +511,20 @@ export default function ProblemDetailPage() {
             {activeLeftTab === 'description' && (
               <>
                 <div className="space-y-2">
-                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{problem.title}</h1>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{problem.title}</h1>
+                    {isSolved ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                        <span>Solved</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-900 text-slate-400 border border-slate-800">
+                        <CircleDashed className="h-3.5 w-3.5 text-slate-500" />
+                        <span>Unsolved</span>
+                      </span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2 items-center text-xs text-slate-400 pt-1">
                     <div className="flex items-center space-x-1 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">
                       <Clock className="h-3 w-3 text-indigo-400" />
