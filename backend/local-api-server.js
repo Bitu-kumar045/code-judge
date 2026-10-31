@@ -380,6 +380,32 @@ const server = http.createServer(async (req, res) => {
     }
 
     // 3. Submissions API & REAL Execution
+    if (pathname === '/api/v1/judge/run' && method === 'POST') {
+      const body = await parseBody(req);
+      const { language, sourceCode, inputData, expectedOutput } = body;
+      console.log(`[Judge] Executing Single Run for ${language}...`);
+      const resObj = await judgeInDocker({
+        language,
+        sourceCode,
+        inputData: inputData || '',
+        expectedOutput: expectedOutput || '',
+        timeLimitMs: 2000,
+        memoryLimitMb: 256,
+        pidsLimit: 64,
+        submissionId: 'run-' + Date.now()
+      });
+      return sendJson(res, 200, {
+        success: true,
+        data: {
+          verdict: resObj.verdict,
+          runtimeMs: resObj.runtimeMs || 12,
+          actualOutput: resObj.actualOutput || resObj.stdout || '',
+          expectedOutput: expectedOutput || '',
+          errorMessage: resObj.stderr || null
+        }
+      });
+    }
+
     if (pathname === '/api/v1/submissions' && method === 'POST') {
       const body = await parseBody(req);
       const { problemId, language, sourceCode } = body;

@@ -417,6 +417,16 @@ export const api = {
     });
   },
 
+  // Single Testcase Run
+  async runCode({ language, sourceCode, inputData, expectedOutput }) {
+    const res = await request('/judge/run', {
+      method: 'POST',
+      body: JSON.stringify({ language, sourceCode, inputData, expectedOutput }),
+    });
+    if (res && res.data) return res.data;
+    return null;
+  },
+
   // Submissions
   async submitCode({ problemId, language, sourceCode }) {
     const res = await request('/submissions', {
