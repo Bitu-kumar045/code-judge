@@ -73,15 +73,15 @@ export default function ProfilePage() {
     { contest: 'R7', rating: 1740 },
   ];
 
-  // Solved by Difficulty Breakdown (matches exact 1,000 question dataset)
+  // Solved by Difficulty Breakdown (matches exact 2,000 question dataset)
   const easySolved = Math.round(effectiveSolved * 0.52);
   const medSolved = Math.round(effectiveSolved * 0.38);
   const hardSolved = Math.max(0, effectiveSolved - easySolved - medSolved);
 
   const difficultyData = [
-    { name: 'Easy', value: easySolved, color: '#10B981', total: 298 },
-    { name: 'Moderate', value: medSolved, color: '#F59E0B', total: 447 },
-    { name: 'Difficult', value: hardSolved, color: '#EF4444', total: 255 },
+    { name: 'Easy', value: easySolved, color: '#10B981', total: 596 },
+    { name: 'Moderate', value: medSolved, color: '#F59E0B', total: 894 },
+    { name: 'Difficult', value: hardSolved, color: '#EF4444', total: 510 },
   ];
 
   // Topic Strength Radar Data

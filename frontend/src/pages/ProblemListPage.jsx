@@ -55,7 +55,7 @@ export default function ProblemListPage() {
   const { isSolved, solvedCount, easySolved, mediumSolved, hardSolved } = useSolvedState();
 
   const [problems, setProblems] = useState([]);
-  const [stats, setStats] = useState({ total: 1000, easy: 298, medium: 447, hard: 255 });
+  const [stats, setStats] = useState({ total: 2000, easy: 596, medium: 894, hard: 510 });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('ALL');
@@ -63,8 +63,8 @@ export default function ProblemListPage() {
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'SOLVED' | 'UNSOLVED'
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const [totalPages, setTotalPages] = useState(50);
-  const [totalElements, setTotalElements] = useState(1000);
+  const [totalPages, setTotalPages] = useState(100);
+  const [totalElements, setTotalElements] = useState(2000);
 
   const fetchProblems = async () => {
     setLoading(true);
@@ -199,7 +199,7 @@ export default function ProblemListPage() {
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-300">
                 <Flame className="h-3.5 w-3.5 text-indigo-400" />
-                <span>1,000 Questions Dataset</span>
+                <span>{stats.total.toLocaleString()} Questions Dataset</span>
               </div>
               <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -210,7 +210,7 @@ export default function ProblemListPage() {
             <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
               <span>Problem Archive</span>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-300 font-mono font-medium">
-                1,000 Problems
+                {stats.total.toLocaleString()} Problems
               </span>
             </h1>
             <p className="text-slate-400 text-sm max-w-2xl leading-relaxed">
@@ -224,7 +224,7 @@ export default function ProblemListPage() {
                   <Trophy className="h-3.5 w-3.5 text-amber-400" />
                   <span>Your Overall Progress:</span>
                 </span>
-                <span className="text-emerald-400 font-bold">{effectiveSolved} / 1,000 ({solvedPercent}%)</span>
+                <span className="text-emerald-400 font-bold">{effectiveSolved} / {stats.total.toLocaleString()} ({solvedPercent}%)</span>
               </div>
               <div className="h-2 w-full bg-slate-950 rounded-full border border-slate-800 overflow-hidden">
                 <div 

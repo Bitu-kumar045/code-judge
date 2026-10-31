@@ -293,19 +293,23 @@ const server = http.createServer(async (req, res) => {
       const mediumSolved = solvedProblems.filter(p => p.difficulty === 'MEDIUM').length;
       const hardSolved = solvedProblems.filter(p => p.difficulty === 'HARD').length;
 
+      const totalEasy = DB.problems.filter(p => p.difficulty === 'EASY').length;
+      const totalMedium = DB.problems.filter(p => p.difficulty === 'MEDIUM').length;
+      const totalHard = DB.problems.filter(p => p.difficulty === 'HARD').length;
+
       const stats = {
         total: DB.problems.length,
-        easy: DB.problems.filter(p => p.difficulty === 'EASY').length,
-        medium: DB.problems.filter(p => p.difficulty === 'MEDIUM').length,
-        hard: DB.problems.filter(p => p.difficulty === 'HARD').length,
+        easy: totalEasy,
+        medium: totalMedium,
+        hard: totalHard,
         solvedCount: solvedProblems.length,
         easySolved,
         mediumSolved,
         hardSolved,
         levelWise: {
-          easy: { solved: easySolved, total: 298 },
-          medium: { solved: mediumSolved, total: 447 },
-          hard: { solved: hardSolved, total: 255 }
+          easy: { solved: easySolved, total: totalEasy },
+          medium: { solved: mediumSolved, total: totalMedium },
+          hard: { solved: hardSolved, total: totalHard }
         },
         topics: Array.from(new Set(DB.problems.map(p => p.topic).filter(Boolean)))
       };
@@ -478,6 +482,10 @@ const server = http.createServer(async (req, res) => {
       const mediumSolved = solvedProblems.filter(p => p.difficulty === 'MEDIUM').length;
       const hardSolved = solvedProblems.filter(p => p.difficulty === 'HARD').length;
 
+      const totalEasy = DB.problems.filter(p => p.difficulty === 'EASY').length;
+      const totalMedium = DB.problems.filter(p => p.difficulty === 'MEDIUM').length;
+      const totalHard = DB.problems.filter(p => p.difficulty === 'HARD').length;
+
       return sendJson(res, 200, {
         success: true,
         data: {
@@ -487,9 +495,9 @@ const server = http.createServer(async (req, res) => {
           mediumSolved,
           hardSolved,
           levelWise: {
-            easy: { solved: easySolved, total: 298 },
-            medium: { solved: mediumSolved, total: 447 },
-            hard: { solved: hardSolved, total: 255 }
+            easy: { solved: easySolved, total: totalEasy },
+            medium: { solved: mediumSolved, total: totalMedium },
+            hard: { solved: hardSolved, total: totalHard }
           }
         }
       });
