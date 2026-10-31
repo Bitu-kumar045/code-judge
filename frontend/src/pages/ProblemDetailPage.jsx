@@ -561,18 +561,15 @@ export default function ProblemDetailPage() {
           {/* Left Pane Content */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             
-            {/* Description Tab */}
+            {/* Description Tab (LeetCode Clean Style) */}
             {activeLeftTab === 'description' && (
               <div className="space-y-6">
                 {/* Problem Title & Header Meta */}
-                <div className="space-y-3">
+                <div className="space-y-3 pb-3 border-b border-slate-800/80">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-indigo-400">
-                        #{problem.no || 1}
-                      </span>
-                      <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{problem.title}</h1>
-                    </div>
+                    <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                      {problem.no ? `${problem.no}. ` : ''}{problem.title}
+                    </h1>
                     {isSolved ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
                         <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -586,7 +583,8 @@ export default function ProblemDetailPage() {
                     )}
                   </div>
 
-                  <div className="flex flex-wrap gap-2 items-center text-xs text-slate-400">
+                  {/* Difficulty, Topics & Companies Bar */}
+                  <div className="flex flex-wrap gap-2 items-center text-xs">
                     <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                       problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
                       problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
@@ -594,146 +592,89 @@ export default function ProblemDetailPage() {
                     }`}>
                       {problem.level || problem.difficulty}
                     </span>
-                    <div className="flex items-center space-x-1 bg-slate-900/80 px-2.5 py-0.5 rounded-full border border-slate-800 font-mono text-[11px]">
-                      <Clock className="h-3 w-3 text-indigo-400" />
-                      <span>{problem.timeLimitMs || 1000} ms</span>
-                    </div>
-                    <div className="flex items-center space-x-1 bg-slate-900/80 px-2.5 py-0.5 rounded-full border border-slate-800 font-mono text-[11px]">
-                      <Database className="h-3 w-3 text-cyan-400" />
-                      <span>{problem.memoryLimitMb || 256} MB</span>
-                    </div>
-                    {problem.acceptanceRate && (
-                      <div className="flex items-center space-x-1 bg-slate-900/80 px-2.5 py-0.5 rounded-full border border-slate-800 font-mono text-[11px] text-slate-300">
-                        <span>Accuracy: {problem.acceptanceRate}%</span>
+
+                    {/* Topic Pill */}
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-slate-900 text-slate-300 border border-slate-800 font-mono">
+                      {problem.topic || 'Algorithms'}
+                    </span>
+
+                    {/* Company Pills */}
+                    {problem.companies && problem.companies.length > 0 && (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-slate-500 text-[11px] font-mono ml-1">Companies:</span>
+                        {problem.companies.map(c => (
+                          <span key={c} className="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-medium">
+                            {c}
+                          </span>
+                        ))}
                       </div>
                     )}
-                    {(problem.tags || []).map(t => (
-                      <span key={t} className="px-2 py-0.5 rounded-full text-[11px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                        {t}
-                      </span>
-                    ))}
                   </div>
                 </div>
 
-                {/* Problem Statement Card */}
-                <div className="p-5 rounded-2xl bg-[#111827]/80 border border-slate-800/90 shadow-lg space-y-3">
-                  <div className="text-xs uppercase font-mono tracking-wider text-indigo-400 font-bold flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Problem Statement</span>
-                  </div>
-                  <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line font-sans">
-                    {problem.statement || problem.descriptionMd}
-                  </div>
-                </div>
-
-                {/* Input & Output Format Specifications */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Input Format */}
-                  <div className="p-4 rounded-xl bg-[#111827]/70 border border-slate-800/80 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-indigo-300 uppercase tracking-wider">
-                      <LogIn className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Input Format</span>
-                    </div>
-                    <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line">
-                      {problem.inputFormat || "Standard input contains the test cases as described."}
-                    </div>
-                  </div>
-
-                  {/* Output Format */}
-                  <div className="p-4 rounded-xl bg-[#111827]/70 border border-slate-800/80 space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider">
-                      <LogOut className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Output Format</span>
-                    </div>
-                    <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line">
-                      {problem.outputFormat || "Print the computed result to standard output followed by a newline."}
-                    </div>
-                  </div>
+                {/* Direct Problem Statement (Clean Simple Prose) */}
+                <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+                  {problem.statement}
                 </div>
 
                 {/* Examples Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs uppercase font-mono tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Examples ({problem.examples?.length || problem.sampleCases?.length || 1})</span>
-                    </h3>
-                    <span className="text-[11px] text-slate-500 font-mono">Interactive sample runner</span>
-                  </div>
-
+                <div className="space-y-4 pt-2">
                   {(problem.examples || problem.sampleCases || []).map((ex, idx) => (
-                    <div key={idx} className="bg-[#111827] border border-slate-800/90 rounded-2xl p-4 sm:p-5 space-y-3.5 hover:border-slate-700/80 transition-all shadow-md">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                            Example {idx + 1}
-                          </span>
-                        </div>
-                        
+                    <div key={idx} className="bg-[#111827]/70 border border-slate-800/80 rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-white">Example {idx + 1}:</span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => {
-                              navigator.clipboard.writeText(ex.input);
+                              navigator.clipboard.writeText(ex.rawInput || ex.input);
                               toast.success(`Copied Example ${idx + 1} input`);
                               setCopiedIndex(idx);
                               setTimeout(() => setCopiedIndex(null), 1500);
                             }}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-mono text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors"
-                            title="Copy input to clipboard"
+                            className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-[11px] font-mono text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors"
+                            title="Copy input"
                           >
                             {copiedIndex === idx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                             <span>{copiedIndex === idx ? 'Copied' : 'Copy'}</span>
                           </button>
-
                           <button
-                            onClick={() => handleLoadExampleToInput(ex.input)}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] font-mono text-indigo-300 hover:text-indigo-200 border border-indigo-500/30 transition-colors"
+                            onClick={() => handleLoadExampleToInput(ex.rawInput || ex.input)}
+                            className="flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-[11px] font-mono text-indigo-300 hover:text-indigo-200 border border-indigo-500/30 transition-colors"
                             title="Load into test console"
                           >
                             <Play className="w-3 h-3 fill-indigo-400 text-indigo-400" />
-                            <span>Test this</span>
+                            <span>Testcase</span>
                           </button>
                         </div>
                       </div>
 
-                      <div className="space-y-1 font-mono text-xs">
-                        <span className="text-slate-400 text-[11px] font-semibold">Input:</span>
-                        <pre className="p-3 rounded-xl bg-[#0B0F19] border border-slate-800 text-slate-200 overflow-x-auto selection:bg-indigo-500/30">
-                          {ex.input}
-                        </pre>
-                      </div>
-
-                      <div className="space-y-1 font-mono text-xs">
-                        <span className="text-slate-400 text-[11px] font-semibold">Output:</span>
-                        <pre className="p-3 rounded-xl bg-[#0B0F19] border border-slate-800 text-emerald-400 font-semibold overflow-x-auto">
-                          {ex.output}
-                        </pre>
-                      </div>
-
-                      {ex.explanation && (
-                        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-xs text-indigo-200 leading-relaxed">
-                          <span className="text-sm select-none">💡</span>
-                          <div>
-                            <strong className="text-indigo-300">Explanation: </strong>
+                      <div className="space-y-1 font-mono text-xs text-slate-300">
+                        <div>
+                          <strong className="text-slate-400 font-semibold">Input: </strong>
+                          <span className="text-slate-200">{ex.input}</span>
+                        </div>
+                        <div>
+                          <strong className="text-slate-400 font-semibold">Output: </strong>
+                          <span className="text-emerald-400 font-semibold">{ex.output}</span>
+                        </div>
+                        {ex.explanation && (
+                          <div className="pt-1 text-slate-400 font-sans text-xs">
+                            <strong className="text-slate-300 font-semibold">Explanation: </strong>
                             <span>{ex.explanation}</span>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Constraints Section */}
+                {/* Constraints Section (Clean List) */}
                 {problem.constraints && problem.constraints.length > 0 && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-[#111827]/70 border border-slate-800/80 space-y-3">
-                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <span>Constraints</span>
-                    </div>
-                    <ul className="space-y-2">
+                  <div className="space-y-2 pt-2 border-t border-slate-800/80">
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">Constraints:</h3>
+                    <ul className="space-y-1.5 pl-3">
                       {problem.constraints.map((c, i) => (
-                        <li key={i} className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                          <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0" />
+                        <li key={i} className="text-xs font-mono text-slate-300 list-disc list-inside">
                           <span>{c}</span>
                         </li>
                       ))}
