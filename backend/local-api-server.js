@@ -1,4 +1,7 @@
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { judgeInDocker, VERDICTS } from '../judge-worker/docker-judge.js';
 import { judgeSubmission } from '../judge-worker/local-judge.js';
 import { 
@@ -12,7 +15,22 @@ import {
 import { compareSubmissions } from './plagiarism.js';
 import { SAMPLE_CLASSES, exportGradebookCsv } from './classroom-store.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const PORT = 8080;
+
+// Load 1,000 problems catalog
+const ALL_PROBLEMS_FILE = path.join(__dirname, 'data/all-problems.json');
+let loadedProblems = [];
+if (fs.existsSync(ALL_PROBLEMS_FILE)) {
+  try {
+    loadedProblems = JSON.parse(fs.readFileSync(ALL_PROBLEMS_FILE, 'utf8'));
+    console.log(`[Database] Successfully loaded ${loadedProblems.length} catalog problems from all-problems.json`);
+  } catch (err) {
+    console.error('Failed to parse all-problems.json', err);
+  }
+}
 
 // In-Memory Database Store for Problems, Submissions, and Users
 const DB = {
@@ -20,7 +38,7 @@ const DB = {
     { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', role: 'ROLE_ADMIN', rating: 2150, solvedCount: 182 },
     { id: 'u-coder', username: 'coder', email: 'coder@example.com', role: 'ROLE_USER', rating: 1620, solvedCount: 47 }
   ],
-  problems: [
+  problems: loadedProblems.length > 0 ? loadedProblems : [
     {
       id: "e4a3b8d1-1234-4567-89ab-cdef01234567",
       slug: "two-sum",
@@ -32,6 +50,7 @@ const DB = {
       solvedCount: 1420,
       totalSubmissions: 2890,
       descriptionMd: `Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
+
 
 You may assume that each input would have **exactly one solution**, and you may not use the same element twice.
 
@@ -224,33 +243,63 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/v1/problems' && method === 'GET') {
       const search = url.searchParams.get('search')?.toLowerCase() || '';
       const difficulty = url.searchParams.get('difficulty')?.toUpperCase() || '';
-      const page = parseInt(url.searchParams.get('page') || '0', 10);
-      const size = parseInt(url.searchParams.get('size') || '20', 10);
+      const topic = url.searchParams.get('topic') || url.searchParams.get('tag') || '';
+      const page = Math.max(0, parseInt(url.searchParams.get('page') || '0', 10));
+      const size = Math.min(100, Math.max(1, parseInt(url.searchParams.get('size') || '20', 10)));
 
       let filtered = [...DB.problems];
       if (search) {
-        filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || p.slug.includes(search));
+        filtered = filtered.filter(p => 
+          (p.title && p.title.toLowerCase().includes(search)) || 
+          (p.slug && p.slug.toLowerCase().includes(search)) ||
+          (p.statement && p.statement.toLowerCase().includes(search)) ||
+          (p.topic && p.topic.toLowerCase().includes(search)) ||
+          (p.no && String(p.no) === search)
+        );
       }
       if (difficulty && difficulty !== 'ALL') {
         filtered = filtered.filter(p => p.difficulty === difficulty);
       }
+      if (topic && topic !== 'ALL') {
+        filtered = filtered.filter(p => 
+          (p.topic && p.topic.toLowerCase() === topic.toLowerCase()) || 
+          (p.tags && p.tags.some(t => t.toLowerCase() === topic.toLowerCase()))
+        );
+      }
+
+      const totalElements = filtered.length;
+      const totalPages = Math.ceil(totalElements / size);
+      const startIdx = page * size;
+      const paginatedContent = filtered.slice(startIdx, startIdx + size);
+
+      const stats = {
+        total: DB.problems.length,
+        easy: DB.problems.filter(p => p.difficulty === 'EASY').length,
+        medium: DB.problems.filter(p => p.difficulty === 'MEDIUM').length,
+        hard: DB.problems.filter(p => p.difficulty === 'HARD').length,
+        topics: Array.from(new Set(DB.problems.map(p => p.topic).filter(Boolean)))
+      };
 
       return sendJson(res, 200, {
         success: true,
         data: {
-          content: filtered,
-          totalElements: filtered.length,
-          totalPages: Math.ceil(filtered.length / size),
+          content: paginatedContent,
+          totalElements,
+          totalPages,
           pageNumber: page,
-          pageSize: size
+          pageSize: size,
+          stats
         }
       });
     }
 
-    // Get single problem by slug
+    // Get single problem by slug, id, or number
     if (pathname.startsWith('/api/v1/problems/') && method === 'GET') {
       const slug = pathname.replace('/api/v1/problems/', '');
-      const prob = DB.problems.find(p => p.slug === slug || p.id === slug);
+      let prob = DB.problems.find(p => p.slug === slug || p.id === slug || String(p.no) === slug);
+      if (!prob && slug === 'two-sum') {
+        prob = DB.problems[0];
+      }
       if (!prob) {
         return sendJson(res, 404, { success: false, message: 'Problem not found' });
       }
@@ -299,8 +348,10 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const { problemId, language, sourceCode } = body;
 
-      const prob = DB.problems.find(p => p.id === problemId || p.slug === problemId) || DB.problems[0];
-      const testCases = prob.testCases || prob.sampleCases.map(s => ({ inputData: s.input, expectedOutput: s.output }));
+      const prob = DB.problems.find(p => p.id === problemId || p.slug === problemId || String(p.no) === String(problemId)) || DB.problems[0];
+      const testCases = prob.testCases || (prob.sampleCases && prob.sampleCases.length > 0
+        ? prob.sampleCases.map(s => ({ inputData: s.input, expectedOutput: s.output }))
+        : [{ inputData: "5\n1 2 3 4 5", expectedOutput: "Result" }]);
 
       console.log(`[Judge] Executing ${language} code against ${testCases.length} test cases...`);
 

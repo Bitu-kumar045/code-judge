@@ -98,3 +98,4 @@ export function compareSubmissions(codeA, codeB, language = 'PYTHON') {
     totalTokensB: tokensB.length,
   };
 }
+

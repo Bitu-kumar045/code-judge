@@ -316,10 +316,12 @@ export const api = {
   },
 
   // Problems
-  async getProblems({ search = '', difficulty = '', tag = '', page = 0, size = 20 } = {}) {
+  async getProblems({ search = '', difficulty = '', tag = '', topic = '', page = 0, size = 20 } = {}) {
     let query = `?page=${page}&size=${size}`;
     if (search) query += `&search=${encodeURIComponent(search)}`;
     if (difficulty && difficulty !== 'ALL') query += `&difficulty=${difficulty}`;
+    const effectiveTopic = topic || tag;
+    if (effectiveTopic && effectiveTopic !== 'ALL') query += `&topic=${encodeURIComponent(effectiveTopic)}`;
 
     const res = await request(`/problems${query}`);
     if (res && res.data && res.data.content) {

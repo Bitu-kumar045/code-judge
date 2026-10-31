@@ -1,0 +1,1001 @@
+No,Difficulty,Topic,Question,Status
+1,Easy,Basics & Math,Read two integers and print their sum.,Not started
+2,Easy,Basics & Math,Check whether a number is even or odd.,Not started
+3,Easy,Basics & Math,Find the largest of three given numbers.,Not started
+4,Easy,Basics & Math,Print the multiplication table of a number up to 10.,Not started
+5,Easy,Basics & Math,Find the factorial of a number n (n at most 20).,Not started
+6,Easy,Basics & Math,Check whether a number is prime.,Not started
+7,Easy,Basics & Math,Print the first n terms of the Fibonacci series.,Not started
+8,Easy,Basics & Math,Reverse the digits of an integer.,Not started
+9,Easy,Basics & Math,Check whether a number is a palindrome.,Not started
+10,Easy,Basics & Math,Find the sum of the digits of a number.,Not started
+11,Easy,Basics & Math,Count the digits in an integer.,Not started
+12,Easy,Basics & Math,Check whether a number is an Armstrong number.,Not started
+13,Easy,Basics & Math,Find the GCD of two numbers.,Not started
+14,Easy,Basics & Math,Find the LCM of two numbers.,Not started
+15,Easy,Basics & Math,Convert a temperature from Celsius to Fahrenheit.,Not started
+16,Easy,Basics & Math,Check whether a given year is a leap year.,Not started
+17,Easy,Basics & Math,Print all prime numbers up to n.,Not started
+18,Easy,Basics & Math,Find the sum of the first n natural numbers.,Not started
+19,Easy,Basics & Math,Compute x raised to the power n without using a power function.,Not started
+20,Easy,Basics & Math,Check whether a number is a perfect square.,Not started
+21,Easy,Basics & Math,Find the sum of all even numbers from 1 to n.,Not started
+22,Easy,Basics & Math,Check whether a number is a perfect number.,Not started
+23,Easy,Basics & Math,Print a right-angled triangle of stars with n rows.,Not started
+24,Easy,Basics & Math,Print a star pyramid with n rows.,Not started
+25,Easy,Basics & Math,Print Floyd's triangle with n rows.,Not started
+26,Easy,Basics & Math,"Convert a number of seconds into hours, minutes and seconds.",Not started
+27,Easy,Basics & Math,"Calculate simple interest from principal, rate and time.",Not started
+28,Easy,Basics & Math,"Find the area of a circle from its radius, correct to two decimal places.",Not started
+29,Easy,Basics & Math,Swap two numbers without using a third variable.,Not started
+30,Easy,Basics & Math,"Classify a character as an alphabet, a digit or a special symbol.",Not started
+31,Easy,Basics & Math,Print the ASCII value of a given character.,Not started
+32,Easy,Basics & Math,Print the grade of a student from the marks using given ranges.,Not started
+33,Easy,Basics & Math,Find the sum of the series 1 + 1/2 + 1/3 + ... + 1/n.,Not started
+34,Easy,Basics & Math,Check whether three given sides form a valid triangle.,Not started
+35,Easy,Basics & Math,"Print numbers from 1 to n, replacing multiples of 3 with Fizz, multiples of 5 with Buzz and multiples of both with FizzBuzz.",Not started
+36,Easy,Basics & Math,Check whether a number is a strong number (sum of the factorials of its digits equals the number).,Not started
+37,Easy,Basics & Math,Convert a decimal number to binary.,Not started
+38,Easy,Basics & Math,Convert a binary number to decimal.,Not started
+39,Easy,Basics & Math,Find the sum of the squares of the first n natural numbers.,Not started
+40,Easy,Basics & Math,Print each digit of a number in words (125 becomes one two five).,Not started
+41,Moderate,Basics & Math,Count the trailing zeros in n! for n up to 10^9.,Not started
+42,Moderate,Basics & Math,Count the divisors of n for n up to 10^12.,Not started
+43,Moderate,Basics & Math,Print the prime factorization of n for n up to 10^12.,Not started
+44,Moderate,Basics & Math,"Print all primes in a range [L, R] with R up to 10^6 using the sieve of Eratosthenes.",Not started
+45,Moderate,Basics & Math,Find the sum of all divisors of n.,Not started
+46,Moderate,Basics & Math,Convert a decimal number into any base from 2 to 16.,Not started
+47,Moderate,Basics & Math,"Count the numbers from 1 to n that are divisible by 3 or 5, for n up to 10^18.",Not started
+48,Moderate,Basics & Math,Print a diamond star pattern whose upper half has n rows.,Not started
+49,Moderate,Basics & Math,"Compute a^b mod m using fast exponentiation, with b up to 10^18.",Not started
+50,Moderate,Basics & Math,Find the digital root of a number given as a string of up to 10^5 digits.,Not started
+51,Moderate,Basics & Math,Find all Armstrong numbers in a given range.,Not started
+52,Moderate,Basics & Math,Check whether a number is a Fibonacci number.,Not started
+53,Moderate,Basics & Math,Find the smallest positive number divisible by every integer from 1 to n.,Not started
+54,Moderate,Basics & Math,Find the sum of all primes below n for n up to 2*10^6.,Not started
+55,Moderate,Basics & Math,"Count how many numbers from 1 to n contain the digit 7, for n up to 10^6.",Not started
+56,Moderate,Basics & Math,Print Pascal's triangle with n rows.,Not started
+57,Moderate,Basics & Math,"Find the nth ugly number (its only prime factors are 2, 3 and 5).",Not started
+58,Moderate,Basics & Math,Convert an integer from 1 to 3999 to a Roman numeral.,Not started
+59,Moderate,Basics & Math,Convert a Roman numeral to an integer.,Not started
+60,Moderate,Basics & Math,Compute Euler's totient function of n for n up to 10^9.,Not started
+61,Difficult,Basics & Math,Find the nth Fibonacci number modulo 10^9+7 for n up to 10^18 using matrix exponentiation.,Not started
+62,Difficult,Basics & Math,Find the last non-zero digit of n! for n up to 10^6.,Not started
+63,Difficult,Basics & Math,Find the nth digit of the infinite sequence 123456789101112... for n up to 10^18.,Not started
+64,Difficult,Basics & Math,"Compute the sum of floor(n/i) for i from 1 to n, with n up to 10^12.",Not started
+65,Difficult,Basics & Math,"Count the pairs (a, b) with 1 <= a < b <= n and gcd(a, b) = 1, for n up to 10^6.",Not started
+66,Easy,Arrays,Find the largest element in an array.,Not started
+67,Easy,Arrays,Find the smallest element in an array.,Not started
+68,Easy,Arrays,Find the sum and average of all array elements.,Not started
+69,Easy,Arrays,Reverse an array in place.,Not started
+70,Easy,Arrays,Count the even and odd numbers in an array.,Not started
+71,Easy,Arrays,Find the second largest element in an array.,Not started
+72,Easy,Arrays,Check whether an array is sorted in non-decreasing order.,Not started
+73,Easy,Arrays,Copy the elements of an array into another array in reverse order.,Not started
+74,Easy,Arrays,Count the occurrences of a given number in an array.,Not started
+75,Easy,Arrays,"Find the index of the first occurrence of a value in an array, or -1 if absent.",Not started
+76,Easy,Arrays,Remove duplicates from a sorted array and print the new length.,Not started
+77,Easy,Arrays,Move all zeros of an array to the end while keeping the order of the other elements.,Not started
+78,Easy,Arrays,Rotate an array to the left by one position.,Not started
+79,Easy,Arrays,Find the missing number in an array holding n-1 distinct numbers from 1 to n.,Not started
+80,Easy,Arrays,Find the element that appears only once when every other element appears twice.,Not started
+81,Easy,Arrays,Merge two sorted arrays into one sorted array.,Not started
+82,Easy,Arrays,Find the largest difference between any two elements of an array.,Not started
+83,Easy,Arrays,Print all elements that appear more than once in an array.,Not started
+84,Easy,Arrays,Find the sum of the elements at even indices and at odd indices.,Not started
+85,Easy,Arrays,Find the union of two arrays.,Not started
+86,Easy,Arrays,Find the intersection of two arrays.,Not started
+87,Easy,Arrays,Check whether an array is a palindrome.,Not started
+88,Easy,Arrays,Find the frequency of every element in an array.,Not started
+89,Easy,Arrays,Find the third largest distinct element of an array.,Not started
+90,Easy,Arrays,Print every element that is greater than all the elements to its right (leaders).,Not started
+91,Easy,Arrays,"Separate the even and odd numbers of an array, with evens first.",Not started
+92,Easy,Arrays,Find the product of all elements of an array modulo 10^9+7.,Not started
+93,Easy,Arrays,Find the maximum element of an array and the number of times it appears.,Not started
+94,Easy,Arrays,Insert an element at a given position of an array and print the result.,Not started
+95,Easy,Arrays,Delete the element at a given position of an array and print the result.,Not started
+96,Easy,Arrays,Check whether two arrays contain the same elements regardless of order.,Not started
+97,Easy,Arrays,Count the elements that are greater than the average of the array.,Not started
+98,Easy,Arrays,"Count the pairs (i, j) with i < j and a[i] equal to a[j] for n up to 1000.",Not started
+99,Easy,Arrays,Find the length of the longest run of equal consecutive elements.,Not started
+100,Easy,Arrays,Find the sum of the largest and the smallest element of an array.,Not started
+101,Easy,Arrays,Print the prefix sums of an array.,Not started
+102,Easy,Arrays,Answer q queries for the sum of elements from index l to r using prefix sums.,Not started
+103,Easy,Arrays,"Replace every element with the greatest element to its right, and the last element with -1.",Not started
+104,Easy,Arrays,"Check whether an array has two elements whose sum equals a target, for n up to 1000.",Not started
+105,Easy,Arrays,Find the sum of all distinct elements of an array.,Not started
+106,Moderate,Arrays,Find the maximum subarray sum using Kadane's algorithm.,Not started
+107,Moderate,Arrays,Find two numbers whose sum equals a target and print their indices.,Not started
+108,Moderate,Arrays,Find the product of the array except self for every index without using division.,Not started
+109,Moderate,Arrays,Rotate an array to the right by k positions using O(1) extra space.,Not started
+110,Moderate,Arrays,Find the majority element that appears more than n/2 times using the Boyer-Moore voting algorithm.,Not started
+111,Moderate,Arrays,Find all elements that appear more than n/3 times.,Not started
+112,Moderate,Arrays,Find the next permutation of an array in place.,Not started
+113,Moderate,Arrays,"Sort an array of 0s, 1s and 2s in a single pass.",Not started
+114,Moderate,Arrays,Find the length of the longest run of consecutive integers in an unsorted array in O(n).,Not started
+115,Moderate,Arrays,"Find the length of the longest subarray with sum equal to k, where the array may contain negatives.",Not started
+116,Moderate,Arrays,Count the subarrays whose sum equals k.,Not started
+117,Moderate,Arrays,Find the maximum product of a subarray.,Not started
+118,Moderate,Arrays,Merge overlapping intervals.,Not started
+119,Moderate,Arrays,Find the first missing positive integer in O(n) time and O(1) space.,Not started
+120,Moderate,Arrays,Find the duplicate number in an array of n+1 integers from 1 to n without modifying the array.,Not started
+121,Moderate,Arrays,Find all triplets that sum to zero with no repeated triplets.,Not started
+122,Moderate,Arrays,Find the equilibrium index where the left sum equals the right sum.,Not started
+123,Moderate,Arrays,Rearrange an array so that positive and negative numbers alternate.,Not started
+124,Moderate,Arrays,Find the maximum profit from buying and selling a stock once.,Not started
+125,Moderate,Arrays,Find the maximum profit from buying and selling a stock any number of times.,Not started
+126,Moderate,Arrays,Find the minimum number of swaps needed to sort an array of distinct numbers.,Not started
+127,Moderate,Arrays,Find all pairs in an array with a given difference k.,Not started
+128,Moderate,Arrays,Count the subarrays with an equal number of 0s and 1s.,Not started
+129,Moderate,Arrays,Find the maximum sum of a circular subarray.,Not started
+130,Moderate,Arrays,Find the kth largest element in an unsorted array.,Not started
+131,Moderate,Arrays,Find the minimum number of platforms required given train arrival and departure times.,Not started
+132,Moderate,Arrays,Rearrange an array so that arr[i] becomes arr[arr[i]] using O(1) extra space.,Not started
+133,Moderate,Arrays,Find the longest subarray with an equal number of even and odd elements.,Not started
+134,Moderate,Arrays,Find the smallest positive integer that cannot be formed as a subset sum of a sorted array.,Not started
+135,Moderate,Arrays,Count the pairs in an array whose sum is divisible by k.,Not started
+136,Moderate,Arrays,Find the maximum value of a[j] - a[i] with j greater than i.,Not started
+137,Moderate,Arrays,Find the length of the longest mountain subarray.,Not started
+138,Moderate,Arrays,"Shuffle an array x1,x2,...,xn,y1,y2,...,yn into x1,y1,x2,y2,... in place.",Not started
+139,Moderate,Arrays,Rearrange an array into wave form so that a0 >= a1 <= a2 >= a3 and so on.,Not started
+140,Moderate,Arrays,Find the element that appears once when every other element appears three times.,Not started
+141,Difficult,Arrays,Find the length of the longest increasing subsequence in O(n log n).,Not started
+142,Difficult,Arrays,Count the inversions in an array.,Not started
+143,Difficult,Arrays,"Find the median of two sorted arrays in O(log(min(n, m))).",Not started
+144,Difficult,Arrays,Compute how much rain water is trapped between the bars of an elevation map.,Not started
+145,Difficult,Arrays,Find the area of the largest rectangle in a histogram.,Not started
+146,Difficult,Arrays,Find the maximum of every window of size k in an array (sliding window maximum).,Not started
+147,Difficult,Arrays,Find the smallest range that includes at least one element from each of k sorted lists.,Not started
+148,Difficult,Arrays,Count the reverse pairs where i < j and a[i] > 2*a[j].,Not started
+149,Difficult,Arrays,Find the maximum sum of a subarray whose length is between L and R.,Not started
+150,Difficult,Arrays,"Find the minimum number of jumps needed to reach the end, where each element is the maximum jump length from that position.",Not started
+151,Difficult,Arrays,Count the subarrays that contain exactly k distinct integers.,Not started
+152,Difficult,Arrays,"Count the range sums that lie within [lower, upper].",Not started
+153,Difficult,Arrays,Find the maximum XOR of any two numbers in an array.,Not started
+154,Difficult,Arrays,Find the longest subarray in which the absolute difference between any two elements is at most limit.,Not started
+155,Difficult,Arrays,"Given buildings as (left, right, height), output the key points of the skyline.",Not started
+156,Difficult,Arrays,Count the ways to split an array of non-negative integers into three non-empty contiguous parts whose sums are non-decreasing.,Not started
+157,Difficult,Arrays,Count the subarrays in which the maximum element appears at least k times.,Not started
+158,Difficult,Arrays,Count the subarrays of a permutation in which max minus min equals length minus 1.,Not started
+159,Difficult,Arrays,"Count the triples (i, j, k) with i < j < k and a[i] < a[j] < a[k].",Not started
+160,Difficult,Arrays,Find the minimum number of elements to remove so that the array becomes a mountain array.,Not started
+161,Easy,Strings,Reverse a string.,Not started
+162,Easy,Strings,Check whether a string is a palindrome.,Not started
+163,Easy,Strings,Count the vowels and consonants in a string.,Not started
+164,Easy,Strings,Count the words in a sentence.,Not started
+165,Easy,Strings,Convert a string to uppercase and lowercase without library functions.,Not started
+166,Easy,Strings,Count the frequency of each character in a string.,Not started
+167,Easy,Strings,Find the first non-repeating character of a string.,Not started
+168,Easy,Strings,Remove all spaces from a string.,Not started
+169,Easy,Strings,Check whether two strings are anagrams.,Not started
+170,Easy,Strings,Find the length of a string without using a length function.,Not started
+171,Easy,Strings,Concatenate two strings without using a library function.,Not started
+172,Easy,Strings,Compare two strings without using a library function.,Not started
+173,Easy,Strings,Replace every occurrence of a character in a string with another character.,Not started
+174,Easy,Strings,Remove all vowels from a string.,Not started
+175,Easy,Strings,Toggle the case of every letter of a string.,Not started
+176,Easy,Strings,Find the character with the highest frequency in a string.,Not started
+177,Easy,Strings,Check whether a string contains only digits.,Not started
+178,Easy,Strings,Reverse the order of the words in a sentence.,Not started
+179,Easy,Strings,Reverse every word of a sentence but keep the word order.,Not started
+180,Easy,Strings,"Count the uppercase letters, lowercase letters, digits and special characters of a string.",Not started
+181,Easy,Strings,Print all substrings of a string.,Not started
+182,Easy,Strings,Check whether a string is a pangram.,Not started
+183,Easy,Strings,"Remove duplicate characters from a string, keeping the first occurrences.",Not started
+184,Easy,Strings,Capitalize the first letter of every word of a sentence.,Not started
+185,Easy,Strings,Find the longest word in a sentence.,Not started
+186,Easy,Strings,Check whether one string is a rotation of another.,Not started
+187,Easy,Strings,Count the occurrences of a substring in a string.,Not started
+188,Easy,Strings,Check whether a string starts and ends with the same character.,Not started
+189,Easy,Strings,Convert a string of digits to an integer without a library function.,Not started
+190,Easy,Strings,Convert an integer to a string without a library function.,Not started
+191,Easy,Strings,Print the ASCII value of every character of a string.,Not started
+192,Easy,Strings,Find the sum of all digits that appear in a string.,Not started
+193,Easy,Strings,Remove all non-alphabetic characters from a string.,Not started
+194,Easy,Strings,Print the characters at the even positions of a string.,Not started
+195,Easy,Strings,Find the second most frequent character of a string.,Not started
+196,Easy,Strings,"Compress a string by counting runs, so aaabb becomes a3b2.",Not started
+197,Easy,Strings,Decompress a string like a3b2 into aaabb.,Not started
+198,Easy,Strings,Check whether the characters of a string are in alphabetical order.,Not started
+199,Easy,Strings,Find the Hamming distance between two strings of equal length.,Not started
+200,Easy,Strings,Find the common prefix of two strings.,Not started
+201,Moderate,Strings,Find the longest common prefix among n strings.,Not started
+202,Moderate,Strings,Check whether two strings are isomorphic.,Not started
+203,Moderate,Strings,Find the longest palindromic substring.,Not started
+204,Moderate,Strings,Count the palindromic substrings of a string.,Not started
+205,Moderate,Strings,Find the length of the longest substring without repeating characters.,Not started
+206,Moderate,Strings,Group the anagrams in a list of words.,Not started
+207,Moderate,Strings,"Implement atoi that handles spaces, signs and overflow.",Not started
+208,Moderate,Strings,Find the first occurrence of a pattern in a text without library functions.,Not started
+209,Moderate,Strings,Write a string in a zigzag pattern over a given number of rows and read it line by line.,Not started
+210,Moderate,Strings,Find the minimum number of characters to add at the front to make a string a palindrome.,Not started
+211,Moderate,Strings,Check whether a string can become a palindrome after removing at most one character.,Not started
+212,Moderate,Strings,Find all starting indices of anagrams of a pattern in a text.,Not started
+213,Moderate,Strings,Multiply two non-negative numbers given as strings.,Not started
+214,Moderate,Strings,Add two binary strings.,Not started
+215,Moderate,Strings,Add two large numbers given as strings.,Not started
+216,Moderate,Strings,Generate the nth term of the count-and-say sequence.,Not started
+217,Moderate,Strings,Find the longest substring that can be made of one repeated letter after at most k replacements.,Not started
+218,Moderate,Strings,Reverse only the letters of a string and keep all other characters in place.,Not started
+219,Moderate,Strings,Sort the characters of a string by decreasing frequency.,Not started
+220,Moderate,Strings,Check whether a list of words follows a given pattern of letters.,Not started
+221,Moderate,Strings,Find the first non-repeating character after every character of a stream.,Not started
+222,Moderate,Strings,Compare two version numbers like 1.02.3 and 1.2.10.,Not started
+223,Moderate,Strings,Convert an Excel column title such as AB to its column number and back.,Not started
+224,Moderate,Strings,Arrange a list of numbers to form the largest possible number.,Not started
+225,Moderate,Strings,Simplify a Unix-style absolute file path.,Not started
+226,Moderate,Strings,Repeatedly remove adjacent duplicate characters from a string.,Not started
+227,Moderate,Strings,Count the distinct substrings of a given length k.,Not started
+228,Moderate,Strings,Find all occurrences of a pattern in a text using the Rabin-Karp rolling hash.,Not started
+229,Moderate,Strings,Count the substrings that contain exactly k distinct characters.,Not started
+230,Moderate,Strings,Justify a list of words into lines of a given width.,Not started
+231,Difficult,Strings,Find the minimum window of a string that contains all characters of a pattern.,Not started
+232,Difficult,Strings,Implement the KMP algorithm and print all occurrences of a pattern.,Not started
+233,Difficult,Strings,Implement the Z-algorithm and print all occurrences of a pattern.,Not started
+234,Difficult,Strings,Find the longest common subsequence of two strings.,Not started
+235,Difficult,Strings,Compute the edit distance between two strings.,Not started
+236,Difficult,Strings,Match a string against a pattern with the wildcards ? and *.,Not started
+237,Difficult,Strings,Match a string against a regular expression containing . and *.,Not started
+238,Difficult,Strings,Count the distinct subsequences of s that equal t.,Not started
+239,Difficult,Strings,Find the longest palindromic subsequence of a string.,Not started
+240,Difficult,Strings,Find the shortest palindrome formed by adding characters in front of a string using KMP.,Not started
+241,Difficult,Strings,Build the suffix array of a string.,Not started
+242,Difficult,Strings,Find the longest repeated substring using binary search and hashing.,Not started
+243,Difficult,Strings,Count the distinct substrings of a string using a suffix array.,Not started
+244,Difficult,Strings,Check whether a string is an interleaving of two other strings.,Not started
+245,Difficult,Strings,Find the minimum number of cuts so that every part of a string is a palindrome.,Not started
+246,Easy,Searching & Sorting,Implement linear search and print the index of the key.,Not started
+247,Easy,Searching & Sorting,Implement binary search on a sorted array.,Not started
+248,Easy,Searching & Sorting,Sort an array using bubble sort.,Not started
+249,Easy,Searching & Sorting,Sort an array using selection sort.,Not started
+250,Easy,Searching & Sorting,Sort an array using insertion sort.,Not started
+251,Easy,Searching & Sorting,Print an array in descending order.,Not started
+252,Easy,Searching & Sorting,Sort a list of strings alphabetically.,Not started
+253,Easy,Searching & Sorting,Sort the characters of a string.,Not started
+254,Easy,Searching & Sorting,Find the first and last occurrence of a number in a sorted array.,Not started
+255,Easy,Searching & Sorting,Count how many times a number appears in a sorted array.,Not started
+256,Easy,Searching & Sorting,Find the integer part of the square root of a number using binary search.,Not started
+257,Easy,Searching & Sorting,Check whether two arrays are equal after sorting them.,Not started
+258,Easy,Searching & Sorting,Find the smallest and largest elements of an array using sorting.,Not started
+259,Easy,Searching & Sorting,Sort an array of 0s and 1s.,Not started
+260,Easy,Searching & Sorting,Count the elements smaller than a given value in a sorted array.,Not started
+261,Easy,Searching & Sorting,Find the insert position of a target in a sorted array.,Not started
+262,Easy,Searching & Sorting,"Sort a list of (name, marks) pairs by marks descending and then by name ascending.",Not started
+263,Easy,Searching & Sorting,Merge two sorted arrays and remove the duplicates.,Not started
+264,Easy,Searching & Sorting,Find the median of an array.,Not started
+265,Easy,Searching & Sorting,Find the minimum absolute difference between any two elements.,Not started
+266,Easy,Searching & Sorting,Check whether an array has any repeated element using sorting.,Not started
+267,Easy,Searching & Sorting,Sort an array of integers by absolute value.,Not started
+268,Easy,Searching & Sorting,Sort an array so that even numbers come first in ascending order and odd numbers follow in descending order.,Not started
+269,Easy,Searching & Sorting,Find the kth smallest element of an array by sorting.,Not started
+270,Easy,Searching & Sorting,Replace each element of an array with its rank in sorted order.,Not started
+271,Moderate,Searching & Sorting,Implement merge sort.,Not started
+272,Moderate,Searching & Sorting,Implement quick sort with a random pivot.,Not started
+273,Moderate,Searching & Sorting,Implement heap sort.,Not started
+274,Moderate,Searching & Sorting,Implement counting sort for numbers up to 10^6.,Not started
+275,Moderate,Searching & Sorting,Implement radix sort.,Not started
+276,Moderate,Searching & Sorting,Search for a target in a rotated sorted array.,Not started
+277,Moderate,Searching & Sorting,Find the minimum element of a rotated sorted array.,Not started
+278,Moderate,Searching & Sorting,Find a peak element of an array in O(log n).,Not started
+279,Moderate,Searching & Sorting,Find the nth root of a number using binary search to a given precision.,Not started
+280,Moderate,Searching & Sorting,Find the smallest divisor such that the sum of the ceilings of the divisions is within a threshold.,Not started
+281,Moderate,Searching & Sorting,Find the minimum eating speed that finishes all banana piles within h hours.,Not started
+282,Moderate,Searching & Sorting,Allocate books to students so that the maximum pages given to a student is minimized.,Not started
+283,Moderate,Searching & Sorting,Split an array into k subarrays so that the largest subarray sum is minimized.,Not started
+284,Moderate,Searching & Sorting,Place k cows in stalls to maximize the minimum distance between any two cows.,Not started
+285,Moderate,Searching & Sorting,Find the minimum ship capacity needed to ship all packages within d days.,Not started
+286,Moderate,Searching & Sorting,Search for a target in a 2D matrix whose rows and columns are sorted.,Not started
+287,Moderate,Searching & Sorting,Find the kth smallest element in a row-wise and column-wise sorted matrix.,Not started
+288,Moderate,Searching & Sorting,"Sort an array by frequency, with smaller values first on ties.",Not started
+289,Moderate,Searching & Sorting,Find the floor and ceiling of a value in a sorted array.,Not started
+290,Moderate,Searching & Sorting,Find the missing and the repeating number in an array of numbers from 1 to n.,Not started
+291,Moderate,Searching & Sorting,"Find the element that appears once in a sorted array where all others appear twice, in O(log n).",Not started
+292,Moderate,Searching & Sorting,Find the h-index of a researcher from the citation counts of their papers.,Not started
+293,Moderate,Searching & Sorting,Merge k sorted arrays into one sorted array.,Not started
+294,Moderate,Searching & Sorting,Count the triangles that can be formed from an array of side lengths.,Not started
+295,Moderate,Searching & Sorting,"Find the element closest to a target in a sorted array, preferring the smaller one on ties.",Not started
+296,Difficult,Searching & Sorting,Find the kth element of the union of two sorted arrays in O(log k).,Not started
+297,Difficult,Searching & Sorting,Find the minimum time to paint all boards using k painters.,Not started
+298,Difficult,Searching & Sorting,Minimize the maximum distance between adjacent gas stations after adding k new stations.,Not started
+299,Difficult,Searching & Sorting,"For every element, count the smaller elements to its right.",Not started
+300,Difficult,Searching & Sorting,Find the minimum number of adjacent swaps needed to sort a permutation.,Not started
+301,Difficult,Searching & Sorting,Find the maximum number of chunks into which an array can be split so that sorting each chunk gives a sorted array.,Not started
+302,Difficult,Searching & Sorting,Sort a nearly sorted array in which every element is at most k positions from its sorted place.,Not started
+303,Difficult,Searching & Sorting,"Count the pairs (i, j) with i < j and a[i] + a[j] within [L, R].",Not started
+304,Difficult,Searching & Sorting,Find the nth positive integer that is divisible by a or b.,Not started
+305,Difficult,Searching & Sorting,Find the kth smallest distance among all pairs of an array.,Not started
+306,Difficult,Searching & Sorting,Find the kth smallest fraction p/q formed from a sorted array containing 1 and primes.,Not started
+307,Difficult,Searching & Sorting,Search for a target in a rotated sorted array that may contain duplicates.,Not started
+308,Difficult,Searching & Sorting,Find the minimum number of days to make m bouquets of k adjacent flowers.,Not started
+309,Difficult,Searching & Sorting,Find the maximum element of a bitonic array.,Not started
+310,Difficult,Searching & Sorting,Find the median of a matrix whose rows are sorted.,Not started
+311,Easy,Two Pointers & Sliding Window,"Check whether a string is a palindrome using two pointers, ignoring non-alphanumeric characters.",Not started
+312,Easy,Two Pointers & Sliding Window,Reverse only the vowels of a string.,Not started
+313,Easy,Two Pointers & Sliding Window,Merge two sorted arrays where the first array has extra space at its end.,Not started
+314,Easy,Two Pointers & Sliding Window,Find the maximum sum of k consecutive elements.,Not started
+315,Easy,Two Pointers & Sliding Window,Return the squares of a sorted array in sorted order.,Not started
+316,Easy,Two Pointers & Sliding Window,Remove all occurrences of a value from an array in place.,Not started
+317,Easy,Two Pointers & Sliding Window,Find the maximum average of any k consecutive elements.,Not started
+318,Easy,Two Pointers & Sliding Window,Check whether one string is a subsequence of another.,Not started
+319,Easy,Two Pointers & Sliding Window,Find a pair in a sorted array with a given sum.,Not started
+320,Easy,Two Pointers & Sliding Window,Count the windows of size k that contain only distinct elements.,Not started
+321,Moderate,Two Pointers & Sliding Window,Find the longest substring with at most k distinct characters.,Not started
+322,Moderate,Two Pointers & Sliding Window,Find the length of the longest subarray with at most two distinct values.,Not started
+323,Moderate,Two Pointers & Sliding Window,Find the minimum size subarray with sum at least s.,Not started
+324,Moderate,Two Pointers & Sliding Window,Find the two lines that form the container holding the most water.,Not started
+325,Moderate,Two Pointers & Sliding Window,Count the subarrays whose product is less than k.,Not started
+326,Moderate,Two Pointers & Sliding Window,Find the longest subarray of 1s after deleting exactly one element.,Not started
+327,Moderate,Two Pointers & Sliding Window,Find the maximum run of consecutive 1s if at most k zeros may be flipped.,Not started
+328,Moderate,Two Pointers & Sliding Window,Find the sum of three integers that is closest to a target.,Not started
+329,Moderate,Two Pointers & Sliding Window,Find all quadruplets that sum to a target.,Not started
+330,Moderate,Two Pointers & Sliding Window,Count the pairs in an array whose sum is less than a target.,Not started
+331,Moderate,Two Pointers & Sliding Window,Find the maximum number of vowels in any substring of length k.,Not started
+332,Moderate,Two Pointers & Sliding Window,Find the maximum score from taking exactly k cards from either end of an array.,Not started
+333,Moderate,Two Pointers & Sliding Window,Find the minimum swaps needed to group all 1s of a binary array together.,Not started
+334,Moderate,Two Pointers & Sliding Window,Count the subarrays that contain exactly k odd numbers.,Not started
+335,Moderate,Two Pointers & Sliding Window,Find the longest subarray with sum at most k in an array of positive numbers.,Not started
+336,Moderate,Two Pointers & Sliding Window,Find the shortest subarray to remove so that the remaining array is sorted.,Not started
+337,Moderate,Two Pointers & Sliding Window,Find the smallest subarray that contains all distinct elements of the array.,Not started
+338,Moderate,Two Pointers & Sliding Window,Find the maximum sum of two non-overlapping subarrays of lengths L and M.,Not started
+339,Moderate,Two Pointers & Sliding Window,Count the substrings of a binary string that have equal numbers of consecutive 0s and 1s.,Not started
+340,Moderate,Two Pointers & Sliding Window,Find the longest substring in which every character appears at most twice.,Not started
+341,Moderate,Two Pointers & Sliding Window,Remove duplicates from a sorted array allowing each value at most twice.,Not started
+342,Moderate,Two Pointers & Sliding Window,Find the shortest subarray that has the same degree as the whole array.,Not started
+343,Moderate,Two Pointers & Sliding Window,Check whether an array has duplicates within k indices of each other.,Not started
+344,Moderate,Two Pointers & Sliding Window,Count the subarrays of size k whose average is at least a threshold.,Not started
+345,Moderate,Two Pointers & Sliding Window,Count the subarrays whose sum is at most k in an array of positive numbers.,Not started
+346,Difficult,Two Pointers & Sliding Window,Find the minimum window of S that contains T as a subsequence.,Not started
+347,Difficult,Two Pointers & Sliding Window,Find the median of every sliding window of size k.,Not started
+348,Difficult,Two Pointers & Sliding Window,Find the shortest subarray with sum at least k in an array that may contain negatives.,Not started
+349,Difficult,Two Pointers & Sliding Window,Find all starting indices of substrings that are a concatenation of all given equal-length words.,Not started
+350,Difficult,Two Pointers & Sliding Window,Find the longest substring in which every character appears at least k times.,Not started
+351,Difficult,Two Pointers & Sliding Window,Count the subarrays whose number of distinct integers lies between L and R.,Not started
+352,Difficult,Two Pointers & Sliding Window,"Count the subarrays whose maximum value lies in the range [L, R].",Not started
+353,Difficult,Two Pointers & Sliding Window,"For every window size from 1 to n, find the maximum of the minimum values of its windows.",Not started
+354,Difficult,Two Pointers & Sliding Window,Find the minimum number of operations to reduce x to zero by removing elements from either end.,Not started
+355,Difficult,Two Pointers & Sliding Window,Find the minimum possible difference between the largest and smallest of any k chosen elements.,Not started
+356,Easy,Recursion & Backtracking,Find the factorial of n using recursion.,Not started
+357,Easy,Recursion & Backtracking,Find the nth Fibonacci number using recursion.,Not started
+358,Easy,Recursion & Backtracking,Find the sum of the digits of a number using recursion.,Not started
+359,Easy,Recursion & Backtracking,Reverse a string using recursion.,Not started
+360,Easy,Recursion & Backtracking,Check whether a string is a palindrome using recursion.,Not started
+361,Easy,Recursion & Backtracking,Print the numbers from 1 to n using recursion and no loop.,Not started
+362,Easy,Recursion & Backtracking,Find x^n using recursion.,Not started
+363,Easy,Recursion & Backtracking,Find the GCD of two numbers using recursion.,Not started
+364,Easy,Recursion & Backtracking,Solve the Tower of Hanoi for n disks and print the moves.,Not started
+365,Easy,Recursion & Backtracking,Find the sum of the elements of an array using recursion.,Not started
+366,Easy,Recursion & Backtracking,Count the ways to climb n stairs taking 1 or 2 steps at a time using recursion.,Not started
+367,Easy,Recursion & Backtracking,Convert a decimal number to binary using recursion.,Not started
+368,Moderate,Recursion & Backtracking,Generate all subsets of a set.,Not started
+369,Moderate,Recursion & Backtracking,Generate all permutations of a list of distinct numbers.,Not started
+370,Moderate,Recursion & Backtracking,Generate all distinct permutations of a list that may contain duplicates.,Not started
+371,Moderate,Recursion & Backtracking,Generate all combinations of k numbers chosen from 1 to n.,Not started
+372,Moderate,Recursion & Backtracking,"Find all combinations of candidates that sum to a target, where each candidate can be reused.",Not started
+373,Moderate,Recursion & Backtracking,"Find all unique combinations that sum to a target, where each element is used at most once.",Not started
+374,Moderate,Recursion & Backtracking,Generate all valid combinations of n pairs of parentheses.,Not started
+375,Moderate,Recursion & Backtracking,Generate all distinct subsets of a list that may contain duplicates.,Not started
+376,Moderate,Recursion & Backtracking,Generate all letter combinations of a phone number's digits.,Not started
+377,Moderate,Recursion & Backtracking,Partition a string into all possible palindromic pieces.,Not started
+378,Moderate,Recursion & Backtracking,Print all paths of a rat in a maze from the top-left to the bottom-right.,Not started
+379,Moderate,Recursion & Backtracking,Check whether a word exists in a grid by moving through adjacent cells.,Not started
+380,Moderate,Recursion & Backtracking,Generate all binary strings of length n that have no two consecutive 1s.,Not started
+381,Moderate,Recursion & Backtracking,Generate all strings obtained by changing the case of each letter of a string.,Not started
+382,Moderate,Recursion & Backtracking,Generate the Gray code sequence for n bits.,Not started
+383,Moderate,Recursion & Backtracking,Find all numbers of length n whose digits are strictly increasing.,Not started
+384,Moderate,Recursion & Backtracking,Find all ways to split a string of digits into valid IP addresses.,Not started
+385,Moderate,Recursion & Backtracking,"Count the ways to reach the nth stair taking 1, 2 or 3 steps using memoization.",Not started
+386,Moderate,Recursion & Backtracking,Check whether a subset of an array has a given sum.,Not started
+387,Moderate,Recursion & Backtracking,Count the subsets of an array with a given sum.,Not started
+388,Moderate,Recursion & Backtracking,Find the kth permutation sequence of the numbers 1 to n.,Not started
+389,Moderate,Recursion & Backtracking,Find all ways to write n as a sum of positive integers.,Not started
+390,Moderate,Recursion & Backtracking,Print all paths from the top-left to the bottom-right of a grid moving only right or down.,Not started
+391,Moderate,Recursion & Backtracking,Generate all subsets of a set in lexicographic order.,Not started
+392,Moderate,Recursion & Backtracking,Find all ways to write n as a product of factors greater than 1.,Not started
+393,Difficult,Recursion & Backtracking,Solve the N-Queens problem and print all solutions.,Not started
+394,Difficult,Recursion & Backtracking,Count the solutions of the N-Queens problem for n up to 12.,Not started
+395,Difficult,Recursion & Backtracking,Solve a 9x9 Sudoku puzzle.,Not started
+396,Difficult,Recursion & Backtracking,Check whether a Hamiltonian cycle exists in a graph of up to 15 vertices.,Not started
+397,Difficult,Recursion & Backtracking,Color a graph with at most m colors so that no two adjacent vertices share a color.,Not started
+398,Difficult,Recursion & Backtracking,"Insert the operators +, - or * between the digits of a string so that the expression equals a target.",Not started
+399,Difficult,Recursion & Backtracking,Find all words of a dictionary that can be formed in a grid of letters.,Not started
+400,Difficult,Recursion & Backtracking,Find a knight's tour on an 8x8 chessboard.,Not started
+401,Difficult,Recursion & Backtracking,Partition an array into k subsets with equal sum.,Not started
+402,Difficult,Recursion & Backtracking,Check whether a set of matchsticks can form a square.,Not started
+403,Difficult,Recursion & Backtracking,Remove the minimum number of invalid parentheses and list all valid results.,Not started
+404,Difficult,Recursion & Backtracking,Return all sentences that can be formed by breaking a string into dictionary words.,Not started
+405,Difficult,Recursion & Backtracking,Count the paths that visit every empty cell of a grid exactly once.,Not started
+406,Difficult,Recursion & Backtracking,Solve the 8-puzzle with the minimum number of moves.,Not started
+407,Difficult,Recursion & Backtracking,Split a string into the maximum number of unique substrings.,Not started
+408,Easy,Linked List,Create a singly linked list from n numbers and print it.,Not started
+409,Easy,Linked List,Count the nodes of a linked list.,Not started
+410,Easy,Linked List,Insert a node at the beginning of a linked list.,Not started
+411,Easy,Linked List,Insert a node at the end of a linked list.,Not started
+412,Easy,Linked List,Insert a node at a given position of a linked list.,Not started
+413,Easy,Linked List,Delete the first node of a linked list.,Not started
+414,Easy,Linked List,Delete the last node of a linked list.,Not started
+415,Easy,Linked List,Delete the node with a given value from a linked list.,Not started
+416,Easy,Linked List,Search for a value in a linked list.,Not started
+417,Easy,Linked List,Find the middle node of a linked list.,Not started
+418,Easy,Linked List,Find the sum of all the nodes of a linked list.,Not started
+419,Easy,Linked List,Print a linked list in reverse order without modifying it.,Not started
+420,Easy,Linked List,Find the nth node from the end of a linked list.,Not started
+421,Easy,Linked List,Check whether a linked list is sorted.,Not started
+422,Easy,Linked List,Find the maximum and minimum values in a linked list.,Not started
+423,Moderate,Linked List,Reverse a singly linked list both iteratively and recursively.,Not started
+424,Moderate,Linked List,Detect a cycle in a linked list.,Not started
+425,Moderate,Linked List,Find the node where a cycle begins in a linked list.,Not started
+426,Moderate,Linked List,Merge two sorted linked lists.,Not started
+427,Moderate,Linked List,Remove the nth node from the end of a list in one pass.,Not started
+428,Moderate,Linked List,Check whether a linked list is a palindrome.,Not started
+429,Moderate,Linked List,Find the intersection node of two linked lists.,Not started
+430,Moderate,Linked List,Remove duplicates from a sorted linked list.,Not started
+431,Moderate,Linked List,"Remove every node that has a duplicate value from a sorted list, leaving only distinct values.",Not started
+432,Moderate,Linked List,Add two numbers represented as linked lists with digits in reverse order.,Not started
+433,Moderate,Linked List,Swap every two adjacent nodes of a linked list.,Not started
+434,Moderate,Linked List,Rotate a linked list to the right by k places.,Not started
+435,Moderate,Linked List,Partition a list so that nodes less than x come before the others while keeping the original order.,Not started
+436,Moderate,Linked List,Sort a linked list using merge sort.,Not started
+437,Moderate,Linked List,"Reorder a list L0, L1, ..., Ln into L0, Ln, L1, Ln-1, and so on.",Not started
+438,Moderate,Linked List,Reverse a linked list between positions m and n.,Not started
+439,Moderate,Linked List,Delete a node of a list when given only a pointer to that node.,Not started
+440,Moderate,Linked List,Segregate the even and odd nodes of a linked list.,Not started
+441,Moderate,Linked List,Convert a binary number stored in a linked list into an integer.,Not started
+442,Moderate,Linked List,"Implement a doubly linked list with insert, delete and print operations.",Not started
+443,Moderate,Linked List,Implement a circular linked list and traverse it.,Not started
+444,Moderate,Linked List,Find the length of the cycle in a linked list.,Not started
+445,Moderate,Linked List,Sort a linked list that is sorted by absolute value into sorted order by actual value.,Not started
+446,Difficult,Linked List,Reverse the nodes of a linked list in groups of k.,Not started
+447,Difficult,Linked List,Merge k sorted linked lists.,Not started
+448,Difficult,Linked List,Clone a linked list in which every node has a random pointer.,Not started
+449,Difficult,Linked List,Flatten a multilevel doubly linked list.,Not started
+450,Difficult,Linked List,Add two numbers represented as linked lists with digits in forward order without reversing the lists.,Not started
+451,Difficult,Linked List,"Implement a skip list with insert, search and delete.",Not started
+452,Difficult,Linked List,Implement an LRU cache with O(1) get and put using a doubly linked list and a hash map.,Not started
+453,Difficult,Linked List,Implement an LFU cache with O(1) operations.,Not started
+454,Difficult,Linked List,Reverse alternate groups of k nodes of a linked list.,Not started
+455,Difficult,Linked List,Convert a sorted linked list into a height-balanced binary search tree.,Not started
+456,Easy,Stack & Queue,Implement a stack using an array.,Not started
+457,Easy,Stack & Queue,Implement a queue using an array.,Not started
+458,Easy,Stack & Queue,Implement a stack using a linked list.,Not started
+459,Easy,Stack & Queue,Implement a queue using a linked list.,Not started
+460,Easy,Stack & Queue,Reverse a string using a stack.,Not started
+461,Easy,Stack & Queue,Check whether a string of brackets is balanced.,Not started
+462,Easy,Stack & Queue,Convert a decimal number to binary using a stack.,Not started
+463,Easy,Stack & Queue,Reverse a queue.,Not started
+464,Easy,Stack & Queue,Implement a circular queue.,Not started
+465,Easy,Stack & Queue,Evaluate a postfix expression.,Not started
+466,Easy,Stack & Queue,Remove all adjacent duplicates of a string using a stack.,Not started
+467,Easy,Stack & Queue,Find the middle element of a stack.,Not started
+468,Moderate,Stack & Queue,Implement a queue using two stacks.,Not started
+469,Moderate,Stack & Queue,Implement a stack using two queues.,Not started
+470,Moderate,Stack & Queue,Implement a stack that returns its minimum element in O(1).,Not started
+471,Moderate,Stack & Queue,Convert an infix expression to postfix.,Not started
+472,Moderate,Stack & Queue,"Evaluate an infix expression with +, -, *, / and parentheses.",Not started
+473,Moderate,Stack & Queue,Find the next greater element for every element of an array.,Not started
+474,Moderate,Stack & Queue,Find the next greater element in a circular array.,Not started
+475,Moderate,Stack & Queue,Find the previous smaller element for every element of an array.,Not started
+476,Moderate,Stack & Queue,Compute the stock span for every day.,Not started
+477,Moderate,Stack & Queue,Find the minimum number of bracket reversals needed to balance an expression.,Not started
+478,Moderate,Stack & Queue,Decode a string like 3[a2[c]] into its expanded form.,Not started
+479,Moderate,Stack & Queue,Remove k digits from a number to make it the smallest possible.,Not started
+480,Moderate,Stack & Queue,Reverse a stack using recursion only.,Not started
+481,Moderate,Stack & Queue,Sort a stack using recursion.,Not started
+482,Moderate,Stack & Queue,Implement a deque using a circular array.,Not started
+483,Moderate,Stack & Queue,Find the first negative number in every window of size k using a queue.,Not started
+484,Moderate,Stack & Queue,Generate the binary numbers from 1 to n using a queue.,Not started
+485,Moderate,Stack & Queue,"Design a stack with push, pop and an increment operation on its bottom k elements.",Not started
+486,Moderate,Stack & Queue,"Find the celebrity among n people using at most O(n) calls of knows(a, b).",Not started
+487,Moderate,Stack & Queue,Check whether a sequence of pushes and pops is a valid stack sequence.,Not started
+488,Moderate,Stack & Queue,Simulate asteroids moving in a line and report the survivors.,Not started
+489,Moderate,Stack & Queue,"For each day, find how many days to wait for a warmer temperature.",Not started
+490,Moderate,Stack & Queue,"Design a browser history with visit, back and forward operations.",Not started
+491,Moderate,Stack & Queue,Design a hit counter that counts hits in the last 5 minutes.,Not started
+492,Moderate,Stack & Queue,Find the minimum number of removals to make a parentheses string valid.,Not started
+493,Difficult,Stack & Queue,Find the length of the longest valid parentheses substring.,Not started
+494,Difficult,Stack & Queue,Find the largest rectangle containing only 1s in a binary matrix.,Not started
+495,Difficult,Stack & Queue,Find the sum of subarray ranges (maximum minus minimum) over all subarrays in O(n).,Not started
+496,Difficult,Stack & Queue,"Implement a basic calculator with +, -, unary minus, parentheses and spaces.",Not started
+497,Difficult,Stack & Queue,Find the widest ramp (i < j with a[i] <= a[j]) in an array.,Not started
+498,Difficult,Stack & Queue,"For each person in a queue, count how many people to their right they can see.",Not started
+499,Difficult,Stack & Queue,Remove duplicate letters so the result is the smallest string in lexicographic order that has each letter once.,Not started
+500,Difficult,Stack & Queue,"Design a max stack with push, pop, peekMax and popMax.",Not started
+501,Difficult,Stack & Queue,Find the sum of the minimums of all subarrays.,Not started
+502,Difficult,Stack & Queue,Count the subarrays in which the leftmost element is not larger than any other element.,Not started
+503,Difficult,Stack & Queue,"Parse a nested list string such as [123,[456,[789]]] into a nested structure and print it.",Not started
+504,Difficult,Stack & Queue,"Simulate a text editor with a cursor, insert, delete, left and right operations using two stacks.",Not started
+505,Difficult,Stack & Queue,"Design a stack that supports push, pop, top and getMin using only O(1) extra space.",Not started
+506,Easy,Hashing,Count the frequency of every element of an array using a hash map.,Not started
+507,Easy,Hashing,Find the first repeating element of an array.,Not started
+508,Easy,Hashing,Check whether an array contains duplicates.,Not started
+509,Easy,Hashing,Find the first non-repeating element of an array.,Not started
+510,Easy,Hashing,Find the union and intersection of two arrays using hash sets.,Not started
+511,Easy,Hashing,Check whether two strings are anagrams using a hash map.,Not started
+512,Easy,Hashing,Find a pair with a given sum using a hash set.,Not started
+513,Easy,Hashing,Count the distinct elements of an array.,Not started
+514,Easy,Hashing,Find the most frequent element of an array.,Not started
+515,Easy,Hashing,Check whether two arrays are disjoint.,Not started
+516,Easy,Hashing,Count the elements common to three sorted arrays.,Not started
+517,Easy,Hashing,Check whether all the characters of a string are unique.,Not started
+518,Moderate,Hashing,Find the first character of a string that appears exactly k times.,Not started
+519,Moderate,Hashing,Find the top k most frequent elements.,Not started
+520,Moderate,Hashing,Find whether a subarray with zero sum exists.,Not started
+521,Moderate,Hashing,Count the subarrays whose sum is zero.,Not started
+522,Moderate,Hashing,Find the number of distinct elements in every window of size k.,Not started
+523,Moderate,Hashing,Count the pairs in an array with a given sum.,Not started
+524,Moderate,Hashing,"Count the quadruples (a, b, c, d) from four arrays with a + b + c + d equal to 0.",Not started
+525,Moderate,Hashing,"Find the intersection of two arrays, counting repeated elements correctly.",Not started
+526,Moderate,Hashing,Find the sum of all the unique elements of an array.,Not started
+527,Moderate,Hashing,"Design a hash map from scratch with put, get and remove using chaining.",Not started
+528,Moderate,Hashing,"Design a hash set with add, remove and contains.",Not started
+529,Moderate,Hashing,"Count the boomerangs: tuples (i, j, k) where the distance from i to j equals the distance from i to k.",Not started
+530,Moderate,Hashing,Find the shortest distance between two words in a list of words.,Not started
+531,Moderate,Hashing,Find the maximum number of points that lie on the same line.,Not started
+532,Moderate,Hashing,Check whether a Sudoku board is valid.,Not started
+533,Moderate,Hashing,Find the common strings with the minimum index sum between two lists.,Not started
+534,Moderate,Hashing,Find the numbers that appear in every row of a matrix.,Not started
+535,Moderate,Hashing,Count the subarrays whose sum is divisible by k.,Not started
+536,Moderate,Hashing,Find the longest harmonious subsequence where the maximum minus the minimum is exactly 1.,Not started
+537,Moderate,Hashing,Find the repeated DNA sequences of length 10 in a string.,Not started
+538,Difficult,Hashing,Design a time-based key-value store that returns the latest value at or before a timestamp.,Not started
+539,Difficult,Hashing,Find all pairs of words in a list that join to form a palindrome.,Not started
+540,Difficult,Hashing,"Design a data structure with insert, delete and getRandom in O(1), allowing duplicates.",Not started
+541,Difficult,Hashing,"Design an all-O(1) structure supporting increment, decrement, getMaxKey and getMinKey.",Not started
+542,Difficult,Hashing,Find the longest subarray that appears in both of two arrays using binary search and hashing.,Not started
+543,Difficult,Hashing,Count the pairs of substrings of a string that are anagrams of each other.,Not started
+544,Difficult,Hashing,Design a frequency stack that pops the most frequent element.,Not started
+545,Difficult,Hashing,Group strings that belong to the same shifting sequence.,Not started
+546,Easy,Binary Tree,Build a binary tree from level-order input and print its inorder traversal.,Not started
+547,Easy,Binary Tree,Print the preorder traversal of a binary tree.,Not started
+548,Easy,Binary Tree,Print the postorder traversal of a binary tree.,Not started
+549,Easy,Binary Tree,Print the level-order traversal of a binary tree.,Not started
+550,Easy,Binary Tree,Find the height of a binary tree.,Not started
+551,Easy,Binary Tree,Count the nodes of a binary tree.,Not started
+552,Easy,Binary Tree,Count the leaf nodes of a binary tree.,Not started
+553,Easy,Binary Tree,Find the sum of all the nodes of a binary tree.,Not started
+554,Easy,Binary Tree,Find the maximum value in a binary tree.,Not started
+555,Easy,Binary Tree,Check whether two binary trees are identical.,Not started
+556,Easy,Binary Tree,Find the mirror image of a binary tree.,Not started
+557,Easy,Binary Tree,Check whether a binary tree is symmetric.,Not started
+558,Easy,Binary Tree,Search for a value in a binary tree.,Not started
+559,Easy,Binary Tree,Print the leaf nodes of a binary tree from left to right.,Not started
+560,Easy,Binary Tree,Find the sum of the left leaves of a binary tree.,Not started
+561,Easy,Binary Tree,Check whether a root-to-leaf path with a given sum exists.,Not started
+562,Easy,Binary Tree,Find the minimum depth of a binary tree.,Not started
+563,Easy,Binary Tree,Count the nodes that have exactly one child.,Not started
+564,Moderate,Binary Tree,Print the inorder traversal of a binary tree iteratively.,Not started
+565,Moderate,Binary Tree,Print the preorder traversal of a binary tree iteratively.,Not started
+566,Moderate,Binary Tree,Print the postorder traversal of a binary tree iteratively.,Not started
+567,Moderate,Binary Tree,Print the zigzag level-order traversal of a binary tree.,Not started
+568,Moderate,Binary Tree,Print the left view of a binary tree.,Not started
+569,Moderate,Binary Tree,Print the right view of a binary tree.,Not started
+570,Moderate,Binary Tree,Print the top view of a binary tree.,Not started
+571,Moderate,Binary Tree,Print the bottom view of a binary tree.,Not started
+572,Moderate,Binary Tree,Print the vertical order traversal of a binary tree.,Not started
+573,Moderate,Binary Tree,Find the diameter of a binary tree.,Not started
+574,Moderate,Binary Tree,Check whether a binary tree is height-balanced.,Not started
+575,Moderate,Binary Tree,Find the lowest common ancestor of two nodes in a binary tree.,Not started
+576,Moderate,Binary Tree,Find the maximum width of a binary tree.,Not started
+577,Moderate,Binary Tree,Print all root-to-leaf paths of a binary tree.,Not started
+578,Moderate,Binary Tree,Construct a binary tree from its preorder and inorder traversals.,Not started
+579,Moderate,Binary Tree,Construct a binary tree from its inorder and postorder traversals.,Not started
+580,Moderate,Binary Tree,Flatten a binary tree into a linked list in place.,Not started
+581,Moderate,Binary Tree,Check whether a binary tree is a subtree of another binary tree.,Not started
+582,Moderate,Binary Tree,Find all nodes at distance k from a given node.,Not started
+583,Moderate,Binary Tree,Check whether a binary tree is a sum tree.,Not started
+584,Moderate,Binary Tree,Find all root-to-leaf paths that have a given sum.,Not started
+585,Moderate,Binary Tree,Count the nodes of a complete binary tree in less than O(n) time.,Not started
+586,Moderate,Binary Tree,Connect every node's next pointer to its right neighbor on the same level.,Not started
+587,Moderate,Binary Tree,Find the sum of all the numbers formed by root-to-leaf paths.,Not started
+588,Moderate,Binary Tree,Serialize and deserialize a binary tree.,Not started
+589,Moderate,Binary Tree,Print the boundary traversal of a binary tree.,Not started
+590,Moderate,Binary Tree,Print the diagonal traversal of a binary tree.,Not started
+591,Moderate,Binary Tree,Check whether a binary tree is a complete binary tree.,Not started
+592,Moderate,Binary Tree,Count the good nodes of a binary tree whose value is at least every value on the path from the root.,Not started
+593,Moderate,Binary Tree,Check whether two nodes of a binary tree are cousins.,Not started
+594,Difficult,Binary Tree,Find the maximum path sum between any two nodes of a binary tree.,Not started
+595,Difficult,Binary Tree,Find the minimum time to burn a binary tree starting from a given node.,Not started
+596,Difficult,Binary Tree,Count the downward paths in a binary tree that sum to a given value.,Not started
+597,Difficult,Binary Tree,Find the largest BST subtree inside a binary tree.,Not started
+598,Difficult,Binary Tree,Find the lowest common ancestor of the deepest leaves of a binary tree.,Not started
+599,Difficult,Binary Tree,Find the maximum difference between a node and any of its ancestors.,Not started
+600,Difficult,Binary Tree,Find the minimum number of cameras needed to monitor every node of a binary tree.,Not started
+601,Difficult,Binary Tree,Find the maximum money a thief can rob from a binary tree without robbing two directly linked nodes.,Not started
+602,Difficult,Binary Tree,Find the minimum number of moves to distribute coins so that every node of a binary tree has exactly one.,Not started
+603,Difficult,Binary Tree,Find the kth ancestor of a node using binary lifting.,Not started
+604,Difficult,Binary Tree,Perform an Euler tour of a tree and answer subtree sum queries.,Not started
+605,Difficult,Binary Tree,Find the sum of distances from every node to all other nodes of a tree.,Not started
+606,Difficult,Binary Tree,Verify the preorder serialization of a binary tree without building it.,Not started
+607,Difficult,Binary Tree,Find the longest zigzag path in a binary tree.,Not started
+608,Difficult,Binary Tree,Delete a set of nodes from a binary tree and return the remaining forest.,Not started
+609,Difficult,Binary Tree,Count the pairs of leaves whose shortest path has length at most d.,Not started
+610,Difficult,Binary Tree,Convert a binary tree to a doubly linked list in place using inorder order.,Not started
+611,Easy,Binary Search Tree,Insert a value into a binary search tree.,Not started
+612,Easy,Binary Search Tree,Search for a value in a binary search tree.,Not started
+613,Easy,Binary Search Tree,Find the minimum and maximum values of a binary search tree.,Not started
+614,Easy,Binary Search Tree,Print the inorder traversal of a binary search tree.,Not started
+615,Easy,Binary Search Tree,Check whether a given binary tree is a binary search tree.,Not started
+616,Easy,Binary Search Tree,Find the height of a binary search tree.,Not started
+617,Easy,Binary Search Tree,Find the floor and ceiling of a value in a binary search tree.,Not started
+618,Easy,Binary Search Tree,Find the value in a binary search tree that is closest to a target.,Not started
+619,Moderate,Binary Search Tree,Delete a node from a binary search tree.,Not started
+620,Moderate,Binary Search Tree,Find the kth smallest element of a binary search tree.,Not started
+621,Moderate,Binary Search Tree,Find the kth largest element of a binary search tree.,Not started
+622,Moderate,Binary Search Tree,Find the lowest common ancestor of two nodes in a binary search tree.,Not started
+623,Moderate,Binary Search Tree,Convert a sorted array into a height-balanced binary search tree.,Not started
+624,Moderate,Binary Search Tree,Construct a binary search tree from its preorder traversal.,Not started
+625,Moderate,Binary Search Tree,Find the inorder successor of a node in a binary search tree.,Not started
+626,Moderate,Binary Search Tree,Find the inorder predecessor of a node in a binary search tree.,Not started
+627,Moderate,Binary Search Tree,Find two nodes of a binary search tree whose sum equals a target.,Not started
+628,Moderate,Binary Search Tree,"Trim a binary search tree so that all values lie in [L, R].",Not started
+629,Moderate,Binary Search Tree,"Find the sum of the values of a binary search tree that lie in [L, R].",Not started
+630,Moderate,Binary Search Tree,Convert a binary search tree to a greater tree where each node also adds all greater values.,Not started
+631,Moderate,Binary Search Tree,Implement a binary search tree iterator with next and hasNext using O(h) memory.,Not started
+632,Moderate,Binary Search Tree,Count the nodes of a binary search tree whose values lie in a given range.,Not started
+633,Moderate,Binary Search Tree,Find the mode(s) of a binary search tree that may contain duplicates.,Not started
+634,Difficult,Binary Search Tree,Recover a binary search tree in which two nodes were swapped by mistake.,Not started
+635,Difficult,Binary Search Tree,Count the unique binary search trees that store the values 1 to n.,Not started
+636,Difficult,Binary Search Tree,Generate all structurally unique binary search trees that store the values 1 to n.,Not started
+637,Difficult,Binary Search Tree,Merge two binary search trees into one sorted list.,Not started
+638,Difficult,Binary Search Tree,Convert a binary search tree into a sorted circular doubly linked list.,Not started
+639,Difficult,Binary Search Tree,Implement an AVL tree with insertion and rotations.,Not started
+640,Difficult,Binary Search Tree,"Implement an order-statistic tree supporting insert, delete, rank and kth element.",Not started
+641,Easy,Heap,Build a min-heap from an array and print it.,Not started
+642,Easy,Heap,Build a max-heap from an array and print it.,Not started
+643,Easy,Heap,Find the kth smallest element using a heap.,Not started
+644,Easy,Heap,Check whether an array represents a min-heap.,Not started
+645,Easy,Heap,Sort an array in descending order using a priority queue.,Not started
+646,Moderate,Heap,Find the k largest elements of an array.,Not started
+647,Moderate,Heap,Find the k most frequent elements of an array using a heap.,Not started
+648,Moderate,Heap,Find the kth largest element in a stream of numbers.,Not started
+649,Moderate,Heap,Find the median of a stream of numbers.,Not started
+650,Moderate,Heap,Find the k closest points to the origin.,Not started
+651,Moderate,Heap,Connect n ropes with the minimum total cost.,Not started
+652,Moderate,Heap,Reorganize a string so that no two adjacent characters are equal.,Not started
+653,Moderate,Heap,Schedule tasks with a cooldown of n and find the minimum time needed.,Not started
+654,Moderate,Heap,Find the weight of the last stone after repeatedly smashing the two heaviest stones.,Not started
+655,Moderate,Heap,Find the sum of the elements between the k1-th and k2-th smallest elements.,Not started
+656,Moderate,Heap,Find the minimum number of meeting rooms needed.,Not started
+657,Moderate,Heap,Find the k pairs with the smallest sums from two sorted arrays.,Not started
+658,Moderate,Heap,Implement a priority queue using an array-based binary heap.,Not started
+659,Moderate,Heap,Rearrange a string so that equal characters are at least k positions apart.,Not started
+660,Moderate,Heap,Maximize the sum of an array after negating exactly k elements.,Not started
+661,Moderate,Heap,Find the top k frequent words ordered by frequency and then alphabetically.,Not started
+662,Moderate,Heap,Design a Twitter-like feed that returns the 10 most recent tweets.,Not started
+663,Moderate,Heap,Find the minimum cost to hire k workers given each worker's quality and minimum wage.,Not started
+664,Moderate,Heap,Find the minimum number of refueling stops needed to reach a destination.,Not started
+665,Moderate,Heap,Find the maximum performance of a team of at most k engineers.,Not started
+666,Difficult,Heap,Choose at most k projects to maximize the final capital (IPO problem).,Not started
+667,Difficult,Heap,Maintain the median of a multiset under insertions and deletions.,Not started
+668,Difficult,Heap,"Find the minimum number of operations to reduce an array sum by half, where each operation halves one element.",Not started
+669,Difficult,Heap,"Find the maximum number of events you can attend, where each event has a start and end day.",Not started
+670,Difficult,Heap,Find the nth super ugly number for a given list of primes.,Not started
+671,Difficult,Heap,Find the kth smallest sum formed by picking one element from each row of a matrix.,Not started
+672,Difficult,Heap,Find the maximum value of yi + yj + |xi - xj| over pairs of points with |xi - xj| at most k.,Not started
+673,Difficult,Heap,Find the free time shared by all employees given their schedules.,Not started
+674,Difficult,Heap,"Assign tasks to servers, each task going to the free server with the smallest weight and then the smallest index.",Not started
+675,Difficult,Heap,Maintain the top k scoring players while scores keep updating.,Not started
+676,Easy,Greedy,"Find the minimum number of coins needed for a change using the denominations 1, 2, 5, 10, 20, 50 and 100.",Not started
+677,Easy,Greedy,Find the maximum number of activities one person can do given their start and end times.,Not started
+678,Easy,Greedy,Maximize the number of children who get a cookie at least as big as their greed factor.,Not started
+679,Easy,Greedy,Find the maximum total value in the fractional knapsack problem.,Not started
+680,Easy,Greedy,"Check whether exact change can be given to all lemonade stand customers paying 5, 10 or 20.",Not started
+681,Easy,Greedy,Find the largest number obtainable by swapping two digits of a number at most once.,Not started
+682,Easy,Greedy,Minimize the sum of absolute differences between two equal-size arrays by pairing their elements optimally.,Not started
+683,Easy,Greedy,Find the maximum number of items that can be bought with a given budget.,Not started
+684,Moderate,Greedy,Solve job sequencing with deadlines to maximize the total profit.,Not started
+685,Moderate,Greedy,Find the minimum number of arrows needed to burst all balloons given as intervals.,Not started
+686,Moderate,Greedy,Find the minimum number of intervals to remove so that the rest do not overlap.,Not started
+687,Moderate,Greedy,Check whether you can reach the last index of an array where each element is the maximum jump length.,Not started
+688,Moderate,Greedy,Find the starting gas station index from which a circular tour can be completed.,Not started
+689,Moderate,Greedy,Find the minimum number of candies to give children so that higher-rated children get more than their neighbors.,Not started
+690,Moderate,Greedy,Partition a string so that every letter appears in at most one part and maximize the number of parts.,Not started
+691,Moderate,Greedy,Reconstruct a queue from people described by their height and the number of taller people in front.,Not started
+692,Moderate,Greedy,Assign mice to holes so that the maximum distance any mouse travels is minimized.,Not started
+693,Moderate,Greedy,Find the minimum number of video clips needed to cover an event of length T.,Not started
+694,Moderate,Greedy,Check whether a person can attend all of a list of meetings.,Not started
+695,Moderate,Greedy,Find the length of the longest chain of pairs where each next pair starts after the previous one ends.,Not started
+696,Moderate,Greedy,Find the minimum number of swaps needed to make a bracket string balanced.,Not started
+697,Moderate,Greedy,Split a string of L and R characters into the maximum number of balanced strings.,Not started
+698,Moderate,Greedy,Find the lexicographically smallest subsequence of length k of a string.,Not started
+699,Moderate,Greedy,Check whether an array can be split into consecutive subsequences of length at least 3.,Not started
+700,Moderate,Greedy,Find the minimum increments needed to make all elements of an array unique.,Not started
+701,Moderate,Greedy,Build Huffman codes for a set of characters with given frequencies.,Not started
+702,Moderate,Greedy,Find the minimum number of boats to rescue people when each boat carries at most two people within a weight limit.,Not started
+703,Moderate,Greedy,Minimize the difference between the tallest and shortest tower after adding or subtracting k from each height.,Not started
+704,Moderate,Greedy,Find the minimum number of taps needed to water a whole garden.,Not started
+705,Moderate,Greedy,Find the minimum cost to buy all candies when each purchase gives up to k cheaper candies free.,Not started
+706,Moderate,Greedy,Find the lexicographically smallest string of length n whose letters have a numeric sum of k.,Not started
+707,Moderate,Greedy,Remove the intervals that are covered by another interval and count the remaining ones.,Not started
+708,Difficult,Greedy,Maximize the number of courses taken given each course's duration and last day (Course Schedule III).,Not started
+709,Difficult,Greedy,Create the largest number of length k by picking digits from two arrays while preserving their relative order.,Not started
+710,Difficult,Greedy,Construct the lexicographically smallest permutation of 1 to n from a string of D and I characters.,Not started
+711,Difficult,Greedy,"Check whether a string of (, ) and * is a valid parentheses string if * can be (, ) or empty.",Not started
+712,Difficult,Greedy,Find the length of the longest wiggle subsequence of an array.,Not started
+713,Difficult,Greedy,Find the minimum number of days to eat n oranges using the three allowed eating rules.,Not started
+714,Difficult,Greedy,Find the minimum number of moves to equalize the dresses in a row of washing machines.,Not started
+715,Difficult,Greedy,Find the maximum number of tasks that can be assigned to workers when a limited number of pills increase strength.,Not started
+716,Difficult,Greedy,Find the minimum operations to build a target array from zeros by incrementing a single element or doubling all elements.,Not started
+717,Difficult,Greedy,Find the minimum possible maximum working time when assigning jobs to k workers.,Not started
+718,Difficult,Greedy,"Build the longest string in which no letter appears three times in a row, given the available letter counts.",Not started
+719,Difficult,Greedy,Find the minimum total cost to make all elements equal when changing element i by one costs c[i].,Not started
+720,Easy,Dynamic Programming,Find the nth Fibonacci number using dynamic programming.,Not started
+721,Easy,Dynamic Programming,Count the ways to climb n stairs taking 1 or 2 steps at a time using dynamic programming.,Not started
+722,Easy,Dynamic Programming,Find the minimum cost to climb a staircase given the cost of each step.,Not started
+723,Easy,Dynamic Programming,Find the maximum sum of non-adjacent elements of an array (house robber).,Not started
+724,Easy,Dynamic Programming,Find the nth Tribonacci number.,Not started
+725,Easy,Dynamic Programming,Count the paths from the top-left to the bottom-right of a grid moving only right or down.,Not started
+726,Easy,Dynamic Programming,Find the minimum path sum from the top-left to the bottom-right of a grid.,Not started
+727,Easy,Dynamic Programming,Count the binary strings of length n that have no two consecutive 1s.,Not started
+728,Easy,Dynamic Programming,Count the ways to tile a 2 x n board with 2 x 1 dominoes.,Not started
+729,Easy,Dynamic Programming,Find the nth Catalan number using dynamic programming.,Not started
+730,Easy,Dynamic Programming,Find the nth Lucas number using dynamic programming.,Not started
+731,Easy,Dynamic Programming,"Find the minimum number of steps to reduce n to 1 by subtracting 1, dividing by 2 or dividing by 3.",Not started
+732,Moderate,Dynamic Programming,Solve the 0/1 knapsack problem to find the maximum value.,Not started
+733,Moderate,Dynamic Programming,Solve the unbounded knapsack problem to find the maximum value.,Not started
+734,Moderate,Dynamic Programming,Find the minimum number of coins needed to make an amount.,Not started
+735,Moderate,Dynamic Programming,Count the combinations of coins that make an amount.,Not started
+736,Moderate,Dynamic Programming,Check whether an array can be partitioned into two subsets with equal sums.,Not started
+737,Moderate,Dynamic Programming,Find the minimum difference between the sums of two subsets of an array.,Not started
+738,Moderate,Dynamic Programming,Count the subsets of an array whose sums differ by a given value.,Not started
+739,Moderate,Dynamic Programming,Count the ways to assign + or - to every element so that the total equals a target.,Not started
+740,Moderate,Dynamic Programming,Find the maximum profit from cutting a rod into pieces of given prices.,Not started
+741,Moderate,Dynamic Programming,Find the longest common substring of two strings.,Not started
+742,Moderate,Dynamic Programming,Find the length of the longest bitonic subsequence.,Not started
+743,Moderate,Dynamic Programming,Find the maximum sum increasing subsequence.,Not started
+744,Moderate,Dynamic Programming,Count the number of longest increasing subsequences.,Not started
+745,Moderate,Dynamic Programming,Find the largest subset in which every pair is divisible by one another.,Not started
+746,Moderate,Dynamic Programming,Find the minimum number of deletions needed to make an array sorted.,Not started
+747,Moderate,Dynamic Programming,Count the ways to decode a digit string into letters.,Not started
+748,Moderate,Dynamic Programming,Check whether a string can be split into words from a dictionary.,Not started
+749,Moderate,Dynamic Programming,Count the unique paths in a grid that contains obstacles.,Not started
+750,Moderate,Dynamic Programming,Find the minimum path sum from top to bottom of a triangle.,Not started
+751,Moderate,Dynamic Programming,Find the area of the largest square of 1s in a binary matrix.,Not started
+752,Moderate,Dynamic Programming,Count the square submatrices that contain only 1s.,Not started
+753,Moderate,Dynamic Programming,Find the minimum falling path sum in a matrix.,Not started
+754,Moderate,Dynamic Programming,Find the minimum number of perfect squares that sum to n.,Not started
+755,Moderate,Dynamic Programming,Break an integer into at least two positive parts to maximize their product.,Not started
+756,Moderate,Dynamic Programming,Find the maximum stock profit with a one-day cooldown after selling.,Not started
+757,Moderate,Dynamic Programming,Find the maximum stock profit with a fee on each transaction.,Not started
+758,Moderate,Dynamic Programming,Solve the house robber problem where the houses are arranged in a circle.,Not started
+759,Moderate,Dynamic Programming,Solve the delete-and-earn problem on an array.,Not started
+760,Moderate,Dynamic Programming,Count the ways to roll d dice with f faces so that the sum equals a target.,Not started
+761,Moderate,Dynamic Programming,Find the minimum number of insertions to make a string a palindrome.,Not started
+762,Moderate,Dynamic Programming,Find the longest common subsequence of three strings.,Not started
+763,Moderate,Dynamic Programming,Find the length of the shortest common supersequence of two strings.,Not started
+764,Moderate,Dynamic Programming,Find the largest subset of binary strings using at most m zeros and n ones.,Not started
+765,Moderate,Dynamic Programming,Partition an array into subarrays of length at most k to maximize the sum of each subarray's maximum times its length.,Not started
+766,Moderate,Dynamic Programming,Find the smallest possible weight of the last stone after smashing stones in any order.,Not started
+767,Moderate,Dynamic Programming,Find the minimum cost of travel tickets for given travel days.,Not started
+768,Moderate,Dynamic Programming,Compute the probability that a knight stays on the chessboard after k moves.,Not started
+769,Moderate,Dynamic Programming,Find the minimum cost to paint houses so that no two adjacent houses share a color.,Not started
+770,Difficult,Dynamic Programming,Find the minimum cost of multiplying a chain of matrices.,Not started
+771,Difficult,Dynamic Programming,Burst balloons in the best order to collect the maximum coins.,Not started
+772,Difficult,Dynamic Programming,Find the minimum number of trials in the worst case of the egg dropping puzzle.,Not started
+773,Difficult,Dynamic Programming,Find the maximum stock profit with at most k transactions.,Not started
+774,Difficult,Dynamic Programming,Collect the maximum cherries on a round trip through a grid.,Not started
+775,Difficult,Dynamic Programming,Find the minimum initial health needed to rescue the princess in a dungeon grid.,Not started
+776,Difficult,Dynamic Programming,Find the largest number of envelopes that can be nested inside one another.,Not started
+777,Difficult,Dynamic Programming,Count the distinct palindromic subsequences of a string.,Not started
+778,Difficult,Dynamic Programming,Find the cost of an optimal binary search tree for given key frequencies.,Not started
+779,Difficult,Dynamic Programming,Find the minimum cost to merge piles of stones into one pile when exactly k piles merge at a time.,Not started
+780,Difficult,Dynamic Programming,Solve the travelling salesman problem using bitmask dynamic programming.,Not started
+781,Difficult,Dynamic Programming,Assign n tasks to n workers at minimum total cost using bitmask dynamic programming.,Not started
+782,Difficult,Dynamic Programming,Count the Hamiltonian paths of a graph using bitmask dynamic programming.,Not started
+783,Difficult,Dynamic Programming,Find the smallest team of people that covers all required skills using bitmask dynamic programming.,Not started
+784,Difficult,Dynamic Programming,"Count the numbers up to n whose digit sum equals s, with n up to 10^18, using digit DP.",Not started
+785,Difficult,Dynamic Programming,"Count the numbers in [L, R] that have no repeated digit using digit DP.",Not started
+786,Difficult,Dynamic Programming,"Count the numbers up to n whose digits are non-decreasing, with n up to 10^18.",Not started
+787,Difficult,Dynamic Programming,Find the maximum sum of a rectangle in a matrix that does not exceed k.,Not started
+788,Difficult,Dynamic Programming,Count the ways to tile a 3 x n board with dominoes.,Not started
+789,Difficult,Dynamic Programming,Count the permutations of 1 to n that have exactly k inversions.,Not started
+790,Difficult,Dynamic Programming,"Count the ways to form a target string from a dictionary of words, taking one character per column.",Not started
+791,Difficult,Dynamic Programming,Check whether a frog can cross a river by jumping between given stones.,Not started
+792,Difficult,Dynamic Programming,Find the length of the longest arithmetic subsequence of an array.,Not started
+793,Difficult,Dynamic Programming,Count all the arithmetic subsequences of length at least 3.,Not started
+794,Difficult,Dynamic Programming,Find the minimum cost to cut a stick at given positions.,Not started
+795,Difficult,Dynamic Programming,Find the minimum number of turns a strange printer needs to print a string.,Not started
+796,Difficult,Dynamic Programming,Remove boxes of the same color in groups to maximize the points.,Not started
+797,Difficult,Dynamic Programming,Find the minimum score of triangulating a convex polygon.,Not started
+798,Difficult,Dynamic Programming,Find the maximum number of students who can take an exam in a classroom with broken seats.,Not started
+799,Difficult,Dynamic Programming,Solve the bounded knapsack problem using binary splitting of item counts.,Not started
+800,Difficult,Dynamic Programming,Count the ways to climb n stairs with steps up to k for n up to 10^9 using matrix exponentiation.,Not started
+801,Difficult,Dynamic Programming,"Count the strings of length n that do not contain abc as a substring, modulo 10^9+7.",Not started
+802,Difficult,Dynamic Programming,Find the maximum sum of k non-overlapping subarrays.,Not started
+803,Easy,Graphs,Represent a graph using an adjacency list and print it.,Not started
+804,Easy,Graphs,Represent a graph using an adjacency matrix and print it.,Not started
+805,Easy,Graphs,Print the BFS traversal of a graph from a given source.,Not started
+806,Easy,Graphs,Print the DFS traversal of a graph from a given source.,Not started
+807,Easy,Graphs,Find the degree of every vertex of an undirected graph.,Not started
+808,Easy,Graphs,Check whether there is a path between two given vertices.,Not started
+809,Easy,Graphs,Count the connected components of an undirected graph.,Not started
+810,Easy,Graphs,Find the shortest path between two vertices of an unweighted graph using BFS.,Not started
+811,Moderate,Graphs,Detect a cycle in an undirected graph.,Not started
+812,Moderate,Graphs,Detect a cycle in a directed graph.,Not started
+813,Moderate,Graphs,Print a topological ordering of a directed acyclic graph.,Not started
+814,Moderate,Graphs,Count the islands in a grid of land and water.,Not started
+815,Moderate,Graphs,Flood fill a region of an image with a new color.,Not started
+816,Moderate,Graphs,Find the minimum time for all oranges in a grid to rot.,Not started
+817,Moderate,Graphs,Find the shortest path in a binary matrix moving in 8 directions.,Not started
+818,Moderate,Graphs,Find the shortest paths from a source using Dijkstra's algorithm.,Not started
+819,Moderate,Graphs,Run the Bellman-Ford algorithm and detect negative cycles.,Not started
+820,Moderate,Graphs,Find all-pairs shortest paths using the Floyd-Warshall algorithm.,Not started
+821,Moderate,Graphs,Check whether a graph is bipartite.,Not started
+822,Moderate,Graphs,Check whether all courses can be finished given their prerequisites.,Not started
+823,Moderate,Graphs,Print a valid order in which all courses can be taken.,Not started
+824,Moderate,Graphs,Clone an undirected graph.,Not started
+825,Moderate,Graphs,Find the minimum spanning tree of a graph using Kruskal's algorithm.,Not started
+826,Moderate,Graphs,Find the minimum spanning tree of a graph using Prim's algorithm.,Not started
+827,Moderate,Graphs,Find the length of the shortest word ladder from a begin word to an end word.,Not started
+828,Moderate,Graphs,Capture all regions of O that are surrounded by X in a grid.,Not started
+829,Moderate,Graphs,Find the cells from which water can flow to both the Pacific and Atlantic oceans.,Not started
+830,Moderate,Graphs,Count the provinces (groups of directly or indirectly connected cities).,Not started
+831,Moderate,Graphs,Find the time for a signal to reach all nodes of a network.,Not started
+832,Moderate,Graphs,Find the cheapest flight price from a source to a destination with at most k stops.,Not started
+833,Moderate,Graphs,Find the route with the minimum effort across a grid of heights.,Not started
+834,Moderate,Graphs,Count the connected components using a disjoint set union.,Not started
+835,Moderate,Graphs,Find the edge that creates a cycle in an undirected graph (redundant connection).,Not started
+836,Moderate,Graphs,Find a mother vertex of a directed graph.,Not started
+837,Moderate,Graphs,Count the paths between two nodes of a directed acyclic graph.,Not started
+838,Moderate,Graphs,Find the shortest paths in a weighted directed acyclic graph using topological order.,Not started
+839,Moderate,Graphs,Derive the order of letters of an alien language from a sorted list of its words.,Not started
+840,Moderate,Graphs,Fill every empty room of a grid with the distance to its nearest gate.,Not started
+841,Moderate,Graphs,Find the minimum number of dice throws to finish a game of snakes and ladders.,Not started
+842,Moderate,Graphs,Find the minimum number of turns to open a four-digit lock while avoiding dead ends.,Not started
+843,Difficult,Graphs,Find the strongly connected components of a directed graph using Kosaraju's algorithm.,Not started
+844,Difficult,Graphs,Find the strongly connected components of a directed graph using Tarjan's algorithm.,Not started
+845,Difficult,Graphs,Find all the bridges of an undirected graph.,Not started
+846,Difficult,Graphs,Find all the articulation points of an undirected graph.,Not started
+847,Difficult,Graphs,Find an Eulerian circuit of a directed graph.,Not started
+848,Difficult,Graphs,Reconstruct a flight itinerary that uses all tickets and is lexicographically smallest.,Not started
+849,Difficult,Graphs,Find the maximum flow of a network using the Edmonds-Karp algorithm.,Not started
+850,Difficult,Graphs,Find a maximum bipartite matching.,Not started
+851,Difficult,Graphs,Find the length of the shortest path that visits every node of a graph.,Not started
+852,Difficult,Graphs,Find the critical and pseudo-critical edges of a minimum spanning tree.,Not started
+853,Difficult,Graphs,Find the lowest common ancestor in a tree using an Euler tour and a sparse table.,Not started
+854,Difficult,Graphs,Find the diameter of a tree.,Not started
+855,Difficult,Graphs,Find the centroid of a tree.,Not started
+856,Difficult,Graphs,Find the roots of minimum height trees in an undirected tree.,Not started
+857,Difficult,Graphs,Count the number of shortest paths from a source to a target in a weighted graph.,Not started
+858,Difficult,Graphs,Detect a negative cycle in a graph and print the cycle.,Not started
+859,Difficult,Graphs,Find the minimum number of arrow flips needed to create a valid path in a grid of arrows.,Not started
+860,Difficult,Graphs,Find the minimum number of obstacles to remove to reach the bottom-right of a grid using 0-1 BFS.,Not started
+861,Difficult,Graphs,Find the minimum time to reach the bottom-right of a grid as the water level rises.,Not started
+862,Difficult,Graphs,Find the size of the largest island after changing at most one 0 to 1.,Not started
+863,Difficult,Graphs,Solve a 2-SAT problem and print a valid assignment.,Not started
+864,Difficult,Graphs,Find the longest path in a directed acyclic graph.,Not started
+865,Difficult,Graphs,Find the minimum cost to supply water to all villages using wells and pipes.,Not started
+866,Easy,Bit Manipulation,Check whether a number is even or odd using bitwise operators.,Not started
+867,Easy,Bit Manipulation,Count the set bits of a number.,Not started
+868,Easy,Bit Manipulation,Check whether a number is a power of two.,Not started
+869,Easy,Bit Manipulation,Check whether the kth bit of a number is set.,Not started
+870,Easy,Bit Manipulation,Set the kth bit of a number.,Not started
+871,Easy,Bit Manipulation,Clear the kth bit of a number.,Not started
+872,Easy,Bit Manipulation,Toggle the kth bit of a number.,Not started
+873,Easy,Bit Manipulation,Swap two numbers using XOR.,Not started
+874,Easy,Bit Manipulation,Find the position of the rightmost set bit of a number.,Not started
+875,Easy,Bit Manipulation,Count the bits that must be flipped to convert one number into another.,Not started
+876,Moderate,Bit Manipulation,Count the set bits of every number from 0 to n.,Not started
+877,Moderate,Bit Manipulation,Find the two numbers that appear once when every other number appears twice.,Not started
+878,Moderate,Bit Manipulation,Reverse the bits of a 32-bit unsigned integer.,Not started
+879,Moderate,Bit Manipulation,Find the XOR of all numbers from 1 to n in O(1).,Not started
+880,Moderate,Bit Manipulation,"Find the XOR of all numbers in the range [L, R].",Not started
+881,Moderate,Bit Manipulation,"Divide two integers without using multiplication, division or the mod operator.",Not started
+882,Moderate,Bit Manipulation,Check whether a number is a power of four.,Not started
+883,Moderate,Bit Manipulation,"Find the bitwise AND of all numbers in the range [L, R].",Not started
+884,Moderate,Bit Manipulation,Generate all subsets of an array using bit masks.,Not started
+885,Moderate,Bit Manipulation,Add two numbers without using the + operator.,Not started
+886,Moderate,Bit Manipulation,Find the missing number in an array of 0 to n using XOR.,Not started
+887,Moderate,Bit Manipulation,Count the pairs in an array whose XOR equals k.,Not started
+888,Moderate,Bit Manipulation,Find the maximum product of the lengths of two words that share no common letter using bitmasks.,Not started
+889,Moderate,Bit Manipulation,Find the largest subset of numbers whose bitwise AND is greater than zero.,Not started
+890,Moderate,Bit Manipulation,Find the sum of the Hamming distances between all pairs of integers in an array.,Not started
+891,Difficult,Bit Manipulation,Find the maximum XOR of any subarray using a trie.,Not started
+892,Difficult,Bit Manipulation,"Count the triples (i, j, k) with a[i] & a[j] & a[k] equal to 0 for n up to 1000 and values below 2^16.",Not started
+893,Difficult,Bit Manipulation,Find the XOR of the sums of all pairs from two arrays.,Not started
+894,Difficult,Bit Manipulation,"For each query, find the maximum XOR of x with any array element not larger than m, using an offline trie.",Not started
+895,Difficult,Bit Manipulation,Find the number of distinct subset XOR values of an array using a linear basis.,Not started
+896,Easy,Number Theory,Find the GCD of an array of numbers.,Not started
+897,Easy,Number Theory,Check whether two numbers are coprime.,Not started
+898,Easy,Number Theory,Find the largest prime factor of a number up to 10^6.,Not started
+899,Easy,Number Theory,Print all divisors of a number in sorted order.,Not started
+900,Easy,Number Theory,Check whether a number is a semiprime.,Not started
+901,Easy,Number Theory,Find the modular inverse of a modulo m by brute force for small m.,Not started
+902,Easy,Number Theory,Find the sum of the first n prime numbers.,Not started
+903,Easy,Number Theory,Find the LCM of an array of numbers.,Not started
+904,Easy,Number Theory,Count the perfect squares between a and b.,Not started
+905,Easy,Number Theory,Print all twin prime pairs up to n.,Not started
+906,Moderate,Number Theory,Compute the smallest prime factor of every number up to 10^6 and use it to factorize queries.,Not started
+907,Moderate,Number Theory,Compute nCr modulo a prime p using factorials and modular inverses.,Not started
+908,Moderate,Number Theory,Find the modular inverse using the extended Euclidean algorithm.,Not started
+909,Moderate,Number Theory,Solve the linear Diophantine equation ax + by = c.,Not started
+910,Moderate,Number Theory,Compute a^(b^c) modulo 10^9+7.,Not started
+911,Moderate,Number Theory,"Find the primes in [L, R] with R up to 10^12 and R - L up to 10^6 using a segmented sieve.",Not started
+912,Moderate,Number Theory,Find the highest power of a prime p that divides n!.,Not started
+913,Moderate,Number Theory,Solve a pair of congruences using the Chinese remainder theorem.,Not started
+914,Moderate,Number Theory,Compute the sum of divisors of every number up to 10^6 using a sieve.,Not started
+915,Moderate,Number Theory,Count the distinct prime factors of every number up to n.,Not started
+916,Moderate,Number Theory,Find the last two digits of a^b.,Not started
+917,Moderate,Number Theory,Compute the Mobius function for every number up to n.,Not started
+918,Moderate,Number Theory,"Count the pairs (x, y) of positive integers with x + y = n and gcd(x, y) = 1.",Not started
+919,Moderate,Number Theory,Find the maximum GCD of any pair in an array.,Not started
+920,Moderate,Number Theory,Compute the nth Catalan number modulo a prime using modular inverses.,Not started
+921,Difficult,Number Theory,Test the primality of a number up to 10^18 using the Miller-Rabin test.,Not started
+922,Difficult,Number Theory,Factorize a number up to 10^18 using Pollard's rho algorithm.,Not started
+923,Difficult,Number Theory,Compute nCr modulo a small prime p for n up to 10^18 using Lucas' theorem.,Not started
+924,Difficult,Number Theory,Count the coprime pairs of an array using Mobius inversion.,Not started
+925,Difficult,Number Theory,"Compute the sum of gcd(i, j) over all 1 <= i, j <= n for n up to 10^7.",Not started
+926,Difficult,Number Theory,Compute a discrete logarithm using the baby-step giant-step algorithm.,Not started
+927,Difficult,Number Theory,Find a primitive root modulo a prime p.,Not started
+928,Difficult,Number Theory,Find the nth term of a linear recurrence modulo 10^9+7 for n up to 10^18.,Not started
+929,Difficult,Number Theory,Count the square-free integers up to n for n up to 10^12.,Not started
+930,Difficult,Number Theory,Multiply two polynomials of size up to 10^5 modulo 998244353 using the number theoretic transform.,Not started
+931,Easy,Matrix,Read a matrix and print it.,Not started
+932,Easy,Matrix,Find the sum of all the elements of a matrix.,Not started
+933,Easy,Matrix,Print the transpose of a matrix.,Not started
+934,Easy,Matrix,Add two matrices.,Not started
+935,Easy,Matrix,Multiply two matrices.,Not started
+936,Easy,Matrix,Print the sum of each row and each column of a matrix.,Not started
+937,Easy,Matrix,Find the sum of the main diagonal and the anti-diagonal of a square matrix.,Not started
+938,Easy,Matrix,Check whether a matrix is symmetric.,Not started
+939,Easy,Matrix,Print a matrix in snake pattern.,Not started
+940,Easy,Matrix,Find the largest element in each row of a matrix.,Not started
+941,Moderate,Matrix,Print a matrix in spiral order.,Not started
+942,Moderate,Matrix,Rotate a square matrix by 90 degrees clockwise in place.,Not started
+943,Moderate,Matrix,"Set the entire row and column to zero wherever an element is zero, using O(1) extra space.",Not started
+944,Moderate,Matrix,Generate an n x n matrix filled in spiral order from 1 to n^2.,Not started
+945,Moderate,Matrix,Print all the diagonals of a matrix.,Not started
+946,Moderate,Matrix,Find the row with the maximum number of 1s in a binary matrix whose rows are sorted.,Not started
+947,Moderate,Matrix,Compute the next state of a grid in the Game of Life.,Not started
+948,Moderate,Matrix,Find the maximum sum of an hourglass shape in a matrix.,Not started
+949,Moderate,Matrix,Check whether a matrix is a Toeplitz matrix.,Not started
+950,Moderate,Matrix,Compute the determinant of a square matrix.,Not started
+951,Moderate,Matrix,Find the lucky numbers of a matrix (smallest in its row and largest in its column).,Not started
+952,Moderate,Matrix,Answer q queries for the sum of any submatrix using a 2D prefix sum.,Not started
+953,Moderate,Matrix,Find the maximum sum path from the top row to the bottom row moving down or diagonally.,Not started
+954,Moderate,Matrix,Rotate a square matrix by 90 degrees anticlockwise.,Not started
+955,Moderate,Matrix,Find the kth element of a matrix when read in spiral order.,Not started
+956,Difficult,Matrix,Count the submatrices whose sum equals a target.,Not started
+957,Difficult,Matrix,Find the rectangle with the maximum sum in a 2D matrix.,Not started
+958,Difficult,Matrix,Find the length of the longest increasing path in a matrix.,Not started
+959,Difficult,Matrix,Compute A^n modulo 10^9+7 for a k x k matrix using fast matrix exponentiation.,Not started
+960,Difficult,Matrix,Solve a system of linear equations using Gaussian elimination.,Not started
+961,Easy,Advanced Data Structures,Implement a trie with insert and search.,Not started
+962,Easy,Advanced Data Structures,Implement a disjoint set union with find and union.,Not started
+963,Easy,Advanced Data Structures,Implement a Fenwick tree with point update and prefix sum query.,Not started
+964,Moderate,Advanced Data Structures,Count the words that start with a given prefix using a trie.,Not started
+965,Moderate,Advanced Data Structures,Find the longest common prefix of a list of strings using a trie.,Not started
+966,Moderate,Advanced Data Structures,Design a structure that adds words and searches them with the wildcard '.'.,Not started
+967,Moderate,Advanced Data Structures,Process connectivity queries using a disjoint set union with path compression and union by rank.,Not started
+968,Moderate,Advanced Data Structures,Report the number of connected components after each edge addition.,Not started
+969,Moderate,Advanced Data Structures,Implement a Fenwick tree with range update and point query.,Not started
+970,Moderate,Advanced Data Structures,Implement a segment tree with range sum query and point update.,Not started
+971,Moderate,Advanced Data Structures,Implement a segment tree for range minimum queries.,Not started
+972,Moderate,Advanced Data Structures,Build a sparse table to answer range minimum queries in O(1).,Not started
+973,Moderate,Advanced Data Structures,Compress the coordinates of an array and answer the rank of every element using a Fenwick tree.,Not started
+974,Moderate,Advanced Data Structures,Count the islands after each land cell is added to an empty grid.,Not started
+975,Moderate,Advanced Data Structures,Merge accounts that share a common email address.,Not started
+976,Moderate,Advanced Data Structures,Replace the words of a sentence by their shortest dictionary root using a trie.,Not started
+977,Moderate,Advanced Data Structures,Implement sqrt decomposition for range sum queries with point updates.,Not started
+978,Moderate,Advanced Data Structures,Find the smallest index whose prefix sum is at least x using binary lifting on a Fenwick tree.,Not started
+979,Difficult,Advanced Data Structures,Implement a segment tree with lazy propagation for range add and range sum.,Not started
+980,Difficult,Advanced Data Structures,Implement a segment tree with lazy propagation for range assign and range minimum.,Not started
+981,Difficult,Advanced Data Structures,Count the elements greater than k in a range using a merge sort tree.,Not started
+982,Difficult,Advanced Data Structures,Find the kth smallest element in a range using a persistent segment tree.,Not started
+983,Difficult,Advanced Data Structures,Count the distinct elements in ranges using offline queries and a Fenwick tree.,Not started
+984,Difficult,Advanced Data Structures,Answer range distinct-count queries using Mo's algorithm.,Not started
+985,Difficult,Advanced Data Structures,Answer queries for the sum of the squares of value counts in ranges using Mo's algorithm.,Not started
+986,Difficult,Advanced Data Structures,Support path sum queries and node updates on a tree using heavy-light decomposition.,Not started
+987,Difficult,Advanced Data Structures,Count the paths of length k in a tree using centroid decomposition.,Not started
+988,Difficult,Advanced Data Structures,Answer LCA and distance queries between tree nodes using binary lifting.,Not started
+989,Difficult,Advanced Data Structures,Find the first index in a range whose value is at least x using a segment tree.,Not started
+990,Difficult,Advanced Data Structures,Implement a 2D Fenwick tree with point update and submatrix sum query.,Not started
+991,Difficult,Advanced Data Structures,"Implement a treap with insert, delete, split and merge.",Not started
+992,Difficult,Advanced Data Structures,"Implement a splay tree with insert, delete and search.",Not started
+993,Difficult,Advanced Data Structures,Count the distinct substrings of a string using a suffix automaton.,Not started
+994,Difficult,Advanced Data Structures,Find all occurrences of multiple patterns in a text using the Aho-Corasick automaton.,Not started
+995,Difficult,Advanced Data Structures,Query the array at any earlier version using a persistent segment tree.,Not started
+996,Difficult,Advanced Data Structures,Answer maximum subarray sum queries on a range using a segment tree.,Not started
+997,Difficult,Advanced Data Structures,"Support add edge, remove edge and connectivity queries offline using divide and conquer with a rollback disjoint set union.",Not started
+998,Difficult,Advanced Data Structures,Insert lines and query the minimum value at a point using a Li Chao tree.,Not started
+999,Difficult,Advanced Data Structures,Optimize a DP recurrence of the form dp[i] = min over j of dp[j] + b[j]*a[i] using the convex hull trick.,Not started
+1000,Difficult,Advanced Data Structures,"Implement a link-cut tree supporting link, cut and path queries.",Not started
