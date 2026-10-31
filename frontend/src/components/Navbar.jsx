@@ -13,6 +13,7 @@ import {
   LogIn, 
   PlusCircle,
   Zap,
+  BookOpen,
   Sun,
   Moon,
   Menu,
@@ -37,6 +38,7 @@ export default function Navbar() {
     { name: 'Contests', path: '/contests', icon: Trophy },
     { name: 'Submissions', path: '/submissions', icon: ListOrdered },
     { name: 'Leaderboard', path: '/leaderboard', icon: Zap },
+    { name: 'Learn', path: '/learn', icon: BookOpen },
   ];
 
   return (

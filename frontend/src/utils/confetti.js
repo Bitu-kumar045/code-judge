@@ -34,3 +34,4 @@ export function fireAcceptedConfetti() {
     console.warn('Confetti trigger ignored:', err);
   }
 }
+

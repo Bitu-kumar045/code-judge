@@ -16,6 +16,7 @@ import ContestsPage from './pages/ContestsPage';
 import ContestArenaPage from './pages/ContestArenaPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
+import LearningHubPage from './pages/LearningHubPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminProblemPage from './pages/AdminProblemPage';
 import LoginPage from './pages/LoginPage';
@@ -66,6 +67,7 @@ export default function App() {
                     <Route path="/contests" element={<ContestsPage />} />
                     <Route path="/contests/:id" element={<ContestArenaPage />} />
                     <Route path="/leaderboard" element={<LeaderboardPage />} />
+                    <Route path="/learn" element={<LearningHubPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
                     <Route path="/admin/problems/new" element={<AdminRoute><AdminProblemPage /></AdminRoute>} />

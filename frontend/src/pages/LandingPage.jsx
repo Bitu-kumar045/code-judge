@@ -14,7 +14,8 @@ import {
   Sparkles,
   Users,
   Layers,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 import CodeTypingHero from '../components/CodeTypingHero';
 
@@ -206,6 +207,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Featured Learning Hub Callout */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="bg-gradient-to-r from-purple-950/40 via-indigo-950/40 to-blue-950/40 border border-indigo-500/30 rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
+              <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Free Developer Curriculum</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Best Websites to Learn the Judge Tech Stack
+            </h3>
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Master Docker sandboxing, Spring Boot, React, Redis queues, and system design with curated guides from Baeldung, Amigoscode, Scrimba, ByteByteGo, and open-source judges like Judge0 & Piston.
+            </p>
+          </div>
+
+          <Link
+            to="/learn"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-indigo-500/30 transition-all shrink-0"
+          >
+            <span>Explore Learning Hub</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* Verdict Color Showcase */}
       <section className="max-w-5xl mx-auto px-4 pb-20">
         <div className="p-8 rounded-2xl bg-[#111827] border border-slate-800 text-center space-y-6">
@@ -234,3 +261,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
