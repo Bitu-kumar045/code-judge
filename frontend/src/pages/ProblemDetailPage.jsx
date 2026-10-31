@@ -509,13 +509,28 @@ export default function ProblemDetailPage() {
                     <div className="flex items-center space-x-2">
                       {judgeVerdict.verdict === 'AC' ? (
                         <>
-                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                          <span className="text-sm font-bold text-emerald-400">Accepted (AC)</span>
+                          <CheckCircle2 className="h-4 w-4 text-verdict-ac" />
+                          <span className="text-sm font-bold text-verdict-ac">Accepted (AC)</span>
+                        </>
+                      ) : judgeVerdict.verdict === 'WA' ? (
+                        <>
+                          <XCircle className="h-4 w-4 text-verdict-wa" />
+                          <span className="text-sm font-bold text-verdict-wa">Wrong Answer (WA)</span>
+                        </>
+                      ) : judgeVerdict.verdict === 'TLE' ? (
+                        <>
+                          <Clock className="h-4 w-4 text-verdict-tle" />
+                          <span className="text-sm font-bold text-verdict-tle">Time Limit Exceeded (TLE)</span>
+                        </>
+                      ) : judgeVerdict.verdict === 'RE' ? (
+                        <>
+                          <AlertTriangle className="h-4 w-4 text-verdict-re" />
+                          <span className="text-sm font-bold text-verdict-re">Runtime Error (RE)</span>
                         </>
                       ) : (
                         <>
-                          <XCircle className="h-4 w-4 text-rose-400" />
-                          <span className="text-sm font-bold text-rose-400">Wrong Answer (WA)</span>
+                          <AlertTriangle className="h-4 w-4 text-verdict-ce" />
+                          <span className="text-sm font-bold text-verdict-ce">Compilation Error (CE)</span>
                         </>
                       )}
                     </div>

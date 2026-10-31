@@ -46,9 +46,16 @@ export default function SubmissionsPage() {
         );
       case 'TLE':
         return (
-          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-verdict-tle border border-amber-500/20">
             <Clock className="h-3 w-3" />
             <span>Time Limit Exceeded</span>
+          </span>
+        );
+      case 'RE':
+        return (
+          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/10 text-verdict-re border border-orange-500/20">
+            <AlertCircle className="h-3 w-3" />
+            <span>Runtime Error</span>
           </span>
         );
       case 'CE':
