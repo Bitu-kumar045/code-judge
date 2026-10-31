@@ -491,5 +491,3 @@ export const api = {
     ];
   }
 };
-
-export const judgeAPI = api;

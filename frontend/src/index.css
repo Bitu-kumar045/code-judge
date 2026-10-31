@@ -5,78 +5,44 @@
 @layer base {
   body {
     @apply text-slate-100 font-sans tracking-tight;
-    background-color: #0B1020;
+    background-color: #0B0F19;
   }
 }
 
-/* AlgoArena Glass Panels and Glowing Cards */
+/* Linear/Vercel-style glowing borders and cards */
 .glass-panel {
-  background: rgba(18, 24, 47, 0.75);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(124, 58, 237, 0.18);
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glow-card {
   position: relative;
-  background: #12182F;
-  border: 1px solid #1E294B;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glow-card:hover {
-  border-color: rgba(124, 58, 237, 0.5);
-  box-shadow: 0 0 25px -4px rgba(124, 58, 237, 0.25);
-  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.15);
 }
 
-.glow-mint {
-  border-color: rgba(52, 211, 153, 0.4);
-  box-shadow: 0 0 20px -3px rgba(52, 211, 153, 0.2);
-}
-
-.glow-gold {
-  border-color: rgba(251, 191, 36, 0.4);
-  box-shadow: 0 0 20px -3px rgba(251, 191, 36, 0.2);
-}
-
-/* Custom Scrollbars */
+/* Subtle custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1020;
+  background: #0B0F19;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E294B;
+  background: #1F2937;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7C3AED;
-}
-
-/* Animated Quest Map Path pulsing */
-@keyframes dash {
-  to {
-    stroke-dashoffset: -40;
-  }
-}
-
-.quest-path-pulse {
-  stroke-dasharray: 8 6;
-  animation: dash 2.5s linear infinite;
-}
-
-/* Shake animation for failed attempt or boss damage */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-4px); }
-  40%, 80% { transform: translateX(4px); }
-}
-
-.animate-shake {
-  animation: shake 0.4s ease-in-out;
+  background: #374151;
 }

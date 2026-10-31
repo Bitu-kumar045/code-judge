@@ -685,39 +685,6 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { success: true, data: result });
     }
 
-    // 9. AlgoArena Gamification & RPG Endpoints
-    if (pathname === '/api/v1/gamification/status' && method === 'GET') {
-      return sendJson(res, 200, {
-        success: true,
-        data: {
-          brand: 'AlgoArena',
-          tagline: 'Play. Visualize. Win.',
-          activeRealms: 12,
-          totalQuestions: DB.problems.length,
-          globalDuelsFought: 89340
-        }
-      });
-    }
-
-    // 10. Live 1v1 Duel Matchmaking
-    if (pathname === '/api/v1/duel/match' && method === 'POST') {
-      const body = await parseBody(req);
-      const opponentNames = ['Vortex_Coder', 'NeonMatrix', 'CyberKnight', 'QuantumCoder', 'ByteSorcerer'];
-      const randomOpponent = opponentNames[Math.floor(Math.random() * opponentNames.length)];
-      return sendJson(res, 200, {
-        success: true,
-        data: {
-          duelId: 'duel-' + Date.now(),
-          opponent: {
-            username: randomOpponent,
-            elo: Math.floor(Math.random() * 200 + 1600),
-            title: 'Algorithm Knight'
-          },
-          timeLimitSeconds: 900
-        }
-      });
-    }
-
     // Fallback 404
     sendJson(res, 404, { success: false, message: 'Endpoint not found' });
 
