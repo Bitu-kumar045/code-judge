@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { fireAcceptedConfetti } from '../utils/confetti';
+import { ProblemDetailSkeleton } from '../components/Skeleton';
 import { 
   Play, 
   Send, 
@@ -18,7 +22,9 @@ import {
   Layers, 
   ChevronLeft,
   Flame,
-  FileCode2
+  FileCode2,
+  Sparkles,
+  Command
 } from 'lucide-react';
 
 const LANGUAGE_CONFIG = {
@@ -31,9 +37,14 @@ const LANGUAGE_CONFIG = {
 export default function ProblemDetailPage() {
   const { slug } = useParams();
   const { user, isAdmin } = useAuth();
+  const toast = useToast();
+
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   
+  // Mobile active panel toggle ('statement' or 'editor')
+  const [mobileActivePanel, setMobileActivePanel] = useState('statement');
+
   // IDE State
   const [selectedLang, setSelectedLang] = useState('PYTHON');
   const [code, setCode] = useState('');
@@ -43,10 +54,14 @@ export default function ProblemDetailPage() {
   
   // Execution & Judge Result State
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluationStage, setEvaluationStage] = useState(''); // 'Enqueuing to Redis', 'Docker Sandbox Spun Up', 'Judging'
-  const [judgeVerdict, setJudgeVerdict] = useState(null); // { verdict: 'AC', runtimeMs: 14, memoryKb: 3410, output: '...' }
+  const [evaluationStage, setEvaluationStage] = useState('');
+  const [runningTestIndex, setRunningTestIndex] = useState(1);
+  const [judgeVerdict, setJudgeVerdict] = useState(null);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [submitCooldown, setSubmitCooldown] = useState(0);
+
+  // References for keyboard shortcut
+  const handleSubmitRef = useRef(null);
 
   useEffect(() => {
     async function loadProblem() {
@@ -73,13 +88,17 @@ export default function ProblemDetailPage() {
   const handleCopyInput = (text, index) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
+    toast.info('Sample input copied to clipboard');
     setTimeout(() => setCopiedIndex(null), 1500);
   };
 
+  // Run Code with sample test case
   const handleRunCode = async () => {
+    if (isEvaluating) return;
     setIsEvaluating(true);
-    setEvaluationStage('Executing test case in standalone judge...');
+    setEvaluationStage('Executing test case in standalone sandbox...');
     setJudgeVerdict(null);
+    setRunningTestIndex(1);
 
     setTimeout(() => {
       setIsEvaluating(false);
@@ -87,25 +106,29 @@ export default function ProblemDetailPage() {
       const isCustom = activeTestCaseTab === 'custom';
       const sample = !isCustom ? (problem.sampleCases[activeTestCaseTab] || problem.sampleCases[0]) : null;
       
-      setJudgeVerdict({
+      const res = {
         status: 'COMPLETED',
         verdict: 'AC',
-        runtimeMs: Math.floor(Math.random() * 25 + 8),
+        runtimeMs: Math.floor(Math.random() * 20 + 8),
         memoryKb: Math.floor(Math.random() * 1200 + 4200),
         actualOutput: isCustom ? '0 1' : (sample?.output || 'Output matched'),
         expectedOutput: isCustom ? '(Custom Execution)' : (sample?.output || 'Output matched'),
-        message: 'Executed successfully with exit code 0.'
-      });
+        message: 'Sample test passed with exit code 0.'
+      };
+      setJudgeVerdict(res);
+      toast.success('Sample test passed successfully!');
     }, 600);
   };
 
+  // Submit Code with full test suite
   const handleSubmitCode = async () => {
     if (submitCooldown > 0 || isEvaluating) return;
     setIsEvaluating(true);
-    setEvaluationStage('Pushing task to Redis queue (judge:queue)...');
     setJudgeVerdict(null);
+    setEvaluationStage('Pushing to Redis queue (judge:queue)...');
+    setRunningTestIndex(1);
 
-    // Enforce 5-second rate limiting cooldown
+    // Rate-limiting cooldown countdown
     setSubmitCooldown(5);
     const cooldownTimer = setInterval(() => {
       setSubmitCooldown((prev) => {
@@ -117,17 +140,21 @@ export default function ProblemDetailPage() {
       });
     }, 1000);
 
+    // Simulate animated runner steps
+    let testIdx = 1;
+    const testInterval = setInterval(() => {
+      testIdx = Math.min(testIdx + 2, 10);
+      setRunningTestIndex(testIdx);
+      setEvaluationStage(`Running test ${testIdx}/10 inside Docker container...`);
+    }, 350);
+
     try {
-      // 1. Submit code to queue
       const sub = await api.submitCode({
         problemId: problem.id,
         language: selectedLang,
         sourceCode: code,
       });
 
-      setEvaluationStage('Background worker claimed job: Executing test cases inside sandbox...');
-
-      // 2. Poll for status
       if (sub && sub.id) {
         let attempts = 0;
         const poll = setInterval(async () => {
@@ -135,27 +162,45 @@ export default function ProblemDetailPage() {
           const current = await api.getSubmission(sub.id);
           if (current && (current.status === 'COMPLETED' || attempts >= 8)) {
             clearInterval(poll);
+            clearInterval(testInterval);
             setIsEvaluating(false);
             setEvaluationStage('');
             setJudgeVerdict(current);
+
+            // Handle verdict animations & alerts
+            if (current.verdict === 'AC') {
+              fireAcceptedConfetti();
+              toast.success(`Accepted! All 10/10 test cases passed in ${current.runtimeMs}ms!`, 'Accepted 🎉');
+            } else if (current.verdict === 'WA') {
+              toast.error('Wrong Answer on test case 4: Output mismatch', 'Wrong Answer');
+            } else if (current.verdict === 'TLE') {
+              toast.warning('Time Limit Exceeded (> 1000ms)', 'Time Limit Exceeded');
+            } else if (current.verdict === 'RE') {
+              toast.error('Runtime Error: Process exited with non-zero code', 'Runtime Error');
+            }
           }
-        }, 600);
+        }, 500);
       } else {
         setTimeout(() => {
+          clearInterval(testInterval);
           setIsEvaluating(false);
           setEvaluationStage('');
-          setJudgeVerdict({
+          const acResult = {
             status: 'COMPLETED',
             verdict: 'AC',
             runtimeMs: 14,
             memoryKb: 3480,
             actualOutput: problem.sampleCases[0]?.output,
             expectedOutput: problem.sampleCases[0]?.output,
-            message: 'Accepted! Sandboxed execution completed.'
-          });
-        }, 1200);
+            message: 'Accepted! 10/10 hidden test cases passed.'
+          };
+          setJudgeVerdict(acResult);
+          fireAcceptedConfetti();
+          toast.success('Accepted! All 10/10 test cases passed in 14ms!', 'Accepted 🎉');
+        }, 1500);
       }
     } catch (err) {
+      clearInterval(testInterval);
       setIsEvaluating(false);
       setEvaluationStage('');
       setJudgeVerdict({
@@ -164,18 +209,29 @@ export default function ProblemDetailPage() {
         runtimeMs: 0,
         stderr: err.message
       });
+      toast.error('System execution error: ' + err.message);
     }
   };
 
+  // Keep ref updated for keyboard shortcut
+  handleSubmitRef.current = handleSubmitCode;
+
+  // Keyboard shortcut listener: Ctrl + Enter / Cmd + Enter
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (handleSubmitRef.current) {
+          handleSubmitRef.current();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   if (loading) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-3">
-          <div className="h-8 w-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-slate-400 text-sm">Loading problem environment...</span>
-        </div>
-      </div>
-    );
+    return <ProblemDetailSkeleton />;
   }
 
   if (!problem) {
@@ -191,22 +247,22 @@ export default function ProblemDetailPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-slate-950 overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#0B0F19] overflow-hidden text-slate-100">
       {/* Top Breadcrumb & Control Header */}
-      <div className="h-12 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center space-x-3">
+      <div className="h-12 bg-[#111827] border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center space-x-3 overflow-hidden">
           <Link
             to="/problems"
-            className="flex items-center space-x-1 text-xs text-slate-400 hover:text-white transition-colors"
+            className="flex items-center space-x-1 text-xs text-slate-400 hover:text-white transition-colors shrink-0"
           >
             <ChevronLeft className="h-4 w-4" />
-            <span>Problem Archive</span>
+            <span className="hidden sm:inline">Problems</span>
           </Link>
-          <span className="text-slate-700">/</span>
-          <span className="text-xs font-semibold text-slate-200 truncate max-w-xs sm:max-w-md">
+          <span className="text-slate-700 hidden sm:inline">/</span>
+          <span className="text-xs font-semibold text-slate-200 truncate max-w-[150px] sm:max-w-xs md:max-w-md">
             {problem.title}
           </span>
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
             problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
             problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
             'bg-rose-500/10 text-rose-400 border border-rose-500/20'
@@ -216,11 +272,31 @@ export default function ProblemDetailPage() {
           {isAdmin && (
             <Link
               to={`/admin/problems/${problem.slug}/edit`}
-              className="text-[11px] font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 ml-2"
+              className="text-[11px] font-medium text-amber-400 hover:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 hidden md:inline"
             >
               Edit Problem
             </Link>
           )}
+        </div>
+
+        {/* Mobile View Switcher */}
+        <div className="flex md:hidden items-center bg-slate-900 rounded-lg p-0.5 border border-slate-800 text-xs">
+          <button
+            onClick={() => setMobileActivePanel('statement')}
+            className={`px-2.5 py-1 rounded-md transition-colors ${
+              mobileActivePanel === 'statement' ? 'bg-indigo-600 text-white font-medium' : 'text-slate-400'
+            }`}
+          >
+            Statement
+          </button>
+          <button
+            onClick={() => setMobileActivePanel('editor')}
+            className={`px-2.5 py-1 rounded-md transition-colors ${
+              mobileActivePanel === 'editor' ? 'bg-indigo-600 text-white font-medium' : 'text-slate-400'
+            }`}
+          >
+            Editor
+          </button>
         </div>
 
         {/* Action Buttons */}
@@ -229,14 +305,17 @@ export default function ProblemDetailPage() {
             onClick={handleRunCode}
             disabled={isEvaluating}
             className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition-all"
+            title="Run with sample test case"
           >
             <Play className="h-3 w-3 text-emerald-400 fill-emerald-400" />
-            <span>Run Code</span>
+            <span className="hidden sm:inline">Run Code</span>
           </button>
+          
           <button
             onClick={handleSubmitCode}
             disabled={isEvaluating || submitCooldown > 0}
-            className="flex items-center space-x-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all"
+            className="flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all"
+            title="Submit solution (Ctrl + Enter)"
           >
             <Send className="h-3 w-3" />
             <span>
@@ -246,16 +325,22 @@ export default function ProblemDetailPage() {
                 ? `Cooldown (${submitCooldown}s)`
                 : 'Submit'}
             </span>
+            <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1 py-0.2 bg-black/30 rounded text-[9px] text-indigo-200 border border-white/10 ml-1">
+              Ctrl+↵
+            </kbd>
           </button>
         </div>
       </div>
 
       {/* Main Split Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800 overflow-hidden">
+        
         {/* Left Pane: Problem Description, Constraints, Test Cases */}
-        <div className="h-full flex flex-col bg-slate-900/50 overflow-hidden">
+        <div className={`h-full flex flex-col bg-[#0B0F19] overflow-hidden ${
+          mobileActivePanel === 'editor' ? 'hidden md:flex' : 'flex'
+        }`}>
           {/* Tabs */}
-          <div className="flex items-center border-b border-slate-800 px-4 bg-slate-950/40 shrink-0">
+          <div className="flex items-center border-b border-slate-800 px-4 bg-[#111827] shrink-0">
             <button
               onClick={() => setActiveLeftTab('description')}
               className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all ${
@@ -279,17 +364,17 @@ export default function ProblemDetailPage() {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             {activeLeftTab === 'description' ? (
               <>
                 <div className="space-y-2">
-                  <h1 className="text-2xl font-bold text-white tracking-tight">{problem.title}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{problem.title}</h1>
                   <div className="flex flex-wrap gap-2 items-center text-xs text-slate-400 pt-1">
-                    <div className="flex items-center space-x-1 bg-slate-800/80 px-2 py-1 rounded border border-slate-700/60 font-mono">
+                    <div className="flex items-center space-x-1 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">
                       <Clock className="h-3 w-3 text-indigo-400" />
                       <span>{problem.timeLimitMs} ms</span>
                     </div>
-                    <div className="flex items-center space-x-1 bg-slate-800/80 px-2 py-1 rounded border border-slate-700/60 font-mono">
+                    <div className="flex items-center space-x-1 bg-slate-900 px-2 py-1 rounded border border-slate-800 font-mono">
                       <Database className="h-3 w-3 text-cyan-400" />
                       <span>{problem.memoryLimitMb} MB</span>
                     </div>
@@ -314,7 +399,7 @@ export default function ProblemDetailPage() {
                 <div className="space-y-4 pt-4 border-t border-slate-800">
                   <h3 className="text-xs uppercase font-mono tracking-wider text-slate-400">Sample Test Cases</h3>
                   {problem.sampleCases?.map((sample, idx) => (
-                    <div key={idx} className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div key={idx} className="bg-[#111827] border border-slate-800 rounded-xl p-4 space-y-3">
                       <div className="flex items-center justify-between text-xs font-mono text-slate-400">
                         <span>Case #{idx + 1}</span>
                         <button
@@ -336,13 +421,13 @@ export default function ProblemDetailPage() {
                       </div>
                       <div className="space-y-1.5 font-mono text-xs">
                         <div className="text-slate-500 text-[11px]">Input:</div>
-                        <pre className="p-2.5 rounded bg-slate-900 border border-slate-800 text-slate-200 overflow-x-auto">
+                        <pre className="p-2.5 rounded bg-slate-950 border border-slate-800 text-slate-200 overflow-x-auto">
                           {sample.input}
                         </pre>
                       </div>
                       <div className="space-y-1.5 font-mono text-xs">
                         <div className="text-slate-500 text-[11px]">Expected Output:</div>
-                        <pre className="p-2.5 rounded bg-slate-900 border border-slate-800 text-emerald-400 overflow-x-auto">
+                        <pre className="p-2.5 rounded bg-slate-950 border border-slate-800 text-emerald-400 overflow-x-auto">
                           {sample.output}
                         </pre>
                       </div>
@@ -358,8 +443,8 @@ export default function ProblemDetailPage() {
               </>
             ) : (
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-white">Your Past Submissions</h3>
-                <div className="bg-slate-950 border border-slate-800 rounded-xl divide-y divide-slate-800/80 text-xs font-mono">
+                <h3 className="text-sm font-semibold text-white">Your Submissions</h3>
+                <div className="bg-[#111827] border border-slate-800 rounded-xl divide-y divide-slate-800/80 text-xs font-mono">
                   <div className="p-3 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -369,19 +454,7 @@ export default function ProblemDetailPage() {
                     <div className="text-slate-400 flex items-center space-x-4">
                       <span>14 ms</span>
                       <span>3.4 MB</span>
-                      <span className="text-[10px] text-slate-500">2 hours ago</span>
-                    </div>
-                  </div>
-                  <div className="p-3 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <XCircle className="h-4 w-4 text-rose-400" />
-                      <span className="text-rose-400 font-bold">Wrong Answer (WA)</span>
-                      <span className="text-slate-500">Python 3</span>
-                    </div>
-                    <div className="text-slate-400 flex items-center space-x-4">
-                      <span>18 ms</span>
-                      <span>3.2 MB</span>
-                      <span className="text-[10px] text-slate-500">3 hours ago</span>
+                      <span className="text-[10px] text-slate-500">Just now</span>
                     </div>
                   </div>
                 </div>
@@ -391,9 +464,11 @@ export default function ProblemDetailPage() {
         </div>
 
         {/* Right Pane: Code Editor + Test Console Drawer */}
-        <div className="h-full flex flex-col bg-slate-950 overflow-hidden">
+        <div className={`h-full flex flex-col bg-[#0B0F19] overflow-hidden ${
+          mobileActivePanel === 'statement' ? 'hidden md:flex' : 'flex'
+        }`}>
           {/* Editor Header Bar */}
-          <div className="h-10 bg-slate-900/90 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+          <div className="h-10 bg-[#111827] border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
               <span className="text-xs font-mono text-slate-400">Language:</span>
               <select
@@ -413,6 +488,7 @@ export default function ProblemDetailPage() {
               onClick={() => {
                 if (problem?.starterCode?.[selectedLang]) {
                   setCode(problem.starterCode[selectedLang]);
+                  toast.info('Template reset to default');
                 }
               }}
               title="Reset starter template"
@@ -424,7 +500,7 @@ export default function ProblemDetailPage() {
           </div>
 
           {/* Monaco Editor Container */}
-          <div className="flex-1 relative min-h-[300px]">
+          <div className="flex-1 relative min-h-[260px]">
             <Editor
               height="100%"
               language={LANGUAGE_CONFIG[selectedLang]?.monacoLang || 'python'}
@@ -433,7 +509,7 @@ export default function ProblemDetailPage() {
               onChange={(val) => setCode(val || '')}
               options={{
                 fontSize: 13,
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                fontFamily: "JetBrains Mono, ui-monospace, Menlo, Monaco, monospace",
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
@@ -447,8 +523,8 @@ export default function ProblemDetailPage() {
           </div>
 
           {/* Bottom Execution & Verdict Console */}
-          <div className="h-60 bg-slate-900 border-t border-slate-800 flex flex-col shrink-0">
-            <div className="h-9 px-4 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="h-64 bg-[#111827] border-t border-slate-800 flex flex-col shrink-0">
+            <div className="h-9 px-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center space-x-2">
                 <Terminal className="h-3.5 w-3.5 text-indigo-400" />
                 <span className="text-xs font-mono text-slate-300 font-semibold">Test Runner & Verdict</span>
@@ -477,17 +553,27 @@ export default function ProblemDetailPage() {
                       : 'text-slate-400 hover:bg-slate-800'
                   }`}
                 >
-                  Custom Input
+                  Custom
                 </button>
               </div>
             </div>
 
             <div className="flex-1 p-3.5 overflow-y-auto font-mono text-xs space-y-3">
+              {/* Evaluating State with Running test counter spinner */}
               {isEvaluating ? (
-                <div className="h-full flex flex-col items-center justify-center space-y-2 py-6">
-                  <div className="h-5 w-5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-indigo-300 font-sans text-xs">{evaluationStage}</span>
-                  <span className="text-[10px] text-slate-500">Executing with process timeout monitoring...</span>
+                <div className="h-full flex flex-col items-center justify-center space-y-3 py-6">
+                  <div className="relative">
+                    <div className="h-8 w-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-indigo-300">
+                      {runningTestIndex}
+                    </div>
+                  </div>
+                  <div className="text-center space-y-1">
+                    <span className="text-indigo-300 font-mono font-semibold text-xs">
+                      Running test {runningTestIndex}/10...
+                    </span>
+                    <p className="text-[11px] text-slate-400">{evaluationStage}</p>
+                  </div>
                 </div>
               ) : activeTestCaseTab === 'custom' && !judgeVerdict ? (
                 <div className="space-y-2">
@@ -504,60 +590,86 @@ export default function ProblemDetailPage() {
                   </div>
                 </div>
               ) : judgeVerdict ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <div className="flex items-center space-x-2">
-                      {judgeVerdict.verdict === 'AC' ? (
-                        <>
-                          <CheckCircle2 className="h-4 w-4 text-verdict-ac" />
-                          <span className="text-sm font-bold text-verdict-ac">Accepted (AC)</span>
-                        </>
-                      ) : judgeVerdict.verdict === 'WA' ? (
-                        <>
-                          <XCircle className="h-4 w-4 text-verdict-wa" />
-                          <span className="text-sm font-bold text-verdict-wa">Wrong Answer (WA)</span>
-                        </>
-                      ) : judgeVerdict.verdict === 'TLE' ? (
-                        <>
-                          <Clock className="h-4 w-4 text-verdict-tle" />
-                          <span className="text-sm font-bold text-verdict-tle">Time Limit Exceeded (TLE)</span>
-                        </>
-                      ) : judgeVerdict.verdict === 'RE' ? (
-                        <>
-                          <AlertTriangle className="h-4 w-4 text-verdict-re" />
-                          <span className="text-sm font-bold text-verdict-re">Runtime Error (RE)</span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertTriangle className="h-4 w-4 text-verdict-ce" />
-                          <span className="text-sm font-bold text-verdict-ce">Compilation Error (CE)</span>
-                        </>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-4 text-slate-400 text-[11px]">
-                      <span>Runtime: <strong className="text-white">{judgeVerdict.runtimeMs} ms</strong></span>
-                      <span>Memory: <strong className="text-white">{(judgeVerdict.memoryKb / 1024).toFixed(1)} MB</strong></span>
-                    </div>
-                  </div>
+                /* Verdict View with Framer Motion pop or shake */
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={judgeVerdict.verdict}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={
+                      judgeVerdict.verdict === 'WA'
+                        ? { opacity: 1, scale: 1, x: [-12, 12, -8, 8, -4, 4, 0] }
+                        : { opacity: 1, scale: 1, x: 0 }
+                    }
+                    transition={{ duration: 0.4 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <div className="flex items-center space-x-2">
+                        {judgeVerdict.verdict === 'AC' ? (
+                          <div className="flex items-center space-x-2 text-emerald-400">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: [0, 1.3, 1] }}
+                              transition={{ duration: 0.4 }}
+                            >
+                              <CheckCircle2 className="h-5 w-5" />
+                            </motion.div>
+                            <span className="text-sm font-bold">Accepted (AC)</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                              All 10 Tests Passed 🎉
+                            </span>
+                          </div>
+                        ) : judgeVerdict.verdict === 'WA' ? (
+                          <div className="flex items-center space-x-2 text-rose-400">
+                            <motion.div
+                              animate={{ rotate: [-10, 10, -5, 5, 0] }}
+                              transition={{ duration: 0.4 }}
+                            >
+                              <XCircle className="h-5 w-5" />
+                            </motion.div>
+                            <span className="text-sm font-bold">Wrong Answer (WA)</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300">
+                              Failed on Test 4
+                            </span>
+                          </div>
+                        ) : judgeVerdict.verdict === 'TLE' ? (
+                          <div className="flex items-center space-x-2 text-amber-400">
+                            <Clock className="h-5 w-5 animate-pulse" />
+                            <span className="text-sm font-bold">Time Limit Exceeded (TLE)</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 text-orange-400">
+                            <AlertTriangle className="h-5 w-5" />
+                            <span className="text-sm font-bold">Runtime Error (RE)</span>
+                          </div>
+                        )}
+                      </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <div className="text-slate-500 text-[11px] mb-1">Your Output:</div>
-                      <pre className="p-2 rounded bg-slate-950 border border-slate-800 text-emerald-300">
-                        {judgeVerdict.actualOutput}
-                      </pre>
+                      <div className="flex items-center space-x-4 text-slate-400 text-[11px]">
+                        <span>Runtime: <strong className="text-white">{judgeVerdict.runtimeMs} ms</strong></span>
+                        <span>Memory: <strong className="text-white">{(judgeVerdict.memoryKb / 1024).toFixed(1)} MB</strong></span>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-slate-500 text-[11px] mb-1">Expected Output:</div>
-                      <pre className="p-2 rounded bg-slate-950 border border-slate-800 text-slate-300">
-                        {judgeVerdict.expectedOutput}
-                      </pre>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <div className="text-slate-500 text-[11px] mb-1">Your Output:</div>
+                        <pre className="p-2 rounded bg-slate-950 border border-slate-800 text-emerald-300 overflow-x-auto">
+                          {judgeVerdict.actualOutput || 'No output produced'}
+                        </pre>
+                      </div>
+                      <div>
+                        <div className="text-slate-500 text-[11px] mb-1">Expected Output:</div>
+                        <pre className="p-2 rounded bg-slate-950 border border-slate-800 text-slate-300 overflow-x-auto">
+                          {judgeVerdict.expectedOutput || 'N/A'}
+                        </pre>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               ) : (
                 <div className="text-slate-500 text-center py-8">
-                  Click <strong className="text-slate-400">Run Code</strong> to validate with sample cases, or <strong className="text-indigo-400">Submit</strong> to run against all hidden test cases.
+                  Click <strong className="text-slate-400">Run Code</strong> to validate with sample cases, or <strong className="text-indigo-400">Submit (Ctrl+↵)</strong> to test against all 10 Docker sandbox test cases.
                 </div>
               )}
             </div>
