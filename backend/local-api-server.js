@@ -286,12 +286,27 @@ const server = http.createServer(async (req, res) => {
         isSolved: coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no))) || false
       }));
 
+      const solvedProblems = DB.problems.filter(p => 
+        coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no)))
+      );
+      const easySolved = solvedProblems.filter(p => p.difficulty === 'EASY').length;
+      const mediumSolved = solvedProblems.filter(p => p.difficulty === 'MEDIUM').length;
+      const hardSolved = solvedProblems.filter(p => p.difficulty === 'HARD').length;
+
       const stats = {
         total: DB.problems.length,
         easy: DB.problems.filter(p => p.difficulty === 'EASY').length,
         medium: DB.problems.filter(p => p.difficulty === 'MEDIUM').length,
         hard: DB.problems.filter(p => p.difficulty === 'HARD').length,
-        solvedCount: Array.from(coderSolved).filter(s => s.startsWith('prob-')).length || coderSolved.size,
+        solvedCount: solvedProblems.length,
+        easySolved,
+        mediumSolved,
+        hardSolved,
+        levelWise: {
+          easy: { solved: easySolved, total: 298 },
+          medium: { solved: mediumSolved, total: 447 },
+          hard: { solved: hardSolved, total: 255 }
+        },
         topics: Array.from(new Set(DB.problems.map(p => p.topic).filter(Boolean)))
       };
 
@@ -455,12 +470,27 @@ const server = http.createServer(async (req, res) => {
     // User Solved Problems API
     if (pathname === '/api/v1/user/solved' && method === 'GET') {
       const username = 'coder';
-      const solvedList = Array.from(DB.solvedByUser[username] || []);
+      const coderSolved = DB.solvedByUser[username] || new Set();
+      const solvedProblems = DB.problems.filter(p => 
+        coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no)))
+      );
+      const easySolved = solvedProblems.filter(p => p.difficulty === 'EASY').length;
+      const mediumSolved = solvedProblems.filter(p => p.difficulty === 'MEDIUM').length;
+      const hardSolved = solvedProblems.filter(p => p.difficulty === 'HARD').length;
+
       return sendJson(res, 200, {
         success: true,
         data: {
-          solvedIds: solvedList,
-          count: solvedList.filter(s => s.startsWith('prob-')).length
+          solvedIds: Array.from(coderSolved),
+          count: solvedProblems.length,
+          easySolved,
+          mediumSolved,
+          hardSolved,
+          levelWise: {
+            easy: { solved: easySolved, total: 298 },
+            medium: { solved: mediumSolved, total: 447 },
+            hard: { solved: hardSolved, total: 255 }
+          }
         }
       });
     }

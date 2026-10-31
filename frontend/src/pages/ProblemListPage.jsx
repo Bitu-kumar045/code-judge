@@ -52,7 +52,7 @@ const ALL_TOPICS = [
 
 export default function ProblemListPage() {
   const { isAdmin } = useAuth();
-  const { isSolved, solvedCount } = useSolvedState();
+  const { isSolved, solvedCount, easySolved, mediumSolved, hardSolved } = useSolvedState();
 
   const [problems, setProblems] = useState([]);
   const [stats, setStats] = useState({ total: 1000, easy: 298, medium: 447, hard: 255 });
@@ -180,7 +180,14 @@ export default function ProblemListPage() {
   };
 
   const effectiveSolved = Math.max(solvedCount, stats.solvedCount || 0);
+  const effectiveEasy = stats.easySolved !== undefined ? stats.easySolved : easySolved;
+  const effectiveMed = stats.mediumSolved !== undefined ? stats.mediumSolved : mediumSolved;
+  const effectiveHard = stats.hardSolved !== undefined ? stats.hardSolved : hardSolved;
+
   const solvedPercent = Math.min(100, Math.round((effectiveSolved / (stats.total || 1000)) * 100));
+  const easyPercent = Math.min(100, Math.round((effectiveEasy / (stats.easy || 298)) * 100));
+  const medPercent = Math.min(100, Math.round((effectiveMed / (stats.medium || 447)) * 100));
+  const hardPercent = Math.min(100, Math.round((effectiveHard / (stats.hard || 255)) * 100));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#0B0F19] text-slate-100 min-h-screen">
@@ -229,45 +236,80 @@ export default function ProblemListPage() {
           </div>
         </div>
 
-        {/* Quick Level Stats Card */}
+        {/* Level Breakdown & Solved Cards */}
         <div className="bg-[#111827] border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg">
           <div className="flex items-center justify-between">
             <span className="text-xs uppercase font-mono text-slate-400 tracking-wider">Level Breakdown</span>
             <TrendingUp className="h-4 w-4 text-indigo-400" />
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-3 gap-2.5 text-center">
+            {/* Easy */}
             <button
               onClick={() => handleDifficultyChange(difficulty === 'EASY' ? 'ALL' : 'EASY')}
-              className={`rounded-xl p-2.5 border transition-all ${
+              className={`rounded-xl p-2.5 border transition-all flex flex-col justify-between ${
                 difficulty === 'EASY'
-                  ? 'bg-emerald-500/20 border-emerald-500/50 shadow-md ring-1 ring-emerald-500'
-                  : 'bg-slate-950/60 border-slate-800/80 hover:border-emerald-500/30'
+                  ? 'bg-emerald-500/20 border-emerald-500/60 shadow-md ring-1 ring-emerald-500'
+                  : 'bg-slate-950/60 border-slate-800/80 hover:border-emerald-500/40'
               }`}
             >
-              <div className="text-xs text-emerald-400 font-medium">Easy</div>
-              <div className="text-lg font-bold text-white mt-0.5">{stats.easy}</div>
+              <div>
+                <div className="text-xs text-emerald-400 font-semibold">Easy</div>
+                <div className="text-base font-bold text-white mt-0.5">{stats.easy}</div>
+              </div>
+              <div className="mt-2 space-y-1">
+                <div className="text-[10px] text-emerald-400/90 font-mono font-medium">
+                  {effectiveEasy} solved
+                </div>
+                <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.max(4, easyPercent)}%` }} />
+                </div>
+              </div>
             </button>
+
+            {/* Moderate */}
             <button
               onClick={() => handleDifficultyChange(difficulty === 'MEDIUM' ? 'ALL' : 'MEDIUM')}
-              className={`rounded-xl p-2.5 border transition-all ${
+              className={`rounded-xl p-2.5 border transition-all flex flex-col justify-between ${
                 difficulty === 'MEDIUM'
-                  ? 'bg-amber-500/20 border-amber-500/50 shadow-md ring-1 ring-amber-500'
-                  : 'bg-slate-950/60 border-slate-800/80 hover:border-amber-500/30'
+                  ? 'bg-amber-500/20 border-amber-500/60 shadow-md ring-1 ring-amber-500'
+                  : 'bg-slate-950/60 border-slate-800/80 hover:border-amber-500/40'
               }`}
             >
-              <div className="text-xs text-amber-400 font-medium">Moderate</div>
-              <div className="text-lg font-bold text-white mt-0.5">{stats.medium}</div>
+              <div>
+                <div className="text-xs text-amber-400 font-semibold">Moderate</div>
+                <div className="text-base font-bold text-white mt-0.5">{stats.medium}</div>
+              </div>
+              <div className="mt-2 space-y-1">
+                <div className="text-[10px] text-amber-400/90 font-mono font-medium">
+                  {effectiveMed} solved
+                </div>
+                <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                  <div className="bg-amber-500 h-full rounded-full" style={{ width: `${Math.max(4, medPercent)}%` }} />
+                </div>
+              </div>
             </button>
+
+            {/* Difficult */}
             <button
               onClick={() => handleDifficultyChange(difficulty === 'HARD' ? 'ALL' : 'HARD')}
-              className={`rounded-xl p-2.5 border transition-all ${
+              className={`rounded-xl p-2.5 border transition-all flex flex-col justify-between ${
                 difficulty === 'HARD'
-                  ? 'bg-rose-500/20 border-rose-500/50 shadow-md ring-1 ring-rose-500'
-                  : 'bg-slate-950/60 border-slate-800/80 hover:border-rose-500/30'
+                  ? 'bg-rose-500/20 border-rose-500/60 shadow-md ring-1 ring-rose-500'
+                  : 'bg-slate-950/60 border-slate-800/80 hover:border-rose-500/40'
               }`}
             >
-              <div className="text-xs text-rose-400 font-medium">Difficult</div>
-              <div className="text-lg font-bold text-white mt-0.5">{stats.hard}</div>
+              <div>
+                <div className="text-xs text-rose-400 font-semibold">Difficult</div>
+                <div className="text-base font-bold text-white mt-0.5">{stats.hard}</div>
+              </div>
+              <div className="mt-2 space-y-1">
+                <div className="text-[10px] text-rose-400/90 font-mono font-medium">
+                  {effectiveHard} solved
+                </div>
+                <div className="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
+                  <div className="bg-rose-500 h-full rounded-full" style={{ width: `${Math.max(4, hardPercent)}%` }} />
+                </div>
+              </div>
             </button>
           </div>
         </div>
@@ -277,7 +319,7 @@ export default function ProblemListPage() {
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           
-          {/* Level Tabs */}
+          {/* Level Tabs with Solved Indicators */}
           <div className="flex items-center space-x-1.5 bg-[#111827] border border-slate-800 p-1.5 rounded-xl text-xs overflow-x-auto scrollbar-none">
             <button
               onClick={() => handleDifficultyChange('ALL')}
@@ -289,7 +331,7 @@ export default function ProblemListPage() {
             >
               <span>All Levels</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-900/60 text-slate-300 font-mono">
-                {stats.total}
+                {stats.total} ({effectiveSolved} ✓)
               </span>
             </button>
             <button
@@ -302,7 +344,7 @@ export default function ProblemListPage() {
             >
               <span>Easy</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-950 text-emerald-300 font-mono">
-                {stats.easy}
+                {stats.easy} ({effectiveEasy} ✓)
               </span>
             </button>
             <button
@@ -315,7 +357,7 @@ export default function ProblemListPage() {
             >
               <span>Moderate</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-950 text-amber-300 font-mono">
-                {stats.medium}
+                {stats.medium} ({effectiveMed} ✓)
               </span>
             </button>
             <button
@@ -328,7 +370,7 @@ export default function ProblemListPage() {
             >
               <span>Difficult</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-950 text-rose-300 font-mono">
-                {stats.hard}
+                {stats.hard} ({effectiveHard} ✓)
               </span>
             </button>
           </div>

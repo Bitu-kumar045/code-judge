@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 
 const STORAGE_KEY = 'codejudge_solved_problems';
+const DETAILS_KEY = 'codejudge_solved_details';
 
 // Retrieve set of solved identifiers (IDs, slugs, and numbers)
 export function getSolvedSet() {
@@ -15,10 +16,48 @@ export function getSolvedSet() {
   }
 }
 
+// Retrieve solved details dictionary: { [id]: { difficulty, topic, no } }
+export function getSolvedDetails() {
+  try {
+    const raw = localStorage.getItem(DETAILS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+// Calculate level-wise solved statistics
+export function getLevelWiseSolved() {
+  const details = getSolvedDetails();
+  let easy = 0;
+  let medium = 0;
+  let hard = 0;
+
+  Object.values(details).forEach(item => {
+    const d = (item.difficulty || '').toUpperCase();
+    if (d === 'EASY') easy++;
+    else if (d === 'HARD') hard++;
+    else medium++;
+  });
+
+  return {
+    easy,
+    medium,
+    hard,
+    total: easy + medium + hard,
+    breakdown: {
+      easy: { solved: easy, total: 298 },
+      medium: { solved: medium, total: 447 },
+      hard: { solved: hard, total: 255 }
+    }
+  };
+}
+
 // Mark problem as solved locally and sync with backend
 export function markProblemSolved(problem) {
   if (!problem) return;
   const set = getSolvedSet();
+  const idStr = String(problem.id || `prob-${problem.no}`);
   
   if (problem.id) set.add(String(problem.id));
   if (problem.slug) set.add(String(problem.slug));
@@ -31,9 +70,30 @@ export function markProblemSolved(problem) {
     console.error('Failed to save solved problems to localStorage', err);
   }
 
+  // Save metadata for level-wise calculations
+  try {
+    const details = getSolvedDetails();
+    const normDiff = (
+      problem.difficulty || 
+      (problem.level === 'Easy' ? 'EASY' : problem.level === 'Moderate' ? 'MEDIUM' : 'HARD') || 
+      'MEDIUM'
+    ).toUpperCase();
+
+    details[idStr] = {
+      id: problem.id || idStr,
+      slug: problem.slug || '',
+      no: problem.no,
+      difficulty: normDiff,
+      topic: problem.topic || 'General'
+    };
+    localStorage.setItem(DETAILS_KEY, JSON.stringify(details));
+  } catch (err) {
+    console.error('Failed to save solved details to localStorage', err);
+  }
+
   // Notify components across the application
   window.dispatchEvent(new CustomEvent('codejudge_solved_updated', {
-    detail: { problem, solvedIds: arr }
+    detail: { problem, solvedIds: arr, levelWise: getLevelWiseSolved() }
   }));
 
   // Sync to backend in background
@@ -58,22 +118,24 @@ export function getSolvedCount(set) {
   const activeSet = set || getSolvedSet();
   let count = 0;
   activeSet.forEach(val => {
-    // Only count canonical IDs like 'prob-1' to avoid double-counting slugs and numbers
     if (val.startsWith('prob-')) {
       count++;
     }
   });
-  // Fallback if IDs without 'prob-' prefix were stored
-  return count > 0 ? count : Math.floor(activeSet.size / 2);
+  const details = getSolvedDetails();
+  const detailCount = Object.keys(details).length;
+  return Math.max(count, detailCount, Math.floor(activeSet.size / 3));
 }
 
 // Custom React hook to subscribe to solved problem updates
 export function useSolvedState() {
   const [solvedSet, setSolvedSet] = useState(() => getSolvedSet());
+  const [levelCounts, setLevelCounts] = useState(() => getLevelWiseSolved());
 
   useEffect(() => {
     // Initial fetch from backend if available
-    api.getSolvedProblems?.().then(ids => {
+    api.getSolvedProblems?.().then(res => {
+      const ids = Array.isArray(res) ? res : res?.solvedIds;
       if (Array.isArray(ids) && ids.length > 0) {
         setSolvedSet(prev => {
           const next = new Set([...prev, ...ids.map(String)]);
@@ -85,6 +147,7 @@ export function useSolvedState() {
 
     const handleUpdate = () => {
       setSolvedSet(getSolvedSet());
+      setLevelCounts(getLevelWiseSolved());
     };
 
     window.addEventListener('codejudge_solved_updated', handleUpdate);
@@ -100,6 +163,10 @@ export function useSolvedState() {
     solvedSet,
     isSolved: (prob) => isProblemSolved(prob, solvedSet),
     solvedCount: getSolvedCount(solvedSet),
+    easySolved: levelCounts.easy,
+    mediumSolved: levelCounts.medium,
+    hardSolved: levelCounts.hard,
+    levelCounts,
     markSolved: markProblemSolved
   };
 }
