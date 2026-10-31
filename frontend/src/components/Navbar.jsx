@@ -18,7 +18,9 @@ import {
   Moon,
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  GraduationCap,
+  Compass
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -35,8 +37,10 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Problems', path: '/problems', icon: Code2 },
+    { name: 'Compiler', path: '/compiler', icon: Terminal },
+    { name: 'Roadmaps', path: '/paths', icon: Compass },
+    { name: 'Classrooms', path: '/classrooms', icon: GraduationCap },
     { name: 'Contests', path: '/contests', icon: Trophy },
-    { name: 'Submissions', path: '/submissions', icon: ListOrdered },
     { name: 'Leaderboard', path: '/leaderboard', icon: Zap },
     { name: 'Learn', path: '/learn', icon: BookOpen },
   ];

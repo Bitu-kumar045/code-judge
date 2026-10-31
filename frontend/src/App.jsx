@@ -17,6 +17,10 @@ import ContestArenaPage from './pages/ContestArenaPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
 import LearningHubPage from './pages/LearningHubPage';
+import ClassroomPage from './pages/ClassroomPage';
+import OnlineCompilerPage from './pages/OnlineCompilerPage';
+import LearningPathsPage from './pages/LearningPathsPage';
+import CollegeLeaderboardPage from './pages/CollegeLeaderboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminProblemPage from './pages/AdminProblemPage';
 import LoginPage from './pages/LoginPage';
@@ -67,8 +71,13 @@ export default function App() {
                     <Route path="/contests" element={<ContestsPage />} />
                     <Route path="/contests/:id" element={<ContestArenaPage />} />
                     <Route path="/leaderboard" element={<LeaderboardPage />} />
+                    <Route path="/colleges" element={<CollegeLeaderboardPage />} />
+                    <Route path="/compiler" element={<OnlineCompilerPage />} />
+                    <Route path="/classrooms" element={<ClassroomPage />} />
+                    <Route path="/paths" element={<LearningPathsPage />} />
                     <Route path="/learn" element={<LearningHubPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/u/:username" element={<ProfilePage />} />
                     <Route path="/admin" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
                     <Route path="/admin/problems/new" element={<AdminRoute><AdminProblemPage /></AdminRoute>} />
                     <Route path="/admin/problems/:id/edit" element={<AdminRoute><AdminProblemPage /></AdminRoute>} />
