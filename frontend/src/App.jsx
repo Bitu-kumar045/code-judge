@@ -9,6 +9,8 @@ import Footer from './components/Footer';
 
 // Pages
 import LandingPage from './pages/LandingPage';
+import QuestMapPage from './pages/QuestMapPage';
+import CodeDuelPage from './pages/CodeDuelPage';
 import ProblemListPage from './pages/ProblemListPage';
 import ProblemDetailPage from './pages/ProblemDetailPage';
 import SubmissionsPage from './pages/SubmissionsPage';
@@ -60,11 +62,13 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <BrowserRouter>
-              <div className="min-h-screen flex flex-col bg-[#0B0F19] text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+              <div className="min-h-screen flex flex-col bg-[#0B1020] text-slate-100 selection:bg-[#7C3AED] selection:text-white transition-colors duration-200">
                 <Navbar />
                 <main className="flex-1 flex flex-col">
                   <Routes>
                     <Route path="/" element={<LandingPage />} />
+                    <Route path="/quests" element={<QuestMapPage />} />
+                    <Route path="/duel" element={<CodeDuelPage />} />
                     <Route path="/problems" element={<ProblemListPage />} />
                     <Route path="/problems/:slug" element={<ProblemDetailPage />} />
                     <Route path="/submissions" element={<SubmissionsPage />} />

@@ -8,6 +8,8 @@ import { useToast } from '../context/ToastContext';
 import { fireAcceptedConfetti } from '../utils/confetti';
 import { ProblemDetailSkeleton } from '../components/Skeleton';
 import { markProblemSolved, isProblemSolved } from '../utils/solvedManager';
+import { awardXp, getPlayerState } from '../utils/gamification';
+import VisualReplayModal from '../components/VisualReplayModal';
 import { 
   Play, 
   Send, 
@@ -42,7 +44,14 @@ import {
   LogOut,
   Lightbulb,
   ShieldCheck,
-  Hash
+  Hash,
+  Eye,
+  Share2,
+  Bug,
+  HelpCircle,
+  CheckSquare,
+  Gamepad2,
+  Zap
 } from 'lucide-react';
 
 const LANGUAGE_CONFIG = {
@@ -113,6 +122,14 @@ export default function ProblemDetailPage() {
   // Pomodoro Practice Timer
   const [pomodoroSeconds, setPomodoroSeconds] = useState(25 * 60);
   const [pomodoroActive, setPomodoroActive] = useState(false);
+
+  // AlgoArena Signature States
+  const [showVisualReplay, setShowVisualReplay] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [practiceMode, setPracticeMode] = useState('STANDARD'); // 'STANDARD' | 'BUG_FIX' | 'PREDICT' | 'FILL_BLANK'
+  const [predictGuess, setPredictGuess] = useState('');
+  const [predictFeedback, setPredictFeedback] = useState(null);
+  const [player, setPlayer] = useState(getPlayerState());
 
   const handleSubmitRef = useRef(null);
 
@@ -377,10 +394,13 @@ export default function ProblemDetailPage() {
         if (isAc) {
           markProblemSolved(problem);
           setIsSolved(true);
+          const updatedPlayer = awardXp(120);
+          setPlayer(updatedPlayer);
           fireAcceptedConfetti();
-          toast.success('Accepted! Problem marked as SOLVED! 🎉', 'Solved 🎉');
+          setShowShareModal(true);
+          toast.success('Accepted! +120 XP earned! Problem marked as SOLVED! 🎉', 'Victory 🎉');
         } else {
-          toast.error(`Verdict: ${sub?.verdict || 'WA'}. Try debugging your code.`, 'Not Accepted');
+          toast.error(`Verdict: ${sub?.verdict || 'WA'}. Open Visual Replay to inspect state!`, 'Not Accepted');
         }
       }, 1500);
     } catch (err) {
@@ -467,20 +487,39 @@ export default function ProblemDetailPage() {
           </button>
         </div>
 
-        {/* Right: AI Assistant, Settings & Submit */}
+        {/* Right: Visual Replay, AI Assistant, Settings & Submit */}
         <div className="flex items-center space-x-2">
           
+          {/* Visual Replay (Step-by-step memory tracer) */}
+          <button
+            onClick={() => setShowVisualReplay(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold shadow-sm transition-all"
+            title="Step-by-step visual memory trace & pointer animation"
+          >
+            <Eye className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Visual Replay</span>
+          </button>
+
+          {/* Social Share Card Trigger */}
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-colors"
+            title="Generate Gamer Share Card"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
+
           {/* Smart AI Assistant Trigger */}
           <button
             onClick={() => {
               setShowAiModal(true);
               fetchAiHint(1);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold shadow-sm transition-all"
-            title="Ask Smart AI for hints & complexity"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#7C3AED]/20 hover:bg-[#7C3AED]/30 text-[#A78BFA] border border-[#7C3AED]/40 text-xs font-semibold shadow-sm transition-all"
+            title="Ask Byte AI for hints & complexity"
           >
-            <Bot className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="hidden sm:inline">Smart AI</span>
+            <Bot className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">Byte AI</span>
           </button>
 
           {/* Editor Settings Trigger */}
@@ -504,7 +543,7 @@ export default function ProblemDetailPage() {
           <button
             onClick={handleSubmitCode}
             disabled={isEvaluating || submitCooldown > 0}
-            className="flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all"
+            className="flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:brightness-110 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-md shadow-purple-900/30 transition-all"
           >
             <Send className="h-3 w-3" />
             <span>
@@ -805,18 +844,66 @@ export default function ProblemDetailPage() {
         <div className="h-full flex flex-col bg-[#0B0F19] overflow-hidden">
           
           {/* Editor Header Bar */}
-          <div className="h-10 bg-[#111827] border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+          <div className="h-10 bg-[#12182F] border-b border-[#1E294B] px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
               <span className="text-xs font-mono text-slate-400">Language:</span>
               <select
                 value={selectedLang}
                 onChange={(e) => setSelectedLang(e.target.value)}
-                className="bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1 text-xs font-mono text-indigo-300 focus:outline-none focus:border-indigo-500"
+                className="bg-[#0B1020] border border-[#1E294B] rounded px-2.5 py-1 text-xs font-mono text-[#A78BFA] focus:outline-none focus:border-[#7C3AED]"
               >
                 {Object.entries(LANGUAGE_CONFIG).map(([key, cfg]) => (
                   <option key={key} value={key}>{cfg.label}</option>
                 ))}
               </select>
+
+              {/* 4 Practice Modes */}
+              <div className="hidden sm:flex items-center space-x-1 bg-[#0B1020] p-0.5 rounded-lg border border-[#1E294B]">
+                <button
+                  onClick={() => setPracticeMode('STANDARD')}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+                    practiceMode === 'STANDARD' ? 'bg-[#7C3AED] text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Standard code submission"
+                >
+                  💻 Code
+                </button>
+                <button
+                  onClick={() => {
+                    setPracticeMode('BUG_FIX');
+                    setCode(`# [Fix the Bug Challenge]: Find and repair the 1 logical flaw!\ndef solve():\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        # BUG: Check the condition carefully\n        if complement not in seen:\n            seen[num] = i\n        else:\n            return [seen[complement], i]\n`);
+                    toast.info('Buggy code loaded. Identify the flaw and fix it!');
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+                    practiceMode === 'BUG_FIX' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Identify and repair buggy code"
+                >
+                  🐛 Fix Bug
+                </button>
+                <button
+                  onClick={() => setPracticeMode('PREDICT')}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+                    practiceMode === 'PREDICT' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Mental execution: Predict output before running"
+                >
+                  🧠 Predict
+                </button>
+                <button
+                  onClick={() => {
+                    setPracticeMode('FILL_BLANK');
+                    setCode(`# [Fill in the Blanks]: Complete the missing sections!\ndef solve():\n    seen = {}\n    for i, num in enumerate(nums):\n        # 1. Calculate needed complement\n        complement = /* TODO: target minus num */\n        \n        # 2. Check if complement already encountered\n        if complement in seen:\n            return [/* TODO: indices */]\n        seen[num] = i\n`);
+                    toast.info('Fill in the blank areas to complete the solution!');
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors ${
+                    practiceMode === 'FILL_BLANK' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Complete blanks in template code"
+                >
+                  ✏️ Blanks
+                </button>
+              </div>
             </div>
 
             <button
@@ -830,6 +917,45 @@ export default function ProblemDetailPage() {
               <span>Reset</span>
             </button>
           </div>
+
+          {/* Predict Output Interactive Banner */}
+          {practiceMode === 'PREDICT' && (
+            <div className="bg-[#12182F] border-b border-[#1E294B] p-3 px-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="text-cyan-400 font-bold font-mono">🧠 Predict Output:</span>
+                <span className="text-slate-300">
+                  Sample input: <code className="bg-[#0B1020] px-1.5 py-0.5 rounded text-white font-mono">{problem.sampleCases?.[0]?.input?.replace(/\n/g, ' ') || '2 7 11 15'}</code>
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={predictGuess}
+                  onChange={(e) => setPredictGuess(e.target.value)}
+                  placeholder="Expected output..."
+                  className="bg-[#0B1020] border border-[#1E294B] rounded-lg px-2.5 py-1 text-white font-mono text-xs focus:outline-none focus:border-cyan-500 w-36"
+                />
+                <button
+                  onClick={() => {
+                    const expected = (problem.sampleCases?.[0]?.output || '0 1').trim();
+                    if (predictGuess.trim() === expected) {
+                      setPredictFeedback('CORRECT');
+                      awardXp(25);
+                      toast.success('🎉 Correct! Mental execution verified (+25 XP)!');
+                    } else {
+                      setPredictFeedback('WRONG');
+                      toast.error(`Incorrect guess. Expected "${expected}". Trace with Visual Replay!`);
+                    }
+                  }}
+                  className="px-3 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition-colors"
+                >
+                  Verify
+                </button>
+                {predictFeedback === 'CORRECT' && <span className="text-emerald-400 font-bold font-mono">✓ Correct!</span>}
+                {predictFeedback === 'WRONG' && <span className="text-rose-400 font-bold font-mono">✗ Wrong</span>}
+              </div>
+            </div>
+          )}
 
           {/* Monaco Editor Container */}
           <div className="flex-1 relative min-h-[260px]">
@@ -969,10 +1095,22 @@ export default function ProblemDetailPage() {
                     </div>
                     <div>
                       <div className="text-slate-500 text-[10px] mb-1 font-semibold">Expected Output:</div>
-                      <pre className="p-2.5 rounded bg-[#0B0F19] border border-slate-800 text-slate-300 overflow-x-auto">
+                      <pre className="p-2.5 rounded bg-[#0B1020] border border-[#1E294B] text-slate-300 overflow-x-auto">
                         {judgeVerdict.expectedOutput || '(Custom Input)'}
                       </pre>
                     </div>
+                  </div>
+
+                  {/* Visual Replay Helper Trigger */}
+                  <div className="pt-2 flex items-center justify-between border-t border-[#1E294B]">
+                    <span className="text-[11px] text-slate-400">Want to inspect variables & pointers?</span>
+                    <button
+                      onClick={() => setShowVisualReplay(true)}
+                      className="px-3 py-1 rounded-lg bg-[#7C3AED]/20 hover:bg-[#7C3AED]/30 text-[#A78BFA] border border-[#7C3AED]/40 text-xs font-semibold flex items-center space-x-1.5 transition-all"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Launch Visual Replay</span>
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -1139,6 +1277,80 @@ export default function ProblemDetailPage() {
               ) : (
                 <span className="text-slate-500">Click a tab above to query AI assistance.</span>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Visual Replay Modal */}
+      <VisualReplayModal
+        isOpen={showVisualReplay}
+        onClose={() => setShowVisualReplay(false)}
+        problemTitle={problem.title}
+        initialArray={[2, 7, 11, 15]}
+        initialTarget={9}
+      />
+
+      {/* Gamer Social Share Card Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#12182F] border border-[#7C3AED]/40 rounded-3xl p-6 max-w-md w-full space-y-5 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-[#1E294B] pb-3">
+              <div className="flex items-center space-x-2">
+                <Trophy className="h-5 w-5 text-amber-400" />
+                <h3 className="font-display font-bold text-white text-base">AlgoArena Victory Card</h3>
+              </div>
+              <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            {/* Generated Shareable Card */}
+            <div className="bg-gradient-to-br from-[#0B1020] via-[#12182F] to-[#1E1B4B] border-2 border-[#7C3AED]/50 rounded-2xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="font-display font-black text-sm tracking-wide text-white">AlgoArena</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/20 text-[#A78BFA] font-mono font-bold">RPG</span>
+                </div>
+                <span className="text-[11px] font-mono text-[#34D399] font-bold">VERDICT: ACCEPTED</span>
+              </div>
+
+              <div>
+                <div className="text-xs text-slate-400 font-mono">Conquered Problem</div>
+                <h4 className="text-xl font-display font-extrabold text-white mt-0.5">{problem.title}</h4>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 bg-[#0B1020]/80 p-3 rounded-xl border border-[#1E294B] text-center font-mono">
+                <div>
+                  <div className="text-[10px] text-slate-400">Runtime</div>
+                  <div className="text-xs font-bold text-emerald-400">{judgeVerdict?.runtimeMs || 14}ms</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400">Beats</div>
+                  <div className="text-xs font-bold text-purple-400">92.4%</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400">XP Bounty</div>
+                  <div className="text-xs font-bold text-amber-400">+120 XP</div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-[#1E294B] text-xs">
+                <span className="text-slate-300 font-semibold">{player.username} (Lv.{player.level} {player.title})</span>
+                <span className="text-amber-400 font-mono font-bold">🔥 {player.streakDays} Day Streak</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => {
+                  const shareText = `🚀 Conquered "${problem.title}" on AlgoArena!\n⚡ Runtime: ${judgeVerdict?.runtimeMs || 14}ms (Beats 92%)\n🏆 Player: ${player.username} (Level ${player.level} ${player.title})\nPlay, Visualize, & Win at AlgoArena!`;
+                  navigator.clipboard.writeText(shareText);
+                  toast.success('Copied victory badge text to clipboard!');
+                }}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#6366F1] text-white font-bold text-xs hover:brightness-110 shadow-lg shadow-purple-900/30 transition-all flex items-center justify-center space-x-2"
+              >
+                <Share2 className="h-4 w-4" />
+                <span>Copy Shareable Badge (LinkedIn / X)</span>
+              </button>
             </div>
           </div>
         </div>
