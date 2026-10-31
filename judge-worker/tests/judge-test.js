@@ -1,0 +1,101 @@
+import { judgeSubmission, VERDICTS, normalizeOutput } from '../local-judge.js';
+
+console.log('🧪 Running Judge Worker Unit & Integration Tests...\n');
+
+let passed = 0;
+let total = 0;
+
+function assert(condition, testName) {
+  total++;
+  if (condition) {
+    passed++;
+    console.log(`  ✅ [PASS] ${testName}`);
+  } else {
+    console.error(`  ❌ [FAIL] ${testName}`);
+    process.exitCode = 1;
+  }
+}
+
+async function runTests() {
+  // Test 1: Output Normalization
+  assert(
+    normalizeOutput('hello world  \r\n\r\n') === 'hello world',
+    'Output Normalization trims trailing whitespace and CRLF'
+  );
+
+  // Test 2: Output Normalization with multiple lines
+  assert(
+    normalizeOutput('line 1  \r\nline 2   \r\n') === 'line 1\nline 2',
+    'Output Normalization handles multi-line outputs'
+  );
+
+  // Test 3: Python Two Sum (AC)
+  const pyResult = await judgeSubmission({
+    language: 'PYTHON',
+    sourceCode: 'import sys\nprint("42")',
+    inputData: '',
+    expectedOutput: '42',
+    timeLimitMs: 1000
+  });
+  assert(pyResult.verdict === VERDICTS.ACCEPTED, 'Python correct answer returns AC');
+
+  // Test 4: Python Wrong Answer (WA)
+  const waResult = await judgeSubmission({
+    language: 'PYTHON',
+    sourceCode: 'print("wrong output")',
+    inputData: '',
+    expectedOutput: 'correct output',
+    timeLimitMs: 1000
+  });
+  assert(waResult.verdict === VERDICTS.WRONG_ANSWER, 'Python incorrect answer returns WA');
+
+  // Test 5: Python Infinite Loop (TLE)
+  const tleResult = await judgeSubmission({
+    language: 'PYTHON',
+    sourceCode: 'import time\nwhile True: time.sleep(0.05)',
+    inputData: '',
+    expectedOutput: 'done',
+    timeLimitMs: 400
+  });
+  assert(tleResult.verdict === VERDICTS.TIME_LIMIT_EXCEEDED, 'Python infinite loop triggers TLE and process kill');
+
+  // Test 6: C Compilation Error (CE)
+  const ceResult = await judgeSubmission({
+    language: 'C',
+    sourceCode: 'invalid c code here',
+    inputData: '',
+    expectedOutput: '',
+    timeLimitMs: 1000
+  });
+  assert(ceResult.verdict === VERDICTS.COMPILATION_ERROR, 'C syntax error returns CE');
+
+  // Test 7: ICPC Penalty Calculation logic
+  function calculateICPCScore(attempts) {
+    // attempts = [{ problem: 'A', accepted: true, timeMinutes: 15, failedBefore: 1 }]
+    let score = 0;
+    let penalty = 0;
+    for (const a of attempts) {
+      if (a.accepted) {
+        score += 100;
+        penalty += a.timeMinutes + (a.failedBefore * 20);
+      }
+    }
+    return { score, penalty };
+  }
+
+  const contestScore = calculateICPCScore([
+    { problem: 'A', accepted: true, timeMinutes: 15, failedBefore: 1 }, // 15 + 20 = 35
+    { problem: 'B', accepted: true, timeMinutes: 40, failedBefore: 0 }, // 40
+    { problem: 'C', accepted: false, timeMinutes: 0, failedBefore: 3 }  // not solved -> 0 penalty
+  ]);
+
+  assert(contestScore.score === 200, 'ICPC Score correctly sums accepted problems');
+  assert(contestScore.penalty === 75, 'ICPC Penalty adds 20 mins per rejected try only on solved problems (35 + 40 = 75)');
+
+  console.log(`\n========================================`);
+  console.log(`Test Results: ${passed} / ${total} tests passed!`);
+  console.log(`========================================\n`);
+}
+
+runTests();
+

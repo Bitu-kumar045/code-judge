@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+target/
+*/target/
+dist/
+*/dist/
+build/
+*.class
+*.jar
+*.war
+
+# Temporary and log files
+*.log
+.DS_Store
+Thumbs.db
+tmp/
+temp/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+
+# Environment & Secrets
+.env
+.env.local
+.env.production
