@@ -600,3 +600,4 @@ console.log('\n--- VERIFICATION: Problem #1001 ---');
 console.log('Title:', p1001.title);
 console.log('Statement:', p1001.statement);
 console.log('Companies:', p1001.companies);
+
