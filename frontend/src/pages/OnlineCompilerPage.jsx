@@ -9,100 +9,22 @@ import {
   Share2, 
   Code2, 
   Cpu, 
-  Sparkles,
-  Layers,
-  CheckCircle2,
-  Clock,
-  Database
+  Sparkles, 
+  Layers, 
+  CheckCircle2, 
+  Clock, 
+  Database 
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
-
-const COMPILER_BOILERPLATES = {
-  PYTHON: {
-    label: 'Python 3',
-    monaco: 'python',
-    code: `# Python 3 Sandbox Execution
-import sys
-
-def main():
-    print("Hello, CodeJudge Sandbox!")
-    # Example reading from standard input
-    # line = sys.stdin.readline().strip()
-    # print(f"Received: {line}")
-
-if __name__ == '__main__':
-    main()`
-  },
-  CPP: {
-    label: 'C++ 17 (GCC 12)',
-    monaco: 'cpp',
-    code: `// C++ 17 Fast I/O Template
-#include <iostream>
-#include <vector>
-#include <string>
-
-using namespace std;
-
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    cout << "Hello from C++ 17 Sandbox!" << "\\n";
-    return 0;
-}`
-  },
-  JAVA: {
-    label: 'Java (OpenJDK 17)',
-    monaco: 'java',
-    code: `import java.util.*;
-
-public class Solution {
-    public static void main(String[] args) {
-        System.out.println("Hello from Java 17 Sandbox!");
-    }
-}`
-  },
-  C: {
-    label: 'C (GCC 11)',
-    monaco: 'c',
-    code: `#include <stdio.h>
-
-int main() {
-    printf("Hello from C Sandbox!\\n");
-    return 0;
-}`
-  },
-  JAVASCRIPT: {
-    label: 'JavaScript (Node.js)',
-    monaco: 'javascript',
-    code: `// Node.js Sandbox Execution
-console.log("Hello from Node.js Sandbox!");
-const arr = [1, 2, 3, 4, 5];
-console.log("Sum:", arr.reduce((a, b) => a + b, 0));`
-  },
-  GO: {
-    label: 'Go (Golang)',
-    monaco: 'go',
-    code: `package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello from Go Sandbox!")
-}`
-  },
-  RUST: {
-    label: 'Rust',
-    monaco: 'rust',
-    code: `fn main() {
-    println!("Hello from Rust Memory-Safe Sandbox!");
-}`
-  }
-};
+import { 
+  LANGUAGE_CATEGORIES, 
+  LANGUAGE_CONFIG, 
+  getStarterCode 
+} from '../utils/languageTemplates';
 
 export default function OnlineCompilerPage() {
   const [lang, setLang] = useState('PYTHON');
-  const [code, setCode] = useState(COMPILER_BOILERPLATES.PYTHON.code);
+  const [code, setCode] = useState(getStarterCode('PYTHON'));
   const [stdinInput, setStdinInput] = useState('');
   const [output, setOutput] = useState('');
   const [errorOutput, setErrorOutput] = useState('');
@@ -113,8 +35,8 @@ export default function OnlineCompilerPage() {
 
   const handleLangChange = (newLang) => {
     setLang(newLang);
-    setCode(COMPILER_BOILERPLATES[newLang]?.code || '');
-    toast.info(`Switched to ${COMPILER_BOILERPLATES[newLang]?.label}`);
+    setCode(getStarterCode(newLang));
+    toast.info(`Switched to ${LANGUAGE_CONFIG[newLang]?.label || newLang}`);
   };
 
   const handleRun = async () => {
@@ -124,14 +46,14 @@ export default function OnlineCompilerPage() {
     setStats(null);
 
     try {
-      const res = await fetch('http://localhost:8080/api/v1/submissions', {
+      const res = await fetch('/api/v1/judge/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          problemId: 'two-sum',
           language: lang,
           sourceCode: code,
-          inputData: stdinInput
+          inputData: stdinInput,
+          expectedOutput: ''
         })
       });
       const json = await res.json();
@@ -144,6 +66,8 @@ export default function OnlineCompilerPage() {
           verdict: json.data.verdict
         });
         toast.success(`Executed in ${json.data.runtimeMs || 12}ms!`);
+      } else {
+        setOutput(json.message || 'Execution completed.');
       }
     } catch (err) {
       setErrorOutput(err.message);
@@ -160,7 +84,7 @@ export default function OnlineCompilerPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const currentCfg = COMPILER_BOILERPLATES[lang] || COMPILER_BOILERPLATES.PYTHON;
+  const currentCfg = LANGUAGE_CONFIG[lang] || LANGUAGE_CONFIG.PYTHON;
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#0B0F19] text-slate-100 overflow-hidden">
@@ -171,22 +95,26 @@ export default function OnlineCompilerPage() {
           <div className="flex items-center space-x-2">
             <Code2 className="w-4 h-4 text-indigo-400" />
             <span className="text-xs font-bold text-white font-mono uppercase tracking-wider">
-              Standalone Online Sandbox Compiler
+              Online Sandbox Compiler (15 Languages)
             </span>
           </div>
 
           <div className="h-4 w-px bg-slate-800" />
 
-          {/* Language Selector */}
+          {/* Categorized Language Selector */}
           <select
             value={lang}
             onChange={(e) => handleLangChange(e.target.value)}
             className="bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs font-mono text-indigo-300 focus:outline-none focus:border-indigo-500"
           >
-            {Object.entries(COMPILER_BOILERPLATES).map(([key, cfg]) => (
-              <option key={key} value={key}>
-                {cfg.label}
-              </option>
+            {LANGUAGE_CATEGORIES.map(cat => (
+              <optgroup key={cat.category} label={cat.category} className="bg-slate-900 text-slate-400 font-sans font-bold">
+                {cat.languages.map(langKey => (
+                  <option key={langKey} value={langKey} className="bg-slate-950 text-slate-100 font-mono font-normal">
+                    {LANGUAGE_CONFIG[langKey].label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>
@@ -194,7 +122,7 @@ export default function OnlineCompilerPage() {
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setCode(currentCfg.code)}
+            onClick={() => setCode(getStarterCode(lang))}
             title="Reset code template"
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
@@ -227,7 +155,7 @@ export default function OnlineCompilerPage() {
         <div className="h-full relative min-h-[300px]">
           <Editor
             height="100%"
-            language={currentCfg.monaco}
+            language={currentCfg.monacoLang || 'python'}
             theme="vs-dark"
             value={code}
             onChange={(val) => setCode(val || '')}
@@ -312,4 +240,3 @@ export default function OnlineCompilerPage() {
     </div>
   );
 }
-

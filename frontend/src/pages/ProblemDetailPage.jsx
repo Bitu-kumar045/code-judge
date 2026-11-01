@@ -44,18 +44,11 @@ import {
   ShieldCheck,
   Hash
 } from 'lucide-react';
-
-const LANGUAGE_CONFIG = {
-  PYTHON: { label: 'Python 3', monacoLang: 'python', ext: '.py' },
-  CPP: { label: 'C++ (GCC 12)', monacoLang: 'cpp', ext: '.cpp' },
-  JAVA: { label: 'Java (OpenJDK 17)', monacoLang: 'java', ext: '.java' },
-  C: { label: 'C (GCC 11)', monacoLang: 'c', ext: '.c' },
-  JAVASCRIPT: { label: 'JavaScript (Node.js)', monacoLang: 'javascript', ext: '.js' },
-  GO: { label: 'Go (Golang)', monacoLang: 'go', ext: '.go' },
-  RUST: { label: 'Rust', monacoLang: 'rust', ext: '.rs' },
-  KOTLIN: { label: 'Kotlin', monacoLang: 'kotlin', ext: '.kt' },
-  CSHARP: { label: 'C# (.NET)', monacoLang: 'csharp', ext: '.cs' },
-};
+import { 
+  LANGUAGE_CATEGORIES, 
+  LANGUAGE_CONFIG, 
+  getStarterCode 
+} from '../utils/languageTemplates';
 
 export default function ProblemDetailPage() {
   const { slug } = useParams();
@@ -134,7 +127,7 @@ export default function ProblemDetailPage() {
       if (data) {
         setProblem(data);
         setIsSolved(data.isSolved || isProblemSolved(data));
-        const starter = data.starterCode?.[selectedLang] || data.starterCode?.PYTHON || "// Write your solution here";
+        const starter = getStarterCode(selectedLang, data);
         setCode(starter);
         if (data.defaultInput || data.examples?.[0]?.input) {
           setCustomInput(data.defaultInput || data.examples[0].input);
@@ -810,19 +803,32 @@ export default function ProblemDetailPage() {
               <span className="text-xs font-mono text-slate-400">Language:</span>
               <select
                 value={selectedLang}
-                onChange={(e) => setSelectedLang(e.target.value)}
+                onChange={(e) => {
+                  const newLang = e.target.value;
+                  setSelectedLang(newLang);
+                  const starter = getStarterCode(newLang, problem);
+                  setCode(starter);
+                  toast.info(`Switched to ${LANGUAGE_CONFIG[newLang]?.label || newLang}`);
+                }}
                 className="bg-slate-950 border border-slate-700/80 rounded px-2.5 py-1 text-xs font-mono text-indigo-300 focus:outline-none focus:border-indigo-500"
               >
-                {Object.entries(LANGUAGE_CONFIG).map(([key, cfg]) => (
-                  <option key={key} value={key}>{cfg.label}</option>
+                {LANGUAGE_CATEGORIES.map(cat => (
+                  <optgroup key={cat.category} label={cat.category} className="bg-slate-900 text-slate-400 font-sans font-bold">
+                    {cat.languages.map(langKey => (
+                      <option key={langKey} value={langKey} className="bg-slate-950 text-slate-100 font-mono font-normal">
+                        {LANGUAGE_CONFIG[langKey].label}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>
 
             <button
               onClick={() => {
-                if (problem?.starterCode?.[selectedLang]) setCode(problem.starterCode[selectedLang]);
-                toast.info('Template reset');
+                const starter = getStarterCode(selectedLang, problem);
+                setCode(starter);
+                toast.info(`Reset ${LANGUAGE_CONFIG[selectedLang]?.label || selectedLang} template`);
               }}
               className="flex items-center space-x-1 text-xs text-slate-400 hover:text-slate-200"
             >

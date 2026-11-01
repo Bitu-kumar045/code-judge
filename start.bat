@@ -20,3 +20,4 @@ start http://localhost:3000
 
 echo Done! Both servers are running in their respective windows.
 pause
+
