@@ -14,3 +14,4 @@ if errorlevel 1 (
     cd /d "%ROOT%\frontend"
     start "" /b "C:\Program Files\nodejs\npm.cmd" run dev -- --host 0.0.0.0 --port 3000
 )
+

@@ -84,6 +84,12 @@ export default function ProblemDetailPage() {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [submitCooldown, setSubmitCooldown] = useState(0);
 
+  // Submissions History for this Problem
+  const [problemSubmissions, setProblemSubmissions] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [selectedSubModal, setSelectedSubModal] = useState(null);
+  const [copiedSubCode, setCopiedSubCode] = useState(false);
+
   // AI Assistant Drawer
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiActiveTab, setAiActiveTab] = useState('hint'); // 'hint' | 'complexity' | 'error' | 'review'
@@ -120,23 +126,47 @@ export default function ProblemDetailPage() {
   };
 
   // Load problem details
+  const loadProblemSubmissions = async (probObj) => {
+    const target = probObj || problem;
+    if (!target) return;
+    setSubmissionsLoading(true);
+    try {
+      const subs = await api.getSubmissions({ 
+        problemId: target.id, 
+        problemSlug: target.slug 
+      });
+      setProblemSubmissions(Array.isArray(subs) ? subs : []);
+    } catch {
+      setProblemSubmissions([]);
+    } finally {
+      setSubmissionsLoading(false);
+    }
+  };
+
   useEffect(() => {
     async function loadProblem() {
       setLoading(true);
       const data = await api.getProblemBySlug(slug);
       if (data) {
         setProblem(data);
-        setIsSolved(data.isSolved || isProblemSolved(data));
+        setIsSolved(Boolean(data.isSolved || isProblemSolved(data)));
         const starter = getStarterCode(selectedLang, data);
         setCode(starter);
         if (data.defaultInput || data.examples?.[0]?.input) {
           setCustomInput(data.defaultInput || data.examples[0].input);
         }
+        loadProblemSubmissions(data);
       }
       setLoading(false);
     }
     loadProblem();
   }, [slug]);
+
+  useEffect(() => {
+    if (activeLeftTab === 'submissions' && problem) {
+      loadProblemSubmissions();
+    }
+  }, [activeLeftTab]);
 
   // Pomodoro timer tick
   useEffect(() => {
@@ -348,23 +378,28 @@ export default function ProblemDetailPage() {
         sourceCode: code,
       });
 
+      // Immediately append submission record to history
+      if (sub && sub.id) {
+        setProblemSubmissions(prev => [sub, ...prev.filter(s => s.id !== sub.id)]);
+      }
+
       setTimeout(() => {
         clearInterval(testInterval);
         setIsEvaluating(false);
         setEvaluationStage('');
-        const isAc = !sub?.verdict || sub.verdict === 'AC';
+        const isAc = sub?.verdict === 'AC';
         const acResult = {
           status: 'COMPLETED',
-          verdict: sub?.verdict || 'AC',
+          verdict: sub?.verdict || 'WA',
           runtimeMs: sub?.runtimeMs || 14,
           memoryKb: sub?.memoryKb || 3480,
-          beatsRuntime: 88,
-          beatsMemory: 92,
-          actualOutput: sub?.actualOutput || problem.sampleCases[0]?.output || '0 1',
-          expectedOutput: sub?.expectedOutput || problem.sampleCases[0]?.output || '0 1',
+          beatsRuntime: isAc ? 88 : 0,
+          beatsMemory: isAc ? 92 : 0,
+          actualOutput: sub?.actualOutput || '0 1',
+          expectedOutput: sub?.expectedOutput || '0 1',
           message: isAc 
-            ? 'Accepted! All 10/10 hidden test cases passed.' 
-            : (sub?.errorMessage || `Execution finished with verdict: ${sub?.verdict}`)
+            ? 'Accepted! All test cases passed successfully.' 
+            : (sub?.errorMessage || `Execution finished with verdict: ${sub?.verdict || 'Wrong Answer'}`)
         };
         setJudgeVerdict(acResult);
         if (isAc) {
@@ -778,16 +813,134 @@ export default function ProblemDetailPage() {
               </div>
             )}
 
-            {/* Submissions Tab */}
+            {/* Submissions Tab (Live Process & History) */}
             {activeLeftTab === 'submissions' && (
-              <div className="space-y-3">
-                <div className="p-3.5 rounded-xl bg-[#111827] border border-slate-800 flex items-center justify-between font-mono text-xs">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Accepted (14ms)</span>
+              <div className="space-y-4">
+                {/* Header with count and global link */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">Submissions History</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      {problemSubmissions.length}
+                    </span>
                   </div>
-                  <span className="text-slate-500">Python 3 • Just now</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => loadProblemSubmissions()}
+                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                      title="Refresh submissions"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Refresh</span>
+                    </button>
+                    <Link
+                      to="/submissions"
+                      className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                    >
+                      All Questions Process →
+                    </Link>
+                  </div>
                 </div>
+
+                {/* Submissions List */}
+                {submissionsLoading ? (
+                  <div className="space-y-2.5 py-4">
+                    <div className="h-16 bg-slate-900/60 rounded-xl border border-slate-800/80 animate-pulse" />
+                    <div className="h-16 bg-slate-900/60 rounded-xl border border-slate-800/80 animate-pulse" />
+                  </div>
+                ) : problemSubmissions.length === 0 ? (
+                  <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800/80 space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+                      <FileCode2 className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-semibold text-white">No submissions yet</h3>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                        Write your code and click <strong className="text-indigo-300">Submit</strong>. Your solution will run against all test cases, and your evaluation verdicts and code history will be saved here.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {problemSubmissions.map((sub, idx) => {
+                      const isAc = sub.verdict === 'AC';
+                      const isWa = sub.verdict === 'WA';
+                      const isTle = sub.verdict === 'TLE';
+                      const formattedTime = sub.createdAt 
+                        ? new Date(sub.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
+                        : 'Just now';
+
+                      return (
+                        <div
+                          key={sub.id || idx}
+                          className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/90 hover:border-slate-700/80 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs"
+                        >
+                          <div className="flex items-center gap-3">
+                            {isAc ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>Accepted</span>
+                              </span>
+                            ) : isWa ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                <XCircle className="w-3.5 h-3.5" />
+                                <span>Wrong Answer</span>
+                              </span>
+                            ) : isTle ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>Time Limit</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                <span>{sub.verdict || 'Error'}</span>
+                              </span>
+                            )}
+
+                            <span className="text-slate-300 font-sans font-semibold">
+                              {sub.language || 'PYTHON'}
+                            </span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400">
+                              {sub.runtimeMs ? `${sub.runtimeMs} ms` : '14 ms'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between sm:justify-end gap-3 text-slate-400 text-[11px]">
+                            <span>{formattedTime}</span>
+                            <div className="flex items-center gap-2">
+                              {sub.sourceCode && (
+                                <>
+                                  <button
+                                    onClick={() => setSelectedSubModal(sub)}
+                                    className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 border border-indigo-500/20 transition-colors flex items-center gap-1"
+                                    title="View submitted source code"
+                                  >
+                                    <FileCode2 className="w-3 h-3" />
+                                    <span>Code</span>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setCode(sub.sourceCode);
+                                      if (sub.language) setSelectedLang(sub.language);
+                                      toast.success('Loaded submission code into editor!');
+                                    }}
+                                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors flex items-center gap-1"
+                                    title="Restore this code into the editor"
+                                  >
+                                    <RotateCcw className="w-3 h-3" />
+                                    <span>Restore</span>
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1035,6 +1188,73 @@ export default function ProblemDetailPage() {
               >
                 Save Settings
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submission Code Inspection Modal */}
+      {selectedSubModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#111827] border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="p-4 bg-[#0B0F19] border-b border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center space-x-3">
+                <FileCode2 className="h-4 w-4 text-indigo-400" />
+                <span className="text-sm font-semibold text-white">
+                  Submission #{selectedSubModal.id} • {selectedSubModal.language}
+                </span>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                  selectedSubModal.verdict === 'AC' 
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                }`}>
+                  {selectedSubModal.verdict === 'AC' ? 'Accepted' : selectedSubModal.verdict}
+                </span>
+              </div>
+              <button
+                onClick={() => setSelectedSubModal(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-3 overflow-y-auto flex-1">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-400 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                <div className="flex items-center space-x-4">
+                  <span>Runtime: <strong className="text-slate-200">{selectedSubModal.runtimeMs || 14} ms</strong></span>
+                  <span>Memory: <strong className="text-slate-200">{((selectedSubModal.memoryKb || 3480) / 1024).toFixed(1)} MB</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedSubModal.sourceCode);
+                      setCopiedSubCode(true);
+                      setTimeout(() => setCopiedSubCode(false), 1500);
+                    }}
+                    className="flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                  >
+                    {copiedSubCode ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                    <span>{copiedSubCode ? 'Copied' : 'Copy'}</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCode(selectedSubModal.sourceCode);
+                      if (selectedSubModal.language) setSelectedLang(selectedSubModal.language);
+                      setSelectedSubModal(null);
+                      toast.success('Restored code to Monaco Editor!');
+                    }}
+                    className="flex items-center space-x-1 px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Restore to Editor</span>
+                  </button>
+                </div>
+              </div>
+
+              <pre className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 font-mono text-xs text-indigo-200 overflow-x-auto max-h-96 leading-relaxed selection:bg-indigo-500/40">
+                {selectedSubModal.sourceCode}
+              </pre>
             </div>
           </div>
         </div>

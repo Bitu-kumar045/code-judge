@@ -133,15 +133,13 @@ export function useSolvedState() {
   const [levelCounts, setLevelCounts] = useState(() => getLevelWiseSolved());
 
   useEffect(() => {
-    // Initial fetch from backend if available
+    // Sync authoritative solved list directly from backend
     api.getSolvedProblems?.().then(res => {
       const ids = Array.isArray(res) ? res : res?.solvedIds;
-      if (Array.isArray(ids) && ids.length > 0) {
-        setSolvedSet(prev => {
-          const next = new Set([...prev, ...ids.map(String)]);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
-          return next;
-        });
+      if (Array.isArray(ids)) {
+        const next = new Set(ids.map(String));
+        setSolvedSet(next);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
       }
     }).catch(() => {});
 

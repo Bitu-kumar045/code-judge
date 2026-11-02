@@ -285,7 +285,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ usernameOrEmail, password }),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     
     // Fallback demo users
     if (usernameOrEmail === 'admin' || usernameOrEmail === 'admin@codejudge.com') {
@@ -307,7 +314,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ username, email, password }),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     return {
       accessToken: "mock-jwt-newuser-token",
       tokenType: "Bearer",
@@ -353,7 +367,14 @@ export const api = {
 
   async getProblemBySlug(slug) {
     const res = await request(`/problems/${slug}`);
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     return SAMPLE_PROBLEMS.find(p => p.slug === slug) || SAMPLE_PROBLEMS[0];
   },
 
@@ -362,7 +383,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(problemData),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     const newProblem = {
       ...problemData,
       id: "prob-" + Date.now(),
@@ -380,7 +408,14 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(problemData),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     const index = SAMPLE_PROBLEMS.findIndex(p => p.id === id || p.slug === id);
     if (index !== -1) {
       SAMPLE_PROBLEMS[index] = { ...SAMPLE_PROBLEMS[index], ...problemData };
@@ -423,7 +458,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ language, sourceCode, inputData, expectedOutput }),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
     return null;
   },
 
@@ -433,19 +475,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ problemId, language, sourceCode }),
     });
-    if (res && res.data) return res.data;
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
 
-    // Realistic simulated execution pipeline
+    // Realistic simulated execution pipeline fallback
     const submissionId = "sub-" + Math.floor(Math.random() * 90000 + 10000);
     const mockPending = {
       id: submissionId,
       problemId,
       language,
       sourceCode,
-      status: "RUNNING",
-      verdict: null,
-      runtimeMs: null,
-      memoryKb: null,
+      status: "COMPLETED",
+      verdict: "AC",
+      runtimeMs: 14,
+      memoryKb: 3480,
       createdAt: new Date().toISOString()
     };
     return mockPending;
@@ -453,19 +502,44 @@ export const api = {
 
   async getSubmission(id) {
     const res = await request(`/submissions/${id}`);
-    if (res && res.data) return res.data;
-    return {
-      id,
-      status: "COMPLETED",
-      verdict: "AC",
-      runtimeMs: 28,
-      memoryKb: 8420,
-      createdAt: new Date().toISOString()
-    };
+    if (res && res.data) {
+      try {
+        const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+        local.unshift(res.data);
+        localStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      } catch {}
+      return res.data;
+    }
+    return null;
   },
 
-  async getSubmissions() {
-    return SAMPLE_SUBMISSIONS;
+  async getSubmissions(params = {}) {
+    let query = '';
+    const parts = [];
+    if (params.problemId) parts.push(`problemId=${encodeURIComponent(params.problemId)}`);
+    if (params.problemSlug) parts.push(`problemSlug=${encodeURIComponent(params.problemSlug)}`);
+    if (params.username) parts.push(`username=${encodeURIComponent(params.username)}`);
+    if (params.verdict && params.verdict !== 'ALL') parts.push(`verdict=${encodeURIComponent(params.verdict)}`);
+    if (parts.length > 0) query = '?' + parts.join('&');
+
+    const res = await request(`/submissions${query}`);
+    if (res && Array.isArray(res.data)) return res.data;
+    if (res && Array.isArray(res)) return res;
+
+    // Fallback to localStorage
+    try {
+      const local = JSON.parse(localStorage.getItem('codejudge_submissions') || '[]');
+      if (params.problemId || params.problemSlug) {
+        return local.filter(s => 
+          s.problemId === params.problemId || 
+          s.problemSlug === params.problemSlug ||
+          (params.problemId && String(s.problemNo) === String(params.problemId))
+        );
+      }
+      return local;
+    } catch {
+      return [];
+    }
   },
 
   // Contests

@@ -20,8 +20,58 @@ const __dirname = path.dirname(__filename);
 
 const PORT = 8080;
 
-// Load 1,000 problems catalog
+// File paths for persistence
 const ALL_PROBLEMS_FILE = path.join(__dirname, 'data/all-problems.json');
+const SUBMISSIONS_FILE = path.join(__dirname, 'data/submissions.json');
+const USER_SOLVED_FILE = path.join(__dirname, 'data/user-solved.json');
+
+// Persistent user submissions
+let loadedSubmissions = [];
+if (fs.existsSync(SUBMISSIONS_FILE)) {
+  try {
+    loadedSubmissions = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, 'utf8'));
+    console.log(`[Database] Loaded ${loadedSubmissions.length} user submissions from disk`);
+  } catch (err) {
+    console.error('Failed to parse submissions.json', err);
+  }
+}
+
+// Persistent user solved problems (starts empty unless user previously submitted AC)
+const loadedSolved = {
+  'coder': new Set(),
+  'admin': new Set()
+};
+if (fs.existsSync(USER_SOLVED_FILE)) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(USER_SOLVED_FILE, 'utf8'));
+    for (const [user, items] of Object.entries(raw)) {
+      loadedSolved[user] = new Set(Array.isArray(items) ? items : []);
+    }
+    console.log(`[Database] Loaded solved records for users: ${Object.keys(loadedSolved).join(', ')}`);
+  } catch (err) {
+    console.error('Failed to parse user-solved.json', err);
+  }
+}
+
+function saveSubmissionsToDisk() {
+  try {
+    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(DB.submissions, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[Database] Failed to save submissions to disk:', err.message);
+  }
+}
+
+function saveSolvedToDisk() {
+  try {
+    const out = {};
+    for (const [user, set] of Object.entries(DB.solvedByUser)) {
+      out[user] = Array.from(set);
+    }
+    fs.writeFileSync(USER_SOLVED_FILE, JSON.stringify(out, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[Database] Failed to save solved records to disk:', err.message);
+  }
+}
 let loadedProblems = [];
 if (fs.existsSync(ALL_PROBLEMS_FILE)) {
   try {
@@ -35,13 +85,10 @@ if (fs.existsSync(ALL_PROBLEMS_FILE)) {
 // In-Memory Database Store for Problems, Submissions, and Users
 const DB = {
   users: [
-    { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', role: 'ROLE_ADMIN', rating: 2150, solvedCount: 182 },
-    { id: 'u-coder', username: 'coder', email: 'coder@example.com', role: 'ROLE_USER', rating: 1620, solvedCount: 47 }
+    { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', role: 'ROLE_ADMIN', rating: 2150, solvedCount: loadedSolved['admin']?.size || 0 },
+    { id: 'u-coder', username: 'coder', email: 'coder@example.com', role: 'ROLE_USER', rating: 1620, solvedCount: loadedSolved['coder']?.size || 0 }
   ],
-  solvedByUser: {
-    'coder': new Set(['prob-1']),
-    'admin': new Set(['prob-1', 'prob-2'])
-  },
+  solvedByUser: loadedSolved,
   problems: loadedProblems.length > 0 ? loadedProblems : [
     {
       id: "e4a3b8d1-1234-4567-89ab-cdef01234567",
@@ -128,21 +175,7 @@ Explanation: The answer is "abc", with the length of 3.
       ]
     }
   ],
-  submissions: [
-    {
-      id: "sub-9001",
-      problemSlug: "two-sum",
-      problemTitle: "Two Sum",
-      username: "tourist",
-      language: "CPP",
-      status: "COMPLETED",
-      verdict: "AC",
-      runtimeMs: 12,
-      memoryKb: 3420,
-      createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-      sourceCode: "#include <iostream>\nusing namespace std;\nint main() { cout << \"0 1\\n\"; return 0; }"
-    }
-  ]
+  submissions: loadedSubmissions
 };
 
 // Helper to parse JSON body
@@ -446,6 +479,7 @@ const server = http.createServer(async (req, res) => {
       const submission = {
         id: 'sub-' + Math.floor(Math.random() * 90000 + 10000),
         problemId: prob.id,
+        problemNo: prob.no,
         problemSlug: prob.slug,
         problemTitle: prob.title,
         username: 'coder',
@@ -462,16 +496,19 @@ const server = http.createServer(async (req, res) => {
       };
 
       DB.submissions.unshift(submission);
+      saveSubmissionsToDisk();
 
-      // Track solved problem on AC verdict
+      // Track solved problem ONLY on AC verdict
       if (finalVerdict === 'AC') {
         const username = 'coder';
         if (!DB.solvedByUser[username]) {
           DB.solvedByUser[username] = new Set();
         }
         DB.solvedByUser[username].add(prob.id);
-        DB.solvedByUser[username].add(prob.slug);
-        if (prob.no) DB.solvedByUser[username].add(String(prob.no));
+        if (prob.slug) DB.solvedByUser[username].add(prob.slug);
+        if (prob.no !== undefined && prob.no !== null) DB.solvedByUser[username].add(String(prob.no));
+
+        saveSolvedToDisk();
 
         const userObj = DB.users.find(u => u.username === username);
         if (userObj) {
@@ -494,7 +531,34 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (pathname === '/api/v1/submissions' && method === 'GET') {
-      return sendJson(res, 200, { success: true, data: DB.submissions });
+      const problemId = url.searchParams.get('problemId') || url.searchParams.get('problemSlug');
+      const username = url.searchParams.get('username');
+      const verdict = url.searchParams.get('verdict');
+
+      let list = [...DB.submissions];
+      if (problemId) {
+        list = list.filter(s => 
+          s.problemId === problemId || 
+          s.problemSlug === problemId || 
+          (s.problemNo && String(s.problemNo) === String(problemId))
+        );
+      }
+      if (username) {
+        list = list.filter(s => s.username === username);
+      }
+      if (verdict && verdict !== 'ALL') {
+        list = list.filter(s => s.verdict === verdict);
+      }
+      return sendJson(res, 200, { success: true, data: list });
+    }
+
+    // Reset user submissions & solved (fresh start)
+    if (pathname === '/api/v1/user/reset' && method === 'POST') {
+      DB.submissions = [];
+      DB.solvedByUser['coder'] = new Set();
+      saveSubmissionsToDisk();
+      saveSolvedToDisk();
+      return sendJson(res, 200, { success: true, message: 'All submissions and solved states have been reset.' });
     }
 
     // User Solved Problems API
@@ -544,6 +608,7 @@ const server = http.createServer(async (req, res) => {
           DB.solvedByUser[username].add(prob.slug);
           if (prob.no) DB.solvedByUser[username].add(String(prob.no));
         }
+        saveSolvedToDisk();
       }
       return sendJson(res, 200, {
         success: true,

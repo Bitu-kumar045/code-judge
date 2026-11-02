@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { 
   Terminal, 
   Code2, 
+  FileCode2,
   Trophy, 
   ListOrdered, 
   ShieldAlert, 
@@ -37,6 +38,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Problems', path: '/problems', icon: Code2 },
+    { name: 'Submissions', path: '/submissions', icon: FileCode2 },
     { name: 'Compiler', path: '/compiler', icon: Terminal },
     { name: 'Roadmaps', path: '/paths', icon: Compass },
     { name: 'Classrooms', path: '/classrooms', icon: GraduationCap },

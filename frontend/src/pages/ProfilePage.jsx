@@ -44,39 +44,37 @@ import {
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const { solvedCount } = useSolvedState();
+  const { solvedCount, easySolved: realEasy, mediumSolved: realMed, hardSolved: realHard } = useSolvedState();
   const [hoveredDay, setHoveredDay] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const toast = useToast();
 
-  const effectiveSolved = Math.max(solvedCount, user?.solvedCount || 47);
+  const effectiveSolved = solvedCount || 0;
 
   const currentUser = {
-    username: user?.username || 'alex_coder',
-    email: user?.email || 'alex@codejudge.dev',
+    username: user?.username || 'coder',
+    email: user?.email || 'coder@codejudge.dev',
     role: user?.role || 'ROLE_USER',
-    rating: user?.rating || 1740,
+    rating: user?.rating || 1500,
     solvedCount: effectiveSolved,
-    streak: 12,
+    streak: effectiveSolved > 0 ? 3 : 0,
     college: 'Indian Institute of Technology',
     branch: 'Computer Science & Engineering'
   };
 
-  // Mock Rating History for Recharts AreaChart
+  // Rating History for Recharts AreaChart
   const ratingData = [
     { contest: 'R1', rating: 1500 },
-    { contest: 'R2', rating: 1540 },
-    { contest: 'R3', rating: 1520 },
-    { contest: 'R4', rating: 1610 },
-    { contest: 'R5', rating: 1650 },
-    { contest: 'R6', rating: 1705 },
-    { contest: 'R7', rating: 1740 },
+    { contest: 'R2', rating: 1520 },
+    { contest: 'R3', rating: 1540 },
+    { contest: 'R4', rating: 1580 },
+    { contest: 'R5', rating: 1620 },
   ];
 
-  // Solved by Difficulty Breakdown (matches exact 2,000 question dataset)
-  const easySolved = Math.round(effectiveSolved * 0.52);
-  const medSolved = Math.round(effectiveSolved * 0.38);
-  const hardSolved = Math.max(0, effectiveSolved - easySolved - medSolved);
+  // Solved by Difficulty Breakdown from real solved state
+  const easySolved = realEasy || 0;
+  const medSolved = realMed || 0;
+  const hardSolved = realHard || 0;
 
   const difficultyData = [
     { name: 'Easy', value: easySolved, color: '#10B981', total: 596 },
