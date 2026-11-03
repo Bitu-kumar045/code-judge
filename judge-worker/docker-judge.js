@@ -69,9 +69,9 @@ export async function judgeInDocker({
   const normLang = language.toUpperCase();
   const hasDocker = await isDockerDaemonAvailable();
 
-  // If Docker daemon isn't running on the machine, use the verified standalone engine
-  if (!hasDocker) {
-    console.log(`[Docker Sandbox] Docker daemon not found. Using local subprocess sandbox for ${normLang}.`);
+  // If Docker daemon isn't running on the machine or language not containerized, use verified local engine
+  if (!hasDocker || !DOCKER_IMAGES[normLang]) {
+    console.log(`[Judge Sandbox] Executing ${normLang} using local sandbox runner.`);
     return await fallbackJudge({
       language,
       sourceCode,

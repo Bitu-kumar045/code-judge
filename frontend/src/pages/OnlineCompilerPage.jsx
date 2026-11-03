@@ -22,6 +22,15 @@ import {
   getStarterCode 
 } from '../utils/languageTemplates';
 
+const QUICK_LANGS = [
+  { key: 'PYTHON', label: 'Python' },
+  { key: 'JAVASCRIPT', label: 'JS' },
+  { key: 'CPP', label: 'C++' },
+  { key: 'JAVA', label: 'Java' },
+  { key: 'SQL', label: 'SQL (Postgres)' },
+  { key: 'MYSQL', label: 'MySQL' },
+];
+
 export default function OnlineCompilerPage() {
   const [lang, setLang] = useState('PYTHON');
   const [code, setCode] = useState(getStarterCode('PYTHON'));
@@ -32,6 +41,8 @@ export default function OnlineCompilerPage() {
   const [stats, setStats] = useState(null);
   const [copied, setCopied] = useState(false);
   const toast = useToast();
+
+  const isSqlMode = lang === 'SQL' || lang === 'MYSQL';
 
   const handleLangChange = (newLang) => {
     setLang(newLang);
@@ -58,7 +69,12 @@ export default function OnlineCompilerPage() {
       });
       const json = await res.json();
       if (json.success && json.data) {
-        setOutput(json.data.actualOutput || 'Program executed with no standard output.');
+        const rawActual = json.data.actualOutput || '';
+        const trimmedActual = rawActual.trim();
+        const fallbackMsg = isSqlMode 
+          ? 'Query OK, statements executed successfully with no tabular output.' 
+          : 'Program executed with no standard output.';
+        setOutput(trimmedActual || fallbackMsg);
         if (json.data.errorMessage) setErrorOutput(json.data.errorMessage);
         setStats({
           runtimeMs: json.data.runtimeMs || 12,
@@ -117,6 +133,23 @@ export default function OnlineCompilerPage() {
               </optgroup>
             ))}
           </select>
+
+          {/* Quick-Pick Popular Language Pills */}
+          <div className="hidden xl:flex items-center space-x-1.5 ml-1">
+            {QUICK_LANGS.map(q => (
+              <button
+                key={q.key}
+                onClick={() => handleLangChange(q.key)}
+                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-all ${
+                  lang === q.key
+                    ? 'bg-indigo-600 text-white font-semibold shadow-sm shadow-indigo-600/30'
+                    : 'bg-slate-900/90 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                {q.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -178,13 +211,13 @@ export default function OnlineCompilerPage() {
           <div className="h-1/3 border-b border-slate-800 flex flex-col p-3">
             <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-              Standard Input (STDIN)
+              {isSqlMode ? '>_ ADDITIONAL SQL INPUT / PARAMETERS (OPTIONAL)' : 'Standard Input (STDIN)'}
             </span>
             <textarea
               rows={4}
               value={stdinInput}
               onChange={(e) => setStdinInput(e.target.value)}
-              placeholder="Enter optional standard input here..."
+              placeholder={isSqlMode ? "Enter optional supplementary SQL queries or parameters here..." : "Enter optional standard input here..."}
               className="flex-1 w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500 resize-none"
             />
           </div>
@@ -194,7 +227,7 @@ export default function OnlineCompilerPage() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Execution Output (STDOUT)
+                {isSqlMode ? 'SQL DATABASE ENGINE (QUERY RESULTS)' : 'Execution Output (STDOUT)'}
               </span>
 
               {stats && (
@@ -215,20 +248,26 @@ export default function OnlineCompilerPage() {
               {isRunning ? (
                 <div className="h-full flex flex-col items-center justify-center space-y-2 py-8 text-slate-400">
                   <div className="h-6 w-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs">Running inside ephemeral sandbox container...</span>
+                  <span className="text-xs">
+                    {isSqlMode ? 'Executing SQL statements against in-memory database...' : 'Running inside ephemeral sandbox container...'}
+                  </span>
                 </div>
               ) : output || errorOutput ? (
                 <div className="space-y-3">
-                  {output && <pre className="text-emerald-400 whitespace-pre-wrap">{output}</pre>}
+                  {output && <pre className="text-emerald-400 whitespace-pre-wrap font-mono leading-relaxed">{output}</pre>}
                   {errorOutput && (
                     <div className="p-2.5 rounded bg-rose-950/40 border border-rose-500/30 text-rose-300">
-                      <div className="font-bold text-[11px] uppercase mb-1">Execution Traceback</div>
-                      <pre className="text-xs whitespace-pre-wrap">{errorOutput}</pre>
+                      <div className="font-bold text-[11px] uppercase mb-1">Execution Traceback / Error</div>
+                      <pre className="text-xs whitespace-pre-wrap font-mono">{errorOutput}</pre>
                     </div>
                   )}
                 </div>
               ) : (
-                <span className="text-slate-600 italic">Output will appear here after clicking "Run Code".</span>
+                <span className="text-slate-600 italic">
+                  {isSqlMode 
+                    ? 'SQL query results and schema summaries will appear here after clicking "Run Code".' 
+                    : 'Output will appear here after clicking "Run Code".'}
+                </span>
               )}
             </div>
           </div>

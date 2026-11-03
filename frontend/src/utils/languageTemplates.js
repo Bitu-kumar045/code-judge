@@ -15,7 +15,7 @@ export const LANGUAGE_CATEGORIES = [
   },
   {
     category: 'Data, Math & Databases',
-    languages: ['SQL', 'R', 'JULIA', 'MATLAB']
+    languages: ['SQL', 'MYSQL', 'R', 'JULIA', 'MATLAB']
   }
 ];
 
@@ -109,7 +109,14 @@ export const LANGUAGE_CONFIG = {
     monacoLang: 'sql',
     ext: '.sql',
     category: 'Data, Math & Databases',
-    description: 'Relational database management and data querying.'
+    description: 'Relational database management, table creation, and analytical data querying.'
+  },
+  MYSQL: {
+    label: 'MySQL (8.0 Database)',
+    monacoLang: 'sql',
+    ext: '.sql',
+    category: 'Data, Math & Databases',
+    description: 'Open-source relational database management system for web and enterprise apps.'
   },
   R: {
     label: 'R (Statistical Computing)',
@@ -317,10 +324,61 @@ fn main() {
 `;
 
     case 'SQL':
-      return `-- Solution for: ${title}
--- Write your query below to compute the expected result:
-SELECT *
-FROM solution_table;
+      return `-- ANSI / PostgreSQL SQL Session
+-- Write DDL, DML and SELECT queries below:
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    country VARCHAR(50),
+    total_spent DECIMAL(10, 2)
+);
+
+INSERT INTO customers VALUES
+(1, 'John Doe', 'USA', 1250.50),
+(2, 'Jane Smith', 'UK', 3420.00),
+(3, 'Carlos Santana', 'Spain', 890.25),
+(4, 'Yuki Tanaka', 'Japan', 2100.00),
+(5, 'Amina Patel', 'India', 4500.75);
+
+-- Retrieve high-value customers
+SELECT 
+    country,
+    COUNT(*) AS total_customers,
+    ROUND(AVG(total_spent), 2) AS avg_spent
+FROM customers
+GROUP BY country
+ORDER BY avg_spent DESC;
+`;
+
+    case 'MYSQL':
+      return `-- MySQL 8.0 Interactive Session
+-- Write DDL, DML and SELECT queries below:
+
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    department VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+INSERT INTO employees (first_name, department, salary) VALUES
+('Alex Mercer', 'Engineering', 95000.00),
+('Sarah Connor', 'Security', 105000.00),
+('Bruce Wayne', 'Management', 150000.00),
+('Diana Prince', 'Engineering', 98000.00);
+
+-- Display created tables
+SHOW TABLES;
+
+-- Query department salaries
+SELECT 
+    department,
+    COUNT(*) AS total_staff,
+    MAX(salary) AS top_salary
+FROM employees
+GROUP BY department
+ORDER BY top_salary DESC;
 `;
 
     case 'R':

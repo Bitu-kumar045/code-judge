@@ -69,7 +69,18 @@ async function runTests() {
   });
   assert(ceResult.verdict === VERDICTS.COMPILATION_ERROR, 'C syntax error returns CE');
 
-  // Test 7: ICPC Penalty Calculation logic
+  // Test 7: SQL Execution & DDL Schema Engine
+  const sqlResult = await judgeSubmission({
+    language: 'SQL',
+    sourceCode: 'CREATE TABLE Sailors (sid INT PRIMARY KEY, sname VARCHAR(20)); INSERT INTO Sailors VALUES (1, "Dustin"); SELECT * FROM Sailors;',
+    inputData: '',
+    expectedOutput: '',
+    timeLimitMs: 1000
+  });
+  assert(sqlResult.verdict === VERDICTS.ACCEPTED, 'SQL table creation, insert, and select query executes with AC');
+  assert(sqlResult.actualOutput.includes('Dustin'), 'SQL output contains formatted result data');
+
+  // Test 8: ICPC Penalty Calculation logic
   function calculateICPCScore(attempts) {
     // attempts = [{ problem: 'A', accepted: true, timeMinutes: 15, failedBefore: 1 }]
     let score = 0;
