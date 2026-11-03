@@ -92,8 +92,9 @@ export default function ProblemDetailPage() {
 
   // AI Assistant Drawer
   const [showAiModal, setShowAiModal] = useState(false);
-  const [aiActiveTab, setAiActiveTab] = useState('hint'); // 'hint' | 'complexity' | 'error' | 'review'
+  const [aiActiveTab, setAiActiveTab] = useState('solution'); // 'solution' | 'fix' | 'hint' | 'complexity' | 'review'
   const [aiHintTier, setAiHintTier] = useState(1);
+  const [aiSolutionLang, setAiSolutionLang] = useState('PYTHON');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState(null);
 
@@ -211,6 +212,56 @@ export default function ProblemDetailPage() {
   };
 
   // AI Feature Handlers
+  const fetchAiSolution = async (targetLang = null) => {
+    setAiLoading(true);
+    setAiResponse(null);
+    setAiActiveTab('solution');
+    const langToUse = targetLang || aiSolutionLang || selectedLang || 'PYTHON';
+    setAiSolutionLang(langToUse);
+    try {
+      const res = await fetch('http://localhost:8080/api/v1/ai/solution', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          problemId: problem?.id,
+          problemTitle: problem?.title || 'Two Sum',
+          language: langToUse,
+          code: code
+        })
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        setAiResponse(json.data);
+      } else {
+        toast.error(json.message || 'AI solution query failed');
+      }
+    } catch (err) {
+      toast.error('AI solution query failed');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleInsertSolution = (solutionCode) => {
+    if (!solutionCode) return;
+    setCode(solutionCode);
+    setShowAiModal(false);
+    toast.success('Optimal verified solution inserted into your editor!');
+  };
+
+  const handleCopySolution = (solutionCode) => {
+    if (!solutionCode) return;
+    navigator.clipboard.writeText(solutionCode);
+    toast.success('Solution code copied to clipboard!');
+  };
+
+  const handleApplyFix = (fixedCode) => {
+    if (!fixedCode) return;
+    setCode(fixedCode);
+    setShowAiModal(false);
+    toast.success('Code bug & indentation fix applied to your editor!');
+  };
+
   const fetchAiHint = async (tier = 1) => {
     setAiLoading(true);
     setAiResponse(null);
@@ -219,7 +270,11 @@ export default function ProblemDetailPage() {
       const res = await fetch('http://localhost:8080/api/v1/ai/hint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ problemTitle: problem?.title || 'Two Sum', tier })
+        body: JSON.stringify({
+          problemId: problem?.id,
+          problemTitle: problem?.title || 'Two Sum',
+          tier
+        })
       });
       const json = await res.json();
       setAiResponse(json.data);
@@ -502,10 +557,11 @@ export default function ProblemDetailPage() {
           <button
             onClick={() => {
               setShowAiModal(true);
-              fetchAiHint(1);
+              setAiActiveTab('solution');
+              fetchAiSolution();
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold shadow-sm transition-all"
-            title="Ask Smart AI for hints & complexity"
+            title="Ask Smart AI for verified solution, code fixes & hints"
           >
             <Bot className="w-3.5 h-3.5 text-indigo-400" />
             <span className="hidden sm:inline">Smart AI</span>
@@ -1262,60 +1318,209 @@ export default function ProblemDetailPage() {
 
       {/* Smart AI Assistant Modal */}
       {showAiModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#111827] border border-indigo-500/30 rounded-3xl p-6 max-w-xl w-full space-y-5 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#111827] border border-indigo-500/40 rounded-3xl p-5 sm:p-6 max-w-2xl w-full space-y-4 shadow-2xl my-auto">
+            
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/30 to-purple-500/30 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Smart Algorithmic AI Assistant</h3>
-                  <p className="text-[11px] text-slate-400">Pedagogical hints without code spoilers</p>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                    Smart AI Code Assistant
+                    <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full px-2 py-0.2 font-mono">v2.0</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Verified optimal solutions, auto-fix & logic breakdown</p>
                 </div>
               </div>
-              <button onClick={() => setShowAiModal(false)} className="text-slate-400 hover:text-white text-sm">✕</button>
+              <button onClick={() => setShowAiModal(false)} className="text-slate-400 hover:text-white p-1 text-sm font-mono rounded-lg hover:bg-slate-800">✕</button>
             </div>
 
             {/* AI Action Tabs */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-1.5 border-b border-slate-800/80 pb-3">
+              <button
+                onClick={() => { setAiActiveTab('solution'); fetchAiSolution(); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  aiActiveTab === 'solution'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                Proper Solution
+              </button>
+
+              <button
+                onClick={() => { setAiActiveTab('fix'); fetchAiSolution(); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  aiActiveTab === 'fix'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-300" />
+                Fix My Code
+              </button>
+
               <button
                 onClick={() => { setAiActiveTab('hint'); fetchAiHint(aiHintTier); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  aiActiveTab === 'hint' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  aiActiveTab === 'hint'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
                 }`}
               >
+                <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
                 Progressive Hint
               </button>
+
               <button
                 onClick={() => { setAiActiveTab('complexity'); fetchAiComplexity(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  aiActiveTab === 'complexity' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  aiActiveTab === 'complexity'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
                 }`}
               >
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
                 Big-O Complexity
-              </button>
-              <button
-                onClick={() => { setAiActiveTab('review'); fetchAiReview(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  aiActiveTab === 'review' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'
-                }`}
-              >
-                Code Review
               </button>
             </div>
 
             {/* AI Result View */}
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 min-h-[160px] text-xs">
+            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 min-h-[220px] text-xs">
               {aiLoading ? (
-                <div className="h-32 flex flex-col items-center justify-center space-y-2 text-slate-400">
-                  <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                  <span>AI reasoning in progress...</span>
+                <div className="h-44 flex flex-col items-center justify-center space-y-2.5 text-slate-400">
+                  <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-mono">Generating verified solution and reasoning...</span>
                 </div>
               ) : aiResponse ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
+                  
+                  {/* PROPER SOLUTION TAB */}
+                  {aiActiveTab === 'solution' && (
+                    <div className="space-y-3.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-emerald-400 font-bold font-mono text-xs">
+                            {aiResponse.title || 'Verified Solution'}
+                          </span>
+                          <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded px-1.5 py-0.5">
+                            Optimal
+                          </span>
+                        </div>
+
+                        {/* Language switcher within modal */}
+                        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-0.5">
+                          {['PYTHON', 'CPP', 'JAVA', 'JAVASCRIPT'].map(l => (
+                            <button
+                              key={l}
+                              onClick={() => fetchAiSolution(l)}
+                              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+                                (aiResponse.language || aiSolutionLang) === l
+                                  ? 'bg-indigo-600 text-white font-bold'
+                                  : 'text-slate-400 hover:text-slate-200'
+                              }`}
+                            >
+                              {l === 'PYTHON' ? 'Python' : l === 'CPP' ? 'C++' : l === 'JAVA' ? 'Java' : 'JS'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Code Display */}
+                      <div className="relative group">
+                        <pre className="bg-[#0B0F19] border border-slate-800/90 rounded-xl p-3.5 font-mono text-xs text-emerald-300 overflow-x-auto max-h-[260px] leading-relaxed select-all">
+                          {aiResponse.code}
+                        </pre>
+                      </div>
+
+                      {/* Action Buttons: Insert into Editor & Copy */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
+                          <span className="text-emerald-400">Time: {aiResponse.timeComplexity || 'O(1)'}</span>
+                          <span>•</span>
+                          <span className="text-cyan-400">Space: {aiResponse.spaceComplexity || 'O(1)'}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleCopySolution(aiResponse.code)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg text-slate-300 hover:text-white text-xs font-semibold transition-colors"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            Copy Code
+                          </button>
+
+                          <button
+                            onClick={() => handleInsertSolution(aiResponse.code)}
+                            className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold shadow-md shadow-emerald-600/30 transition-all"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            Insert Solution Into Editor
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Approach explanation */}
+                      {aiResponse.approach && (
+                        <div className="p-3 bg-slate-900/70 border border-slate-800/80 rounded-xl space-y-1">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Approach & Logic</div>
+                          <pre className="text-xs text-slate-300 font-sans whitespace-pre-wrap leading-relaxed">{aiResponse.approach}</pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* FIX MY CODE TAB */}
+                  {aiActiveTab === 'fix' && (
+                    <div className="space-y-3">
+                      {aiResponse.codeFix?.hasIssues ? (
+                        <div className="space-y-3">
+                          <div className="p-3 bg-rose-950/40 border border-rose-500/30 rounded-xl space-y-1.5">
+                            <div className="text-[11px] font-bold text-rose-300 uppercase flex items-center gap-1.5">
+                              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                              Issues Detected in Your Code
+                            </div>
+                            <ul className="list-disc list-inside space-y-1 text-slate-300 text-xs">
+                              {aiResponse.codeFix.issues.map((iss, i) => (
+                                <li key={i}>{iss}</li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <div className="text-[11px] font-mono text-emerald-400 font-semibold">Corrected Code (Indentation & Capitalization Fixed):</div>
+                            <pre className="bg-[#0B0F19] border border-slate-800/90 rounded-xl p-3.5 font-mono text-xs text-emerald-300 overflow-x-auto max-h-[220px] leading-relaxed">
+                              {aiResponse.codeFix.fixedCode}
+                            </pre>
+                          </div>
+
+                          <div className="flex justify-end pt-1">
+                            <button
+                              onClick={() => handleApplyFix(aiResponse.codeFix.fixedCode)}
+                              className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/30 transition-all"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              Apply Fix to Editor
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-emerald-950/30 border border-emerald-500/30 rounded-xl space-y-2 text-center py-6">
+                          <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                          <div className="font-bold text-emerald-300 text-sm">No Syntax or Formatting Bugs Found!</div>
+                          <p className="text-slate-400 text-xs">Your current code structure and indentation appear correct. Check the "Proper Solution" tab to review the optimal implementation.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* PROGRESSIVE HINTS TAB */}
                   {aiActiveTab === 'hint' && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-indigo-400 font-bold font-mono uppercase text-[11px]">
                           Tier {aiHintTier}: {aiResponse.title}
@@ -1325,8 +1530,8 @@ export default function ProblemDetailPage() {
                             <button
                               key={t}
                               onClick={() => fetchAiHint(t)}
-                              className={`px-2 py-0.5 rounded text-[10px] font-mono ${
-                                aiHintTier === t ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-400'
+                              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                                aiHintTier === t ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
                               }`}
                             >
                               Hint {t}
@@ -1334,33 +1539,29 @@ export default function ProblemDetailPage() {
                           ))}
                         </div>
                       </div>
-                      <p className="text-slate-300 leading-relaxed text-xs">{aiResponse.text}</p>
+                      <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-xl">
+                        <p className="text-slate-200 leading-relaxed text-xs">{aiResponse.text}</p>
+                      </div>
                     </div>
                   )}
 
+                  {/* COMPLEXITY TAB */}
                   {aiActiveTab === 'complexity' && (
-                    <div className="space-y-2 font-mono">
-                      <div className="flex items-center gap-4">
-                        <span className="text-emerald-400 font-bold">Time: {aiResponse.timeComplexity}</span>
-                        <span className="text-cyan-400 font-bold">Space: {aiResponse.spaceComplexity}</span>
+                    <div className="space-y-3 font-mono">
+                      <div className="flex items-center gap-4 bg-slate-900 p-3 rounded-xl border border-slate-800">
+                        <span className="text-emerald-400 font-bold">Time: {aiResponse.timeComplexity || 'O(1)'}</span>
+                        <span>•</span>
+                        <span className="text-cyan-400 font-bold">Space: {aiResponse.spaceComplexity || 'O(1)'}</span>
                       </div>
-                      <p className="text-slate-300 text-xs font-sans leading-relaxed pt-1">{aiResponse.reasoning}</p>
-                      <div className="p-2.5 rounded bg-slate-900 border border-slate-800 text-amber-300 text-[11px]">
-                        💡 {aiResponse.suggestion}
-                      </div>
+                      <p className="text-slate-300 text-xs font-sans leading-relaxed pt-1">{aiResponse.reasoning || aiResponse.approach}</p>
+                      {aiResponse.suggestion && (
+                        <div className="p-2.5 rounded bg-slate-900 border border-slate-800 text-amber-300 text-[11px]">
+                          💡 {aiResponse.suggestion}
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {aiActiveTab === 'review' && (
-                    <div className="space-y-2">
-                      <div className="text-emerald-400 font-bold">Rating: {aiResponse.rating}</div>
-                      <ul className="list-disc list-inside space-y-1 text-slate-300">
-                        {aiResponse.recommendations?.map((r, i) => (
-                          <li key={i}>{r}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <span className="text-slate-500">Click a tab above to query AI assistance.</span>

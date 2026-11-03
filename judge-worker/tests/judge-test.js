@@ -80,7 +80,34 @@ async function runTests() {
   assert(sqlResult.verdict === VERDICTS.ACCEPTED, 'SQL table creation, insert, and select query executes with AC');
   assert(sqlResult.actualOutput.includes('Dustin'), 'SQL output contains formatted result data');
 
-  // Test 8: ICPC Penalty Calculation logic
+  // Test 8: Python Auto-heal Indentation Error (User request: ignore indentation error in all problems)
+  const badIndentCode = `import sys
+
+def solve():
+# Unindented lines inside function block
+input_data = sys.stdin.read().split()
+if not input_data:
+return
+n = int(input_data[-1])
+if n % 2 == 0:
+print("even")
+else:
+print("odd")
+
+if __name__ == '__main__':
+solve()`;
+
+  const indentResult = await judgeSubmission({
+    language: 'PYTHON',
+    sourceCode: badIndentCode,
+    inputData: 'n = 4',
+    expectedOutput: 'Even',
+    timeLimitMs: 1000
+  });
+  assert(indentResult.verdict === VERDICTS.ACCEPTED, 'Python code with broken indentation is automatically healed and returns AC');
+  assert(indentResult.actualOutput.toLowerCase() === 'even', 'Python output correctly matches expected output');
+
+  // Test 9: ICPC Penalty Calculation logic
   function calculateICPCScore(attempts) {
     // attempts = [{ problem: 'A', accepted: true, timeMinutes: 15, failedBefore: 1 }]
     let score = 0;

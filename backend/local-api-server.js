@@ -7,6 +7,7 @@ import { judgeSubmission } from '../judge-worker/local-judge.js';
 import { 
   checkAiRateLimit, 
   getProblemHint, 
+  getProperProblemSolution,
   explainCompilerError, 
   estimateComplexity, 
   reviewAcceptedCode, 
@@ -656,6 +657,32 @@ const server = http.createServer(async (req, res) => {
     }
 
     // 6. Smart AI Endpoints (with Rate-Limiting Guard)
+    if (pathname === '/api/v1/ai/solution' && method === 'POST') {
+      const body = await parseBody(req);
+      const rateCheck = checkAiRateLimit(body.userId || 'guest', 30);
+      if (!rateCheck.allowed) {
+        return sendJson(res, 429, {
+          success: false,
+          message: `AI rate limit reached. Please wait ${rateCheck.waitSec} seconds.`
+        });
+      }
+
+      const prob = DB.problems.find(p => 
+        p.id === body.problemId || 
+        p.slug === body.problemId || 
+        p.title?.toLowerCase() === body.problemTitle?.toLowerCase() ||
+        (body.problemTitle && p.title?.toLowerCase().includes(body.problemTitle.toLowerCase()))
+      ) || DB.problems[0];
+
+      const solutionData = getProperProblemSolution({
+        problem: prob,
+        language: body.language || 'PYTHON',
+        userCode: body.code || ''
+      });
+
+      return sendJson(res, 200, { success: true, data: solutionData });
+    }
+
     if (pathname === '/api/v1/ai/hint' && method === 'POST') {
       const body = await parseBody(req);
       const rateCheck = checkAiRateLimit(body.userId || 'guest');
@@ -666,7 +693,13 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      const hint = getProblemHint(body.problemTitle || 'Two Sum', body.tier || 1);
+      const prob = DB.problems.find(p => 
+        p.id === body.problemId || 
+        p.slug === body.problemId || 
+        p.title?.toLowerCase() === body.problemTitle?.toLowerCase()
+      );
+
+      const hint = getProblemHint(body.problemTitle || 'Two Sum', body.tier || 1, prob);
       return sendJson(res, 200, { success: true, data: hint });
     }
 

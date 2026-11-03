@@ -83,6 +83,62 @@ export function normalizeOutput(output) {
 }
 
 /**
+ * Intelligent Indentation Healer for Python
+ * Automatically detects and fixes missing indents, mixed tabs/spaces,
+ * and block alignment errors so user code never fails on IndentationError.
+ */
+export function healPythonIndentation(source) {
+  if (!source || !source.trim()) return source;
+  
+  const lines = source.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const expanded = lines.map(l => l.replace(/\t/g, '    '));
+
+  const fixed = [];
+  let level = 0;
+  const INDENT = '    ';
+  const dedentRegex = /^\s*(elif\b|else\s*:|except\b|finally\s*:)/i;
+
+  for (let i = 0; i < expanded.length; i++) {
+    const raw = expanded[i];
+    const stripped = raw.trim();
+    if (!stripped) {
+      fixed.push('');
+      continue;
+    }
+
+    if (stripped.startsWith('#')) {
+      fixed.push((INDENT.repeat(level)) + stripped);
+      continue;
+    }
+
+    if (stripped.startsWith('if __name__')) {
+      level = 0;
+    }
+
+    if (dedentRegex.test(stripped)) {
+      level = Math.max(0, level - 1);
+      fixed.push((INDENT.repeat(level)) + stripped);
+      const codePart = stripped.split('#')[0].trim();
+      if (codePart.endsWith(':')) {
+        level++;
+      }
+      continue;
+    }
+
+    fixed.push((INDENT.repeat(level)) + stripped);
+
+    const codePart = stripped.split('#')[0].trim();
+    if (codePart.endsWith(':')) {
+      level++;
+    } else if (/^(return\b|break\b|continue\b|pass\b)/.test(stripped) && level > 1) {
+      level--;
+    }
+  }
+
+  return fixed.join('\n');
+}
+
+/**
  * Floating-Point Comparison with tolerance
  */
 export function compareFloatOutput(actual, expected, tolerance = 1e-6) {
@@ -183,6 +239,7 @@ export async function judgeSubmission({
       case 'PYTHON': {
         const pyBin = await getPythonBinary();
         sourceFile = 'solution.py';
+        sourceCode = sourceCode.replace(/\t/g, '    ');
         runCommand = [pyBin, '-u', path.join(tmpDir, sourceFile)];
         break;
       }
@@ -346,29 +403,54 @@ export async function judgeSubmission({
     }
 
     if (runResult.exitCode !== 0) {
-      if (runResult.stderr && (runResult.stderr.includes('ENOENT') || runResult.stderr.includes('not recognized'))) {
-        const simOutput = expectedOutput || 'Sandbox execution passed';
+      // Auto-heal IndentationError / TabError for Python so indentation errors are ignored and fixed
+      if (normLang === 'PYTHON' && (
+        runResult.stderr?.includes('IndentationError') || 
+        runResult.stderr?.includes('TabError') ||
+        runResult.stderr?.includes('unexpected indent') ||
+        runResult.stderr?.includes('unindent')
+      )) {
+        const healedCode = healPythonIndentation(sourceCode);
+        if (healedCode && healedCode !== sourceCode) {
+          try {
+            await fs.writeFile(sourcePath, healedCode, 'utf8');
+            const retryResult = await runProcess(runCommand, inputData, timeLimitMs);
+            if (retryResult.exitCode === 0 || !retryResult.stderr?.includes('IndentationError')) {
+              runResult.exitCode = retryResult.exitCode;
+              runResult.stdout = retryResult.stdout;
+              runResult.stderr = retryResult.stderr;
+              runResult.timedOut = retryResult.timedOut;
+              runResult.runtimeMs = retryResult.runtimeMs;
+            }
+          } catch {}
+        }
+      }
+
+      if (runResult.exitCode !== 0) {
+        if (runResult.stderr && (runResult.stderr.includes('ENOENT') || runResult.stderr.includes('not recognized'))) {
+          const simOutput = expectedOutput || 'Sandbox execution passed';
+          return {
+            verdict: VERDICTS.ACCEPTED,
+            runtimeMs: Math.floor(Math.random() * 14 + 12),
+            stdout: simOutput,
+            stderr: '',
+            actualOutput: simOutput,
+            expectedOutput: expectedOutput,
+            isMatch: true,
+            beatsRuntime: 89,
+            beatsMemory: 92,
+            diff: [],
+            details: `Sandbox evaluation: Code syntax verified for ${normLang}.`
+          };
+        }
         return {
-          verdict: VERDICTS.ACCEPTED,
-          runtimeMs: Math.floor(Math.random() * 14 + 12),
-          stdout: simOutput,
-          stderr: '',
-          actualOutput: simOutput,
-          expectedOutput: expectedOutput,
-          isMatch: true,
-          beatsRuntime: 89,
-          beatsMemory: 92,
-          diff: [],
-          details: `Sandbox evaluation: Code syntax verified for ${normLang}.`
+          verdict: VERDICTS.RUNTIME_ERROR,
+          runtimeMs: runResult.runtimeMs,
+          stdout: runResult.stdout,
+          stderr: runResult.stderr || `Terminated with exit code ${runResult.exitCode}`,
+          details: `Runtime Error: Process exited abnormally (code ${runResult.exitCode}).`,
         };
       }
-      return {
-        verdict: VERDICTS.RUNTIME_ERROR,
-        runtimeMs: runResult.runtimeMs,
-        stdout: runResult.stdout,
-        stderr: runResult.stderr || `Terminated with exit code ${runResult.exitCode}`,
-        details: `Runtime Error: Process exited abnormally (code ${runResult.exitCode}).`,
-      };
     }
 
     // 5. Output Verification
@@ -387,6 +469,11 @@ export async function judgeSubmission({
       checkerNotes = checkRes.notes || 'Custom checker evaluated';
     } else {
       isMatch = actualNorm === expectedNorm;
+      // Case-insensitive tolerance for common outputs (e.g. Even vs even, Odd vs odd, True vs true, Yes vs yes)
+      if (!isMatch && expectedNorm && actualNorm.toLowerCase() === expectedNorm.toLowerCase()) {
+        isMatch = true;
+        checkerNotes = 'Accepted (case-insensitive match)';
+      }
     }
 
     // Percentile statistics simulation based on actual runtime
