@@ -262,7 +262,7 @@ export function getProperProblemSolution({ problem, language = 'PYTHON', userCod
     approach = `Parity Verification via Modulo Arithmetic:
 1. An integer $n$ is divisible by 2 if and only if $n \\pmod 2 == 0$.
 2. If remainder is 0, the number is Even; otherwise, it is Odd.
-3. Handle token parsing cleanly so inputs like 'n = 4' or '4' are both parsed accurately.
+3. Read integer $n$ directly from standard input.
 4. Output exact required capitalization: 'Even' and 'Odd'.`;
     timeComplexity = 'O(1)';
     spaceComplexity = 'O(1)';
@@ -274,16 +274,11 @@ export function getProperProblemSolution({ problem, language = 'PYTHON', userCod
       solutionCode = `import sys
 
 def solve():
-    # Read all tokens from standard input (handles inputs like "4" or "n = 4")
-    tokens = sys.stdin.read().split()
-    if not tokens:
+    # Read tokens from standard input
+    input_data = sys.stdin.read().split()
+    if not input_data:
         return
-    
-    # Safely extract numeric value from tokens
-    num_tokens = [t for t in tokens if t.lstrip('-').isdigit()]
-    if not num_tokens:
-        return
-    n = int(num_tokens[-1])
+    n = int(input_data[0])
     
     # Parity check: Even if divisible by 2
     if n % 2 == 0:
@@ -296,27 +291,14 @@ if __name__ == '__main__':
 `;
     } else if (normLang === 'CPP' || normLang === 'C++') {
       solutionCode = `#include <iostream>
-#include <string>
-#include <cctype>
 using namespace std;
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    string token, last_num = "";
-    while (cin >> token) {
-        bool is_num = true;
-        int start = (token[0] == '-') ? 1 : 0;
-        if (token.length() <= start) is_num = false;
-        for (int i = start; i < token.length(); i++) {
-            if (!isdigit(token[i])) { is_num = false; break; }
-        }
-        if (is_num) last_num = token;
-    }
-
-    if (!last_num.empty()) {
-        long long n = stoll(last_num);
+    long long n;
+    if (cin >> n) {
         if (n % 2 == 0) {
             cout << "Even\\n";
         } else {
@@ -332,15 +314,8 @@ int main() {
 public class Solution {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String lastNum = "";
-        while (sc.hasNext()) {
-            String token = sc.next();
-            if (token.matches("-?\\\\d+")) {
-                lastNum = token;
-            }
-        }
-        if (!lastNum.isEmpty()) {
-            long n = Long.parseLong(lastNum);
+        if (sc.hasNextLong()) {
+            long n = sc.nextLong();
             if (n % 2 == 0) {
                 System.out.println("Even");
             } else {
@@ -357,10 +332,8 @@ function solve() {
     const input = fs.readFileSync(0, 'utf-8').trim();
     if (!input) return;
     const tokens = input.split(/\\s+/);
-    const numbers = tokens.filter(t => /^-?\\d+$/.test(t));
-    if (numbers.length === 0) return;
+    const n = parseInt(tokens[0], 10);
 
-    const n = parseInt(numbers[numbers.length - 1], 10);
     if (n % 2 === 0) {
         console.log("Even");
     } else {
@@ -374,7 +347,7 @@ solve();
       solutionCode = starterCode[normLang] || starterCode.PYTHON || '';
     }
   } else if (titleLower.includes('two sum') || titleLower.includes('print their sum') || titleLower.includes('two integers')) {
-    approach = `Optimal Hash Map / Direct Accumulation:
+    approach = `Optimal Direct Reading & Summation:
 1. For two integers sum: Read $a$ and $b$, print $a + b$.
 2. For Two Sum with target: Use a single pass hash table storing { complement: index } for $O(N)$ lookup.`;
     timeComplexity = titleLower.includes('target') ? 'O(N)' : 'O(1)';
@@ -384,12 +357,11 @@ solve();
       solutionCode = `import sys
 
 def solve():
-    tokens = sys.stdin.read().split()
-    if not tokens:
-        return
-    nums = [int(t) for t in tokens if t.lstrip('-').isdigit()]
-    if len(nums) >= 2:
-        print(nums[0] + nums[1])
+    input_data = sys.stdin.read().split()
+    if len(input_data) >= 2:
+        a = int(input_data[0])
+        b = int(input_data[1])
+        print(a + b)
 
 if __name__ == '__main__':
     solve()
@@ -420,11 +392,9 @@ $\\max(a, \\max(b, c))$.`;
       solutionCode = `import sys
 
 def solve():
-    tokens = sys.stdin.read().split()
-    if not tokens:
-        return
-    nums = [int(t) for t in tokens if t.lstrip('-').isdigit()]
-    if nums:
+    input_data = sys.stdin.read().split()
+    if input_data:
+        nums = [int(x) for x in input_data]
         print(max(nums))
 
 if __name__ == '__main__':
@@ -482,12 +452,6 @@ if __name__ == '__main__':
         issues.push('Capitalization Mismatch: Problem requires "Odd" with uppercase O. Your code was printing "odd" in lowercase.');
         fixedCode = fixedCode.replace(/"odd"/g, '"Odd"').replace(/'odd'/g, "'Odd'");
       }
-    }
-
-    // 3. Check Input Parsing for "n = X" style sample inputs
-    if (normLang === 'PYTHON' && fixedCode.includes('int(input_data[0])') && sampleCases.some(s => s.input?.includes('='))) {
-      issues.push('Input Parsing Safety: Input contains assignment format (e.g. "n = 4"). Reading input_data[0] yields "n" instead of the number. Fixed to read numeric token.');
-      fixedCode = fixedCode.replace('int(input_data[0])', 'int(input_data[-1])');
     }
 
     if (issues.length > 0) {

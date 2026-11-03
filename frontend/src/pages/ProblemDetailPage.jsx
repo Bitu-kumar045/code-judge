@@ -153,8 +153,8 @@ export default function ProblemDetailPage() {
         setIsSolved(Boolean(data.isSolved || isProblemSolved(data)));
         const starter = getStarterCode(selectedLang, data);
         setCode(starter);
-        if (data.defaultInput || data.examples?.[0]?.input) {
-          setCustomInput(data.defaultInput || data.examples[0].input);
+        if (data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input) {
+          setCustomInput(data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input);
         }
         loadProblemSubmissions(data);
       }
@@ -348,8 +348,12 @@ export default function ProblemDetailPage() {
     setRunningTestIndex(1);
 
     const isCustom = activeTestCaseTab === 'custom';
-    const sample = !isCustom ? (problem?.examples?.[activeTestCaseTab] || problem?.sampleCases?.[activeTestCaseTab] || problem?.sampleCases?.[0]) : null;
-    const inputToRun = isCustom ? customInput : (sample?.input || '');
+    const sample = !isCustom ? (problem?.sampleCases?.[activeTestCaseTab] || problem?.examples?.[activeTestCaseTab] || problem?.sampleCases?.[0]) : null;
+    const rawInputCandidate = isCustom ? customInput : (sample?.rawInput || sample?.input || '');
+    // Sanitize any variable assignment format (e.g. "n = 4" -> "4")
+    const inputToRun = /^[a-zA-Z_]\w*\s*=/.test(rawInputCandidate)
+      ? rawInputCandidate.replace(/[a-zA-Z_]\w*\s*=\s*/g, '').replace(/[\[\]]/g, ' ').replace(/,/g, ' ').replace(/\s+/g, ' ').trim()
+      : rawInputCandidate;
     const expectedOut = isCustom ? '' : (sample?.output || '');
 
     try {
@@ -1109,7 +1113,7 @@ export default function ProblemDetailPage() {
                   {activeTestCaseTab !== 'custom' && (
                     <button
                       onClick={() => {
-                        const cur = problem?.examples?.[activeTestCaseTab]?.input || problem?.sampleCases?.[activeTestCaseTab]?.input || '';
+                        const cur = problem?.sampleCases?.[activeTestCaseTab]?.input || problem?.examples?.[activeTestCaseTab]?.rawInput || problem?.examples?.[activeTestCaseTab]?.input || '';
                         setCustomInput(cur);
                         setActiveTestCaseTab('custom');
                         toast.info('Loaded input into Custom tab for editing');
@@ -1131,7 +1135,7 @@ export default function ProblemDetailPage() {
                   />
                 ) : (
                   <pre className="p-2.5 rounded-lg bg-[#0B0F19] border border-slate-800 text-slate-200 text-xs font-mono overflow-x-auto">
-                    {problem?.examples?.[activeTestCaseTab]?.input || problem?.sampleCases?.[activeTestCaseTab]?.input || '(No input required)'}
+                    {problem?.sampleCases?.[activeTestCaseTab]?.input || problem?.examples?.[activeTestCaseTab]?.rawInput || problem?.examples?.[activeTestCaseTab]?.input || '(No input required)'}
                   </pre>
                 )}
               </div>

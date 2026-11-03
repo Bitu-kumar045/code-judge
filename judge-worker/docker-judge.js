@@ -20,7 +20,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import os from 'os';
 import { performance } from 'perf_hooks';
-import { judgeSubmission as fallbackJudge, normalizeOutput, VERDICTS } from './local-judge.js';
+import { judgeSubmission as fallbackJudge, normalizeOutput, sanitizeStdinInput, VERDICTS } from './local-judge.js';
 
 export { VERDICTS };
 
@@ -67,6 +67,7 @@ export async function judgeInDocker({
   submissionId = 'sub-' + Math.floor(Math.random() * 100000),
 }) {
   const normLang = language.toUpperCase();
+  const cleanInput = sanitizeStdinInput(inputData);
   const hasDocker = await isDockerDaemonAvailable();
 
   // If Docker daemon isn't running on the machine or language not containerized, use verified local engine
@@ -75,7 +76,7 @@ export async function judgeInDocker({
     return await fallbackJudge({
       language,
       sourceCode,
-      inputData,
+      inputData: cleanInput,
       expectedOutput,
       timeLimitMs,
     });
@@ -138,7 +139,7 @@ export async function judgeInDocker({
 
     console.log(`[Docker Sandbox] Spawning: docker run --rm --network none --memory ${memoryLimitMb}m --cpus 1.0 ...`);
 
-    const result = await runDockerProcess(dockerArgs, inputData, timeLimitMs + 1000, containerName);
+    const result = await runDockerProcess(dockerArgs, cleanInput, timeLimitMs + 1000, containerName);
 
     // Timeout (Exit code 124 or 137 from GNU timeout / SIGKILL)
     if (result.timedOut || result.exitCode === 124 || result.exitCode === 137) {

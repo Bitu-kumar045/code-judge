@@ -1,5 +1,23 @@
 [
   {
+    "id": "sub-90637",
+    "problemId": "prob-2",
+    "problemNo": 2,
+    "problemSlug": "p2-a-number-is-even-or-odd",
+    "problemTitle": "Number Is Even or Odd",
+    "username": "coder",
+    "language": "PYTHON",
+    "status": "COMPLETED",
+    "verdict": "AC",
+    "runtimeMs": 122,
+    "memoryKb": 3480,
+    "createdAt": "2026-11-03T17:45:51.745Z",
+    "sourceCode": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    if n % 2 == 0:\n        print(\"Even\")\n    else:\n        print(\"Odd\")\n\nif __name__ == '__main__':\n    solve()\n",
+    "actualOutput": "Even",
+    "expectedOutput": "Even",
+    "errorMessage": null
+  },
+  {
     "id": "sub-47948",
     "problemId": "prob-2",
     "problemNo": 2,

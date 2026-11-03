@@ -83,6 +83,23 @@ export function normalizeOutput(output) {
 }
 
 /**
+ * Sanitizes standard input by converting LeetCode/assignment notations
+ * (e.g. "n = 4", "a = 12, b = 25", "nums = [1, 2, 3]") into standard raw space-separated tokens ("4", "12 25", "1 2 3").
+ */
+export function sanitizeStdinInput(input) {
+  if (input === null || input === undefined) return '';
+  let s = input.toString().trim();
+  if (!s) return '';
+  // Check if input begins with or contains variable assignment: e.g. "n = 4" or "a = 12, b = 25"
+  if (/^[a-zA-Z_]\w*\s*=/.test(s)) {
+    s = s.replace(/[a-zA-Z_]\w*\s*=\s*/g, '');
+    s = s.replace(/[\[\]]/g, ' ').replace(/,/g, ' ');
+    s = s.replace(/\s+/g, ' ').trim();
+  }
+  return s;
+}
+
+/**
  * Intelligent Indentation Healer for Python
  * Automatically detects and fixes missing indents, mixed tabs/spaces,
  * and block alignment errors so user code never fails on IndentationError.
@@ -226,6 +243,7 @@ export async function judgeSubmission({
   }
 
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'judge-box-'));
+  const cleanInput = sanitizeStdinInput(inputData);
 
   let sourceFile;
   let compileCommand = null;
@@ -390,7 +408,7 @@ export async function judgeSubmission({
     }
 
     // 4. Execution Phase with Time Limit
-    const runResult = await runProcess(runCommand, inputData, timeLimitMs);
+    const runResult = await runProcess(runCommand, cleanInput, timeLimitMs);
 
     if (runResult.timedOut) {
       return {
@@ -414,7 +432,7 @@ export async function judgeSubmission({
         if (healedCode && healedCode !== sourceCode) {
           try {
             await fs.writeFile(sourcePath, healedCode, 'utf8');
-            const retryResult = await runProcess(runCommand, inputData, timeLimitMs);
+            const retryResult = await runProcess(runCommand, cleanInput, timeLimitMs);
             if (retryResult.exitCode === 0 || !retryResult.stderr?.includes('IndentationError')) {
               runResult.exitCode = retryResult.exitCode;
               runResult.stdout = retryResult.stdout;
