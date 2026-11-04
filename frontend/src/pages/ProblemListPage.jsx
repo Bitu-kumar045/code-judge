@@ -497,8 +497,13 @@ export default function ProblemListPage() {
                     </td>
                   </tr>
                 ) : (
-                  problems.map((problem) => {
-                    const probNo = problem.no || (problem.id ? problem.id.replace('prob-', '') : '');
+                  problems.map((problem, index) => {
+                    const extractedIdNum = (problem.id && !isNaN(Number(String(problem.id).replace(/^prob-/, ''))))
+                      ? Number(String(problem.id).replace(/^prob-/, ''))
+                      : null;
+                    const probNo = (problem.no && !isNaN(Number(problem.no)))
+                      ? Number(problem.no)
+                      : (extractedIdNum || (page * pageSize + index + 1));
                     const solved = Boolean(problem.isSolved || isSolved(problem));
                     const acceptance = problem.acceptanceRate || 
                       (problem.totalSubmissions 

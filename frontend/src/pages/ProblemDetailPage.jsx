@@ -8,20 +8,20 @@ import { useToast } from '../context/ToastContext';
 import { fireAcceptedConfetti } from '../utils/confetti';
 import { ProblemDetailSkeleton } from '../components/Skeleton';
 import { markProblemSolved, isProblemSolved } from '../utils/solvedManager';
-import { 
-  Play, 
-  Send, 
-  RotateCcw, 
-  Copy, 
-  Check, 
-  Terminal, 
-  Clock, 
-  Database, 
-  CheckCircle2, 
+import {
+  Play,
+  Send,
+  RotateCcw,
+  Copy,
+  Check,
+  Terminal,
+  Clock,
+  Database,
+  CheckCircle2,
   CircleDashed,
-  XCircle, 
-  AlertTriangle, 
-  Layers, 
+  XCircle,
+  AlertTriangle,
+  Layers,
   ChevronLeft,
   ChevronDown,
   ChevronUp,
@@ -44,10 +44,10 @@ import {
   ShieldCheck,
   Hash
 } from 'lucide-react';
-import { 
-  LANGUAGE_CATEGORIES, 
-  LANGUAGE_CONFIG, 
-  getStarterCode 
+import {
+  LANGUAGE_CATEGORIES,
+  LANGUAGE_CONFIG,
+  getStarterCode
 } from '../utils/languageTemplates';
 
 export default function ProblemDetailPage() {
@@ -58,7 +58,7 @@ export default function ProblemDetailPage() {
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSolved, setIsSolved] = useState(false);
-  
+
   // Mobile active panel toggle ('statement' or 'editor')
   const [mobileActivePanel, setMobileActivePanel] = useState('statement');
 
@@ -68,7 +68,7 @@ export default function ProblemDetailPage() {
   const [activeLeftTab, setActiveLeftTab] = useState('description'); // 'description' | 'submissions' | 'discussions' | 'notes'
   const [activeTestCaseTab, setActiveTestCaseTab] = useState(0);
   const [customInput, setCustomInput] = useState('4\n2 7 11 15\n9');
-  
+
   // Editor Settings
   const [fontSize, setFontSize] = useState(13);
   const [tabSize, setTabSize] = useState(4);
@@ -132,9 +132,9 @@ export default function ProblemDetailPage() {
     if (!target) return;
     setSubmissionsLoading(true);
     try {
-      const subs = await api.getSubmissions({ 
-        problemId: target.id, 
-        problemSlug: target.slug 
+      const subs = await api.getSubmissions({
+        problemId: target.id,
+        problemSlug: target.slug
       });
       setProblemSubmissions(Array.isArray(subs) ? subs : []);
     } catch {
@@ -153,15 +153,15 @@ export default function ProblemDetailPage() {
         setIsSolved(Boolean(data.isSolved || isProblemSolved(data)));
         const starter = getStarterCode(selectedLang, data);
         setCode(starter);
-        if (data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input) {
-          setCustomInput(data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input);
+          if (data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input) {
+            setCustomInput(data.defaultInput || data.sampleCases?.[0]?.input || data.examples?.[0]?.rawInput || data.examples?.[0]?.input);
+          }
+          loadProblemSubmissions(data);
         }
-        loadProblemSubmissions(data);
+        setLoading(false);
       }
-      setLoading(false);
-    }
-    loadProblem();
-  }, [slug]);
+      loadProblem();
+    }, [slug]);
 
   useEffect(() => {
     if (activeLeftTab === 'submissions' && problem) {
@@ -456,8 +456,8 @@ export default function ProblemDetailPage() {
           beatsMemory: isAc ? 92 : 0,
           actualOutput: sub?.actualOutput || '0 1',
           expectedOutput: sub?.expectedOutput || '0 1',
-          message: isAc 
-            ? 'Accepted! All test cases passed successfully.' 
+          message: isAc
+            ? 'Accepted! All test cases passed successfully.'
             : (sub?.errorMessage || `Execution finished with verdict: ${sub?.verdict || 'Wrong Answer'}`)
         };
         setJudgeVerdict(acResult);
@@ -501,12 +501,20 @@ export default function ProblemDetailPage() {
   if (loading) return <ProblemDetailSkeleton />;
   if (!problem) return null;
 
+  const problemDisplayNo = (problem.no && !isNaN(Number(problem.no)))
+    ? Number(problem.no)
+    : (problem.slug && /^p(\d+)-/.test(problem.slug)
+        ? Number(problem.slug.match(/^p(\d+)-/)[1])
+        : (problem.id && !isNaN(Number(String(problem.id).replace(/^prob-/, '')))
+            ? Number(String(problem.id).replace(/^prob-/, ''))
+            : null));
+
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#0B0F19] overflow-hidden text-slate-100">
-      
+
       {/* Top Breadcrumb & Control Header */}
       <div className="h-12 bg-[#111827] border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
-        
+
         {/* Left: Breadcrumbs & Problem Info */}
         <div className="flex items-center space-x-3 overflow-hidden">
           <Link
@@ -518,13 +526,12 @@ export default function ProblemDetailPage() {
           </Link>
           <span className="text-slate-700 hidden sm:inline">/</span>
           <span className="text-xs font-semibold text-slate-200 truncate max-w-[150px] sm:max-w-xs">
-            {problem.title}
+            {problemDisplayNo ? `${problemDisplayNo}. ` : ''}{problem.title}
           </span>
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
-            problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-            problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-            'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-          }`}>
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+              problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+            }`}>
             {problem.difficulty}
           </span>
           {isSolved ? (
@@ -556,7 +563,7 @@ export default function ProblemDetailPage() {
 
         {/* Right: AI Assistant, Settings & Submit */}
         <div className="flex items-center space-x-2">
-          
+
           {/* Smart AI Assistant Trigger */}
           <button
             onClick={() => {
@@ -588,7 +595,7 @@ export default function ProblemDetailPage() {
             <Play className="h-3 w-3 text-emerald-400 fill-emerald-400" />
             <span className="hidden sm:inline">Run</span>
           </button>
-          
+
           <button
             onClick={handleSubmitCode}
             disabled={isEvaluating || submitCooldown > 0}
@@ -604,42 +611,38 @@ export default function ProblemDetailPage() {
 
       {/* Main Split Layout */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800 overflow-hidden">
-        
+
         {/* Left Pane: Tabs (Description, Submissions, Discussions, Personal Notes) */}
         <div className="h-full flex flex-col bg-[#0B0F19] overflow-hidden">
-          
+
           {/* Left Navigation Tabs */}
           <div className="flex items-center border-b border-slate-800 px-4 bg-[#111827] shrink-0 overflow-x-auto">
             <button
               onClick={() => setActiveLeftTab('description')}
-              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-                activeLeftTab === 'description' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${activeLeftTab === 'description' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
             >
               Description
             </button>
             <button
               onClick={() => setActiveLeftTab('submissions')}
-              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-                activeLeftTab === 'submissions' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${activeLeftTab === 'submissions' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
             >
               Submissions
             </button>
             <button
               onClick={() => setActiveLeftTab('discussions')}
-              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap flex items-center gap-1 ${
-                activeLeftTab === 'discussions' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap flex items-center gap-1 ${activeLeftTab === 'discussions' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
               <span>Discussion</span>
             </button>
             <button
               onClick={() => setActiveLeftTab('notes')}
-              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap flex items-center gap-1 ${
-                activeLeftTab === 'notes' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap flex items-center gap-1 ${activeLeftTab === 'notes' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Notes</span>
@@ -648,7 +651,7 @@ export default function ProblemDetailPage() {
 
           {/* Left Pane Content */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-            
+
             {/* Description Tab (LeetCode Clean Style) */}
             {activeLeftTab === 'description' && (
               <div className="space-y-6">
@@ -656,7 +659,7 @@ export default function ProblemDetailPage() {
                 <div className="space-y-3 pb-3 border-b border-slate-800/80">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      {problem.no ? `${problem.no}. ` : ''}{problem.title}
+                      {problemDisplayNo ? `${problemDisplayNo}. ` : ''}{problem.title}
                     </h1>
                     {isSolved ? (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
@@ -673,11 +676,10 @@ export default function ProblemDetailPage() {
 
                   {/* Difficulty, Topics & Companies Bar */}
                   <div className="flex flex-wrap gap-2 items-center text-xs">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                      problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                      problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
-                      'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                    }`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${problem.difficulty === 'EASY' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+                        problem.difficulty === 'MEDIUM' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
+                          'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                      }`}>
                       {problem.level || problem.difficulty}
                     </span>
 
@@ -926,7 +928,7 @@ export default function ProblemDetailPage() {
                       const isAc = sub.verdict === 'AC';
                       const isWa = sub.verdict === 'WA';
                       const isTle = sub.verdict === 'TLE';
-                      const formattedTime = sub.createdAt 
+                      const formattedTime = sub.createdAt
                         ? new Date(sub.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
                         : 'Just now';
 
@@ -1009,7 +1011,7 @@ export default function ProblemDetailPage() {
 
         {/* Right Pane: Code Editor + Test Console */}
         <div className="h-full flex flex-col bg-[#0B0F19] overflow-hidden">
-          
+
           {/* Editor Header Bar */}
           <div className="h-10 bg-[#111827] border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
@@ -1083,18 +1085,16 @@ export default function ProblemDetailPage() {
                   <button
                     key={i}
                     onClick={() => setActiveTestCaseTab(i)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${
-                      activeTestCaseTab === i ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800'
-                    }`}
+                    className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${activeTestCaseTab === i ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800'
+                      }`}
                   >
                     Case {i + 1}
                   </button>
                 ))}
                 <button
                   onClick={() => setActiveTestCaseTab('custom')}
-                  className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${
-                    activeTestCaseTab === 'custom' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800'
-                  }`}
+                  className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${activeTestCaseTab === 'custom' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800'
+                    }`}
                 >
                   Custom
                 </button>
@@ -1106,8 +1106,8 @@ export default function ProblemDetailPage() {
               <div className="space-y-1.5 pb-2 border-b border-slate-800/80">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400 font-semibold">
-                    {activeTestCaseTab === 'custom' 
-                      ? 'Custom Standard Input (STDIN):' 
+                    {activeTestCaseTab === 'custom'
+                      ? 'Custom Standard Input (STDIN):'
                       : `Case #${typeof activeTestCaseTab === 'number' ? activeTestCaseTab + 1 : 1} Input:`}
                   </span>
                   {activeTestCaseTab !== 'custom' && (
@@ -1209,7 +1209,7 @@ export default function ProblemDetailPage() {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#111827] border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 className="text-sm font-bold text-white uppercase font-mono">Editor Preferences</h3>
-            
+
             <div className="space-y-3 text-xs">
               <div>
                 <label className="text-slate-400 block mb-1">Font Size: {fontSize}px</label>
@@ -1230,9 +1230,8 @@ export default function ProblemDetailPage() {
                     <button
                       key={s}
                       onClick={() => setTabSize(s)}
-                      className={`flex-1 py-1.5 rounded-lg border text-xs font-mono ${
-                        tabSize === s ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-slate-400'
-                      }`}
+                      className={`flex-1 py-1.5 rounded-lg border text-xs font-mono ${tabSize === s ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-slate-400'
+                        }`}
                     >
                       {s} Spaces
                     </button>
@@ -1263,11 +1262,10 @@ export default function ProblemDetailPage() {
                 <span className="text-sm font-semibold text-white">
                   Submission #{selectedSubModal.id} • {selectedSubModal.language}
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                  selectedSubModal.verdict === 'AC' 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${selectedSubModal.verdict === 'AC'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                     : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                }`}>
+                  }`}>
                   {selectedSubModal.verdict === 'AC' ? 'Accepted' : selectedSubModal.verdict}
                 </span>
               </div>
@@ -1324,7 +1322,7 @@ export default function ProblemDetailPage() {
       {showAiModal && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div className="bg-[#111827] border border-indigo-500/40 rounded-3xl p-5 sm:p-6 max-w-2xl w-full space-y-4 shadow-2xl my-auto">
-            
+
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2.5">
@@ -1346,11 +1344,10 @@ export default function ProblemDetailPage() {
             <div className="flex flex-wrap gap-1.5 border-b border-slate-800/80 pb-3">
               <button
                 onClick={() => { setAiActiveTab('solution'); fetchAiSolution(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  aiActiveTab === 'solution'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${aiActiveTab === 'solution'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/20'
                     : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
                 Proper Solution
@@ -1358,11 +1355,10 @@ export default function ProblemDetailPage() {
 
               <button
                 onClick={() => { setAiActiveTab('fix'); fetchAiSolution(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  aiActiveTab === 'fix'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${aiActiveTab === 'fix'
                     ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20'
                     : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-indigo-300" />
                 Fix My Code
@@ -1370,11 +1366,10 @@ export default function ProblemDetailPage() {
 
               <button
                 onClick={() => { setAiActiveTab('hint'); fetchAiHint(aiHintTier); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  aiActiveTab === 'hint'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${aiActiveTab === 'hint'
                     ? 'bg-indigo-600 text-white'
                     : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
                 Progressive Hint
@@ -1382,11 +1377,10 @@ export default function ProblemDetailPage() {
 
               <button
                 onClick={() => { setAiActiveTab('complexity'); fetchAiComplexity(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  aiActiveTab === 'complexity'
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${aiActiveTab === 'complexity'
                     ? 'bg-indigo-600 text-white'
                     : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <Clock className="w-3.5 h-3.5 text-cyan-400" />
                 Big-O Complexity
@@ -1402,7 +1396,7 @@ export default function ProblemDetailPage() {
                 </div>
               ) : aiResponse ? (
                 <div className="space-y-4">
-                  
+
                   {/* PROPER SOLUTION TAB */}
                   {aiActiveTab === 'solution' && (
                     <div className="space-y-3.5">
@@ -1422,11 +1416,10 @@ export default function ProblemDetailPage() {
                             <button
                               key={l}
                               onClick={() => fetchAiSolution(l)}
-                              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-                                (aiResponse.language || aiSolutionLang) === l
+                              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${(aiResponse.language || aiSolutionLang) === l
                                   ? 'bg-indigo-600 text-white font-bold'
                                   : 'text-slate-400 hover:text-slate-200'
-                              }`}
+                                }`}
                             >
                               {l === 'PYTHON' ? 'Python' : l === 'CPP' ? 'C++' : l === 'JAVA' ? 'Java' : 'JS'}
                             </button>
@@ -1534,9 +1527,8 @@ export default function ProblemDetailPage() {
                             <button
                               key={t}
                               onClick={() => fetchAiHint(t)}
-                              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                                aiHintTier === t ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
-                              }`}
+                              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${aiHintTier === t ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'
+                                }`}
                             >
                               Hint {t}
                             </button>

@@ -4,7 +4,8 @@ const API_BASE_URL = '/api/v1';
 // Sample fallback problems matching the backend seed & standard LeetCode problems
 export const SAMPLE_PROBLEMS = [
   {
-    id: "e4a3b8d1-1234-4567-89ab-cdef01234567",
+    no: 1,
+    id: "prob-1",
     slug: "two-sum",
     title: "Two Sum",
     difficulty: "EASY",
@@ -50,7 +51,8 @@ Output: [1,2]
     }
   },
   {
-    id: "f5b4c9e2-2345-6789-01bc-def012345678",
+    no: 2,
+    id: "prob-2",
     slug: "longest-substring-without-repeating-characters",
     title: "Longest Substring Without Repeating Characters",
     difficulty: "MEDIUM",
@@ -91,7 +93,8 @@ Explanation: The answer is "b", with the length of 1.
     }
   },
   {
-    id: "a1b2c3d4-3456-7890-12cd-ef0123456789",
+    no: 3,
+    id: "prob-3",
     slug: "median-of-two-sorted-arrays",
     title: "Median of Two Sorted Arrays",
     difficulty: "HARD",
@@ -128,7 +131,8 @@ Explanation: merged array = [1,2,3] and median is 2.
     }
   },
   {
-    id: "b2c3d4e5-4567-8901-23de-f01234567890",
+    no: 4,
+    id: "prob-4",
     slug: "coin-change",
     title: "Coin Change",
     difficulty: "MEDIUM",
