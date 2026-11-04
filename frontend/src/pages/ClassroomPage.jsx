@@ -34,15 +34,34 @@ export default function ClassroomPage() {
   useEffect(() => {
     async function loadClasses() {
       try {
-        const res = await fetch('http://localhost:8080/api/v1/classrooms');
+        const res = await fetch('/api/v1/classrooms');
         const json = await res.json();
-        if (json.success && json.data) {
+        if (json.success && json.data && json.data.length > 0) {
           setClasses(json.data);
           setSelectedClass(json.data[0]);
+          return;
         }
       } catch (err) {
-        console.error('Failed to load classrooms:', err);
+        console.warn('Failed to load classrooms from API, using demo data:', err.message);
       }
+      // Demo classroom fallback for Vercel
+      const fallback = [
+        {
+          id: "cls-101",
+          name: "Data Structures & Algorithms Lab",
+          code: "CSE-2026",
+          department: "CSE",
+          instructor: "Dr. Sharma",
+          studentsCount: 64,
+          students: [
+            { id: "std-1", name: "Rahul Verma", rollNo: "21CS042", status: "SUBMITTED", marks: 95 },
+            { id: "std-2", name: "Ananya Patel", rollNo: "21CS058", status: "SUBMITTED", marks: 90 },
+            { id: "std-3", name: "Amit Kumar", rollNo: "21CS019", status: "IN_PROGRESS", marks: 78 }
+          ]
+        }
+      ];
+      setClasses(fallback);
+      setSelectedClass(fallback[0]);
     }
     loadClasses();
   }, []);
@@ -70,7 +89,7 @@ export default function ClassroomPage() {
     if (!newClassForm.name) return;
 
     try {
-      const res = await fetch('http://localhost:8080/api/v1/classrooms', {
+      const res = await fetch('/api/v1/classrooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newClassForm)
@@ -82,16 +101,33 @@ export default function ClassroomPage() {
         setShowCreateModal(false);
         toast.success(`Classroom "${newClassForm.name}" created with code ${json.data.code}!`);
         setNewClassForm({ name: '', code: '', department: 'CSE', instructor: '' });
+        return;
       }
     } catch (err) {
-      toast.error('Failed to create classroom');
+      // Local fallback for Vercel demo
+      const localNew = {
+        id: "cls-" + Date.now(),
+        name: newClassForm.name,
+        code: newClassForm.code || ("CSE-" + Math.floor(Math.random() * 9000 + 1000)),
+        department: newClassForm.department || 'CSE',
+        instructor: newClassForm.instructor || 'Instructor',
+        studentsCount: 0,
+        students: []
+      };
+      setClasses([localNew, ...classes]);
+      setSelectedClass(localNew);
+      setShowCreateModal(false);
+      toast.success(`Classroom "${newClassForm.name}" created with code ${localNew.code}!`);
+      setNewClassForm({ name: '', code: '', department: 'CSE', instructor: '' });
     }
   };
 
   const handleExportCsv = () => {
     if (!selectedClass) return;
-    window.open(`http://localhost:8080/api/v1/classrooms/${selectedClass.id}/export`, '_blank');
-    toast.success('Gradebook exported as CSV with marks and anti-cheat audit logs!');
+    try {
+      window.open(`/api/v1/classrooms/${selectedClass.id}/export`, '_blank');
+      toast.success('Gradebook exported as CSV with marks and anti-cheat audit logs!');
+    } catch {}
   };
 
   if (!selectedClass) return null;

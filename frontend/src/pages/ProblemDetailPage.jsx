@@ -219,21 +219,17 @@ export default function ProblemDetailPage() {
     const langToUse = targetLang || aiSolutionLang || selectedLang || 'PYTHON';
     setAiSolutionLang(langToUse);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/ai/solution', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          problemId: problem?.id,
-          problemTitle: problem?.title || 'Two Sum',
-          language: langToUse,
-          code: code
-        })
+      const data = await api.getAiSolution({
+        problemId: problem?.id,
+        problemTitle: problem?.title || 'Two Sum',
+        language: langToUse,
+        code: code,
+        problem
       });
-      const json = await res.json();
-      if (json.success && json.data) {
-        setAiResponse(json.data);
+      if (data) {
+        setAiResponse(data);
       } else {
-        toast.error(json.message || 'AI solution query failed');
+        toast.error('AI solution query failed');
       }
     } catch (err) {
       toast.error('AI solution query failed');
@@ -267,17 +263,15 @@ export default function ProblemDetailPage() {
     setAiResponse(null);
     setAiHintTier(tier);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/ai/hint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          problemId: problem?.id,
-          problemTitle: problem?.title || 'Two Sum',
-          tier
-        })
+      const data = await api.getAiHint({
+        problemId: problem?.id,
+        problemTitle: problem?.title || 'Two Sum',
+        tier,
+        problem
       });
-      const json = await res.json();
-      setAiResponse(json.data);
+      if (data) {
+        setAiResponse(data);
+      }
     } catch (err) {
       toast.error('AI hint query failed');
     } finally {
@@ -289,13 +283,10 @@ export default function ProblemDetailPage() {
     setAiLoading(true);
     setAiResponse(null);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/ai/complexity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, language: selectedLang })
-      });
-      const json = await res.json();
-      setAiResponse(json.data);
+      const data = await api.getAiComplexity({ code, language: selectedLang });
+      if (data) {
+        setAiResponse(data);
+      }
     } catch (err) {
       toast.error('AI complexity analysis failed');
     } finally {
@@ -307,13 +298,10 @@ export default function ProblemDetailPage() {
     setAiLoading(true);
     setAiResponse(null);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/ai/explain-error', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ errorText: judgeVerdict?.stderr || 'Compilation or Runtime error' })
-      });
-      const json = await res.json();
-      setAiResponse(json.data);
+      const data = await api.explainError({ errorText: judgeVerdict?.stderr || 'Compilation or Runtime error' });
+      if (data) {
+        setAiResponse(data);
+      }
     } catch (err) {
       toast.error('AI error analysis failed');
     } finally {
@@ -325,13 +313,10 @@ export default function ProblemDetailPage() {
     setAiLoading(true);
     setAiResponse(null);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/ai/review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, language: selectedLang })
-      });
-      const json = await res.json();
-      setAiResponse(json.data);
+      const data = await api.getAiReview({ code, language: selectedLang });
+      if (data) {
+        setAiResponse(data);
+      }
     } catch (err) {
       toast.error('AI code review failed');
     } finally {
