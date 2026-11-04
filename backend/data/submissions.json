@@ -1,5 +1,23 @@
 [
   {
+    "id": "sub-94089",
+    "problemId": "prob-1",
+    "problemNo": 1,
+    "problemSlug": "p1-two-integers-and-print-their-sum",
+    "problemTitle": "Two Integers and Print Their Sum",
+    "username": "coder",
+    "language": "JAVA",
+    "status": "COMPLETED",
+    "verdict": "AC",
+    "runtimeMs": 13,
+    "memoryKb": 3480,
+    "createdAt": "2026-11-04T12:06:01.628Z",
+    "sourceCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNext()) {\n            // Write your solution logic here\n        }\n    }\n}",
+    "actualOutput": "0",
+    "expectedOutput": "0",
+    "errorMessage": null
+  },
+  {
     "id": "sub-90637",
     "problemId": "prob-2",
     "problemNo": 2,

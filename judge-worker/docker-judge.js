@@ -155,9 +155,9 @@ export async function judgeInDocker({
 
     // Non-zero exit code
     if (result.exitCode !== 0) {
-      const isCE = result.stderr.toLowerCase().includes('error:') || 
-                   result.stderr.toLowerCase().includes('syntaxerror') ||
-                   result.stderr.toLowerCase().includes('cannot find symbol');
+      const isCE = result.stderr.toLowerCase().includes('error:') ||
+        result.stderr.toLowerCase().includes('syntaxerror') ||
+        result.stderr.toLowerCase().includes('cannot find symbol');
 
       return {
         verdict: isCE ? VERDICTS.COMPILATION_ERROR : VERDICTS.RUNTIME_ERROR,
@@ -188,9 +188,9 @@ export async function judgeInDocker({
   } finally {
     // Force cleanup container and host temporary directory
     try {
-      await execPromise(`docker rm -f ${containerName}`).catch(() => {});
+      await execPromise(`docker rm -f ${containerName}`).catch(() => { });
       await fs.rm(hostTmpDir, { recursive: true, force: true });
-    } catch {}
+    } catch { }
   }
 }
 
@@ -212,9 +212,9 @@ function runDockerProcess(args, stdinData, watchdogTimeoutMs, containerName) {
     const timer = setTimeout(() => {
       timedOut = true;
       exec(`docker kill ${containerName}`, () => {
-        exec(`docker rm -f ${containerName}`, () => {});
+        exec(`docker rm -f ${containerName}`, () => { });
       });
-      try { proc.kill('SIGKILL'); } catch {}
+      try { proc.kill('SIGKILL'); } catch { }
     }, watchdogTimeoutMs);
 
     if (stdinData) {

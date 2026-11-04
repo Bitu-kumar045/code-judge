@@ -42,8 +42,8 @@ async function getPythonBinary() {
   const isWindows = process.platform === 'win32';
   const localPy = path.join(os.homedir(), '.local', 'bin', 'python3.14.exe');
 
-  const candidates = isWindows 
-    ? [localPy, 'python3.14', 'py', 'python', 'python3'] 
+  const candidates = isWindows
+    ? [localPy, 'python3.14', 'py', 'python', 'python3']
     : ['python3', 'python'];
 
   for (const bin of candidates) {
@@ -51,7 +51,7 @@ async function getPythonBinary() {
       await execPromise(`"${bin}" --version`);
       cachedPythonBin = bin;
       return bin;
-    } catch {}
+    } catch { }
   }
   return 'python';
 }
@@ -106,7 +106,7 @@ export function sanitizeStdinInput(input) {
  */
 export function healPythonIndentation(source) {
   if (!source || !source.trim()) return source;
-  
+
   const lines = source.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
   const expanded = lines.map(l => l.replace(/\t/g, '    '));
 
@@ -423,7 +423,7 @@ export async function judgeSubmission({
     if (runResult.exitCode !== 0) {
       // Auto-heal IndentationError / TabError for Python so indentation errors are ignored and fixed
       if (normLang === 'PYTHON' && (
-        runResult.stderr?.includes('IndentationError') || 
+        runResult.stderr?.includes('IndentationError') ||
         runResult.stderr?.includes('TabError') ||
         runResult.stderr?.includes('unexpected indent') ||
         runResult.stderr?.includes('unindent')
@@ -440,7 +440,7 @@ export async function judgeSubmission({
               runResult.timedOut = retryResult.timedOut;
               runResult.runtimeMs = retryResult.runtimeMs;
             }
-          } catch {}
+          } catch { }
         }
       }
 
@@ -526,7 +526,7 @@ export async function judgeSubmission({
     // 6. Cleanup Scratch Directory
     try {
       await fs.rm(tmpDir, { recursive: true, force: true });
-    } catch {}
+    } catch { }
   }
 }
 
@@ -550,11 +550,11 @@ function runProcess(cmd, stdinData, timeLimitMs) {
       timedOut = true;
       try {
         if (process.platform === 'win32') {
-          exec(`taskkill /pid ${proc.pid} /T /F`, () => {});
+          exec(`taskkill /pid ${proc.pid} /T /F`, () => { });
         } else {
           proc.kill('SIGKILL');
         }
-      } catch {}
+      } catch { }
     }, timeLimitMs);
 
     proc.stdout.on('data', (chunk) => {
@@ -593,7 +593,7 @@ function runProcess(cmd, stdinData, timeLimitMs) {
       try {
         proc.stdin.write(stdinData);
         proc.stdin.end();
-      } catch {}
+      } catch { }
     } else {
       proc.stdin.end();
     }
