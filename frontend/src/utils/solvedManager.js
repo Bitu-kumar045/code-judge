@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { api } from '../services/api';
+import { api } from '../services/api.js';
+import { getCurrentUserKey, getScopedItem, setScopedItem } from './userStorage.js';
 
-const STORAGE_KEY = 'codejudge_solved_problems';
-const DETAILS_KEY = 'codejudge_solved_details';
+const BASE_STORAGE_KEY = 'codejudge_solved';
+const BASE_DETAILS_KEY = 'codejudge_solved_details';
 
-// Retrieve set of solved identifiers (IDs, slugs, and numbers)
+// Retrieve set of solved identifiers (IDs, slugs, and numbers) scoped to the active Gmail/user
 export function getSolvedSet() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = getScopedItem(BASE_STORAGE_KEY, null);
     if (!raw) return new Set();
     const arr = JSON.parse(raw);
     return new Set(Array.isArray(arr) ? arr : []);
@@ -16,10 +17,10 @@ export function getSolvedSet() {
   }
 }
 
-// Retrieve solved details dictionary: { [id]: { difficulty, topic, no } }
+// Retrieve solved details dictionary: { [id]: { difficulty, topic, no } } scoped to the active Gmail/user
 export function getSolvedDetails() {
   try {
-    const raw = localStorage.getItem(DETAILS_KEY);
+    const raw = getScopedItem(BASE_DETAILS_KEY, null);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
@@ -46,14 +47,14 @@ export function getLevelWiseSolved() {
     hard,
     total: easy + medium + hard,
     breakdown: {
-      easy: { solved: easy, total: 298 },
-      medium: { solved: medium, total: 447 },
-      hard: { solved: hard, total: 255 }
+      easy: { solved: easy, total: 596 },
+      medium: { solved: medium, total: 894 },
+      hard: { solved: hard, total: 510 }
     }
   };
 }
 
-// Mark problem as solved locally and sync with backend
+// Mark problem as solved locally for the active Gmail/user and sync with backend
 export function markProblemSolved(problem) {
   if (!problem) return;
   const set = getSolvedSet();
@@ -65,9 +66,9 @@ export function markProblemSolved(problem) {
 
   const arr = Array.from(set);
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    setScopedItem(BASE_STORAGE_KEY, JSON.stringify(arr));
   } catch (err) {
-    console.error('Failed to save solved problems to localStorage', err);
+    console.error('Failed to save solved problems to scoped storage', err);
   }
 
   // Save metadata for level-wise calculations
@@ -86,14 +87,16 @@ export function markProblemSolved(problem) {
       difficulty: normDiff,
       topic: problem.topic || 'General'
     };
-    localStorage.setItem(DETAILS_KEY, JSON.stringify(details));
+    setScopedItem(BASE_DETAILS_KEY, JSON.stringify(details));
   } catch (err) {
-    console.error('Failed to save solved details to localStorage', err);
+    console.error('Failed to save solved details to scoped storage', err);
   }
+
+  const activeUser = getCurrentUserKey();
 
   // Notify components across the application
   window.dispatchEvent(new CustomEvent('codejudge_solved_updated', {
-    detail: { problem, solvedIds: arr, levelWise: getLevelWiseSolved() }
+    detail: { problem, solvedIds: arr, levelWise: getLevelWiseSolved(), userKey: activeUser }
   }));
 
   // Sync to backend in background
@@ -102,7 +105,7 @@ export function markProblemSolved(problem) {
   }
 }
 
-// Check whether problem is solved
+// Check whether problem is solved by the active user
 export function isProblemSolved(problem, set) {
   if (!problem) return false;
   const activeSet = set || getSolvedSet();
@@ -127,7 +130,7 @@ export function getSolvedCount(set) {
   return Math.max(count, detailCount, Math.floor(activeSet.size / 3));
 }
 
-// Custom React hook to subscribe to solved problem updates
+// Custom React hook to subscribe to solved problem updates and user changes
 export function useSolvedState() {
   const [solvedSet, setSolvedSet] = useState(() => getSolvedSet());
   const [levelCounts, setLevelCounts] = useState(() => getLevelWiseSolved());
@@ -139,7 +142,7 @@ export function useSolvedState() {
       if (Array.isArray(ids)) {
         const next = new Set(ids.map(String));
         setSolvedSet(next);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
+        setScopedItem(BASE_STORAGE_KEY, JSON.stringify(Array.from(next)));
       }
     }).catch(() => {});
 
@@ -149,10 +152,12 @@ export function useSolvedState() {
     };
 
     window.addEventListener('codejudge_solved_updated', handleUpdate);
+    window.addEventListener('codejudge_auth_changed', handleUpdate);
     window.addEventListener('storage', handleUpdate);
 
     return () => {
       window.removeEventListener('codejudge_solved_updated', handleUpdate);
+      window.removeEventListener('codejudge_auth_changed', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
   }, []);

@@ -1,4 +1,5 @@
 import INITIAL_SAMPLE_PROBLEMS from './sample_20_problems.js';
+import { getCurrentUserKey } from '../utils/userStorage.js';
 
 // Unified API service connecting to backend with seamless fallback for Vercel/offline deployments
 const API_BASE_URL = '/api/v1';
@@ -142,12 +143,25 @@ const safeStorage = {
   }
 };
 
-// Helper to make API requests with token headers
+// Helper to make API requests with token and user identification headers
 export async function request(endpoint, options = {}) {
   const token = safeStorage.getItem('token');
+  const userStr = safeStorage.getItem('user');
+  let userEmail = '';
+  let username = '';
+  try {
+    if (userStr) {
+      const u = JSON.parse(userStr);
+      userEmail = u?.email || '';
+      username = u?.username || '';
+    }
+  } catch {}
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(userEmail ? { 'X-User-Email': userEmail } : {}),
+    ...(username ? { 'X-User-Name': username } : {}),
     ...options.headers,
   };
 
@@ -169,43 +183,108 @@ export async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  // Auth
+  // Auth: Strictly protects admin credentials ('admin' with 'admin045') and isolates Gmail user data
   async login(usernameOrEmail, password) {
+    const trimmedInput = (usernameOrEmail || '').trim();
+    const trimmedPassword = (password || '').trim();
+
+    // 1. Try real backend API first
     const res = await request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ usernameOrEmail, password }),
+      body: JSON.stringify({ usernameOrEmail: trimmedInput, password: trimmedPassword }),
     });
-    if (res && res.data) {
+    if (res && res.data && res.data.accessToken) {
       return res.data;
     }
     
-    // Fallback demo users
-    if (usernameOrEmail === 'admin' || usernameOrEmail === 'admin@codejudge.com') {
+    // 2. Client-side / Offline / Vercel fallback authentication
+    const lowerInput = trimmedInput.toLowerCase();
+
+    // Admin check: ONLY username "admin" with password "admin045"
+    if (lowerInput === 'admin' || lowerInput === 'admin@codejudge.com') {
+      if (trimmedPassword !== 'admin045') {
+        throw new Error('Invalid credentials. Password for admin is incorrect.');
+      }
       return {
-        accessToken: "mock-jwt-admin-token-xyz",
+        accessToken: "jwt-admin-token-supersecure",
         tokenType: "Bearer",
-        user: { id: "u-admin", username: "admin", email: "admin@codejudge.com", role: "ROLE_ADMIN", rating: 2150, solvedCount: 182 }
+        user: {
+          id: "u-admin",
+          username: "admin",
+          email: "admin@codejudge.com",
+          role: "ROLE_ADMIN",
+          rating: 2450,
+          solvedCount: 0
+        }
       };
     }
+
+    // Normal user check: Any Gmail / email / username
+    if (!trimmedInput) {
+      throw new Error('Please enter your Gmail address or username.');
+    }
+
+    let email = lowerInput;
+    let username = trimmedInput;
+    if (lowerInput.includes('@')) {
+      email = lowerInput;
+      username = lowerInput.split('@')[0];
+    } else {
+      email = `${lowerInput}@gmail.com`;
+    }
+
+    // Retrieve scoped solved count for this Gmail account
+    let userSolvedCount = 0;
+    try {
+      const rawSolved = safeStorage.getItem(`codejudge_solved_${email}`);
+      if (rawSolved) {
+        const parsed = JSON.parse(rawSolved);
+        userSolvedCount = parsed.filter(s => String(s).startsWith('prob-')).length;
+      }
+    } catch {}
+
     return {
-      accessToken: "mock-jwt-coder-token-abc",
+      accessToken: "jwt-user-token-" + btoa(email),
       tokenType: "Bearer",
-      user: { id: "u-coder", username: usernameOrEmail || "coder", email: `${usernameOrEmail || 'coder'}@example.com`, role: "ROLE_USER", rating: 1620, solvedCount: 47 }
+      user: {
+        id: "u-" + email.replace(/[^a-zA-Z0-9]/g, '_'),
+        username: username,
+        email: email,
+        role: "ROLE_USER",
+        rating: 1500,
+        solvedCount: userSolvedCount
+      }
     };
   },
 
   async register(username, email, password) {
+    const trimmedUser = (username || '').trim();
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const trimmedPass = (password || '').trim();
+
+    if (trimmedUser.toLowerCase() === 'admin' || trimmedEmail.includes('admin')) {
+      throw new Error("Username 'admin' is reserved exclusively for the system administrator.");
+    }
+
     const res = await request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username: trimmedUser, email: trimmedEmail, password: trimmedPass }),
     });
-    if (res && res.data) {
+    if (res && res.data && res.data.accessToken) {
       return res.data;
     }
+
     return {
-      accessToken: "mock-jwt-newuser-token",
+      accessToken: "jwt-user-token-" + btoa(trimmedEmail),
       tokenType: "Bearer",
-      user: { id: "u-" + Date.now(), username, email, role: "ROLE_USER", rating: 1500, solvedCount: 0 }
+      user: {
+        id: "u-" + trimmedEmail.replace(/[^a-zA-Z0-9]/g, '_'),
+        username: trimmedUser,
+        email: trimmedEmail,
+        role: "ROLE_USER",
+        rating: 1500,
+        solvedCount: 0
+      }
     };
   },
 
@@ -228,10 +307,18 @@ export const api = {
     const allCatalog = await getAllProblemsCatalog();
     let filtered = [...allCatalog];
 
-    // Read solved problems from localStorage
+    // Read solved problems from localStorage scoped to active user
     let solvedSet = new Set();
     try {
-      const savedSolved = JSON.parse(safeStorage.getItem('codejudge_solved_problems') || '[]');
+      const userKey = getCurrentUserKey();
+      let saved = safeStorage.getItem(`codejudge_solved_${userKey}`);
+      if (!saved && userKey !== 'guest') {
+        saved = safeStorage.getItem('codejudge_solved_problems');
+        if (saved) {
+          safeStorage.setItem(`codejudge_solved_${userKey}`, saved);
+        }
+      }
+      const savedSolved = JSON.parse(saved || '[]');
       savedSolved.forEach(s => solvedSet.add(String(s)));
     } catch {}
 
@@ -369,22 +456,31 @@ export const api = {
     return res || { success: true };
   },
 
-  // Solved Tracking
+  // Solved Tracking: Scoped strictly per user/Gmail
   async getSolvedProblems() {
     const res = await request('/user/solved');
     if (res && res.data && res.data.solvedIds) {
       return res.data.solvedIds;
     }
-    const saved = safeStorage.getItem('codejudge_solved_problems');
+    const userKey = getCurrentUserKey();
+    let saved = safeStorage.getItem(`codejudge_solved_${userKey}`);
+    if (!saved && userKey !== 'guest') {
+      saved = safeStorage.getItem('codejudge_solved_problems');
+      if (saved) {
+        safeStorage.setItem(`codejudge_solved_${userKey}`, saved);
+      }
+    }
     return saved ? JSON.parse(saved) : [];
   },
 
   async markSolved(problemId) {
+    const userKey = getCurrentUserKey();
+    const key = `codejudge_solved_${userKey}`;
     try {
-      const saved = JSON.parse(safeStorage.getItem('codejudge_solved_problems') || '[]');
-      if (!saved.includes(problemId)) {
-        saved.push(problemId);
-        safeStorage.setItem('codejudge_solved_problems', JSON.stringify(saved));
+      const saved = JSON.parse(safeStorage.getItem(key) || '[]');
+      if (!saved.includes(String(problemId))) {
+        saved.push(String(problemId));
+        safeStorage.setItem(key, JSON.stringify(saved));
       }
     } catch {}
 
@@ -416,17 +512,32 @@ export const api = {
     };
   },
 
-  // Submissions
-  async submitCode({ problemId, language, sourceCode }) {
+  // Submissions: Isolated and persisted per logged-in user/Gmail
+  async submitCode({ problemId, language, sourceCode, problemTitle, problemNo, problemSlug }) {
+    const userStr = safeStorage.getItem('user');
+    let username = 'guest';
+    let userEmail = 'guest';
+    try {
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        username = u.username || 'guest';
+        userEmail = u.email || username;
+      }
+    } catch {}
+
+    const userKey = getCurrentUserKey();
+    const subKey = `codejudge_submissions_${userKey}`;
+    const solvedKey = `codejudge_solved_${userKey}`;
+
     const res = await request('/submissions', {
       method: 'POST',
-      body: JSON.stringify({ problemId, language, sourceCode }),
+      body: JSON.stringify({ problemId, language, sourceCode, username, userEmail, problemTitle, problemNo, problemSlug }),
     });
     if (res && res.data) {
       try {
-        const local = JSON.parse(safeStorage.getItem('codejudge_submissions') || '[]');
+        const local = JSON.parse(safeStorage.getItem(subKey) || '[]');
         local.unshift(res.data);
-        safeStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+        safeStorage.setItem(subKey, JSON.stringify(local.slice(0, 500)));
       } catch {}
       return res.data;
     }
@@ -436,6 +547,11 @@ export const api = {
     const mockSubmission = {
       id: submissionId,
       problemId,
+      problemNo,
+      problemSlug,
+      problemTitle,
+      username,
+      userEmail,
       language,
       sourceCode,
       status: "COMPLETED",
@@ -446,14 +562,14 @@ export const api = {
     };
 
     try {
-      const local = JSON.parse(safeStorage.getItem('codejudge_submissions') || '[]');
+      const local = JSON.parse(safeStorage.getItem(subKey) || '[]');
       local.unshift(mockSubmission);
-      safeStorage.setItem('codejudge_submissions', JSON.stringify(local.slice(0, 500)));
+      safeStorage.setItem(subKey, JSON.stringify(local.slice(0, 500)));
 
-      const solvedList = JSON.parse(safeStorage.getItem('codejudge_solved_problems') || '[]');
-      if (!solvedList.includes(problemId)) {
-        solvedList.push(problemId);
-        safeStorage.setItem('codejudge_solved_problems', JSON.stringify(solvedList));
+      const solvedList = JSON.parse(safeStorage.getItem(solvedKey) || '[]');
+      if (!solvedList.includes(String(problemId))) {
+        solvedList.push(String(problemId));
+        safeStorage.setItem(solvedKey, JSON.stringify(solvedList));
       }
     } catch {}
 
@@ -481,9 +597,21 @@ export const api = {
     if (res && Array.isArray(res.data)) return res.data;
     if (res && Array.isArray(res)) return res;
 
-    // Fallback to localStorage
+    // Fallback to localStorage scoped to active user
     try {
-      const local = JSON.parse(safeStorage.getItem('codejudge_submissions') || '[]');
+      const userKey = getCurrentUserKey();
+      const subKey = `codejudge_submissions_${userKey}`;
+      let local = JSON.parse(safeStorage.getItem(subKey) || '[]');
+
+      // Auto-migrate legacy submissions if this user has none yet
+      if (local.length === 0 && userKey !== 'guest') {
+        const legacy = JSON.parse(safeStorage.getItem('codejudge_submissions') || '[]');
+        if (legacy.length > 0) {
+          local = legacy;
+          safeStorage.setItem(subKey, JSON.stringify(local));
+        }
+      }
+
       if (params.problemId || params.problemSlug) {
         return local.filter(s => 
           s.problemId === params.problemId || 

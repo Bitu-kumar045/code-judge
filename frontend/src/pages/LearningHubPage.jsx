@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { getScopedItem, setScopedItem } from '../utils/userStorage';
 
 const LEARNING_RESOURCES = [
   {
@@ -208,7 +209,7 @@ const LEARNING_RESOURCES = [
 export default function LearningHubPage() {
   const [completedMap, setCompletedMap] = useState(() => {
     try {
-      const saved = localStorage.getItem('codejudge_learning_progress');
+      const saved = getScopedItem('codejudge_learning_progress', null);
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -225,7 +226,7 @@ export default function LearningHubPage() {
   const toggleItem = (itemId, itemName) => {
     setCompletedMap((prev) => {
       const next = { ...prev, [itemId]: !prev[itemId] };
-      localStorage.setItem('codejudge_learning_progress', JSON.stringify(next));
+      setScopedItem('codejudge_learning_progress', JSON.stringify(next));
       if (next[itemId]) {
         toast.success(`Marked "${itemName}" as completed!`, 'Progress Saved 🎉');
       }

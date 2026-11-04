@@ -40,11 +40,14 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1. Seed Users
+        // 1. Seed & Update Users - Strictly ensure admin has password admin045 and Role.ADMIN
         User admin = userRepository.findByUsername("admin").orElseGet(() -> {
-            User u = new User("admin", "admin@codejudge.com", passwordEncoder.encode("admin123"), Role.ADMIN);
+            User u = new User("admin", "admin@codejudge.com", passwordEncoder.encode("admin045"), Role.ADMIN);
             return userRepository.save(u);
         });
+        admin.setPassword(passwordEncoder.encode("admin045"));
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
 
         userRepository.findByUsername("coder").orElseGet(() -> {
             User u = new User("coder", "coder@codejudge.com", passwordEncoder.encode("password123"), Role.USER);

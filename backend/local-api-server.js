@@ -25,6 +25,7 @@ const PORT = 8080;
 const ALL_PROBLEMS_FILE = path.join(__dirname, 'data/all-problems.json');
 const SUBMISSIONS_FILE = path.join(__dirname, 'data/submissions.json');
 const USER_SOLVED_FILE = path.join(__dirname, 'data/user-solved.json');
+const USERS_FILE = path.join(__dirname, 'data/users.json');
 
 // Persistent user submissions
 let loadedSubmissions = [];
@@ -40,17 +41,66 @@ if (fs.existsSync(SUBMISSIONS_FILE)) {
 // Persistent user solved problems (starts empty unless user previously submitted AC)
 const loadedSolved = {
   'coder': new Set(),
-  'admin': new Set()
+  'admin': new Set(),
+  'layriceth@gmail.com': new Set()
 };
 if (fs.existsSync(USER_SOLVED_FILE)) {
   try {
     const raw = JSON.parse(fs.readFileSync(USER_SOLVED_FILE, 'utf8'));
     for (const [user, items] of Object.entries(raw)) {
-      loadedSolved[user] = new Set(Array.isArray(items) ? items : []);
+      loadedSolved[user.toLowerCase()] = new Set(Array.isArray(items) ? items : []);
+    }
+    // Backward compatibility: If layriceth@gmail.com doesn't have solved data yet, migrate from coder
+    if ((!loadedSolved['layriceth@gmail.com'] || loadedSolved['layriceth@gmail.com'].size === 0) && loadedSolved['coder']?.size > 0) {
+      loadedSolved['layriceth@gmail.com'] = new Set(Array.from(loadedSolved['coder']));
     }
     console.log(`[Database] Loaded solved records for users: ${Object.keys(loadedSolved).join(', ')}`);
   } catch (err) {
     console.error('Failed to parse user-solved.json', err);
+  }
+}
+
+// Persistent users store
+let loadedUsers = [
+  { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', password: 'admin045', role: 'ROLE_ADMIN', rating: 2450, solvedCount: 0 },
+  { id: 'u-coder', username: 'coder', email: 'coder@example.com', password: 'password123', role: 'ROLE_USER', rating: 1620, solvedCount: 0 },
+  { id: 'u-layriceth', username: 'layriceth', email: 'layriceth@gmail.com', password: 'password123', role: 'ROLE_USER', rating: 1500, solvedCount: 0 }
+];
+
+if (fs.existsSync(USERS_FILE)) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    if (Array.isArray(raw) && raw.length > 0) {
+      loadedUsers = raw;
+    }
+  } catch (err) {
+    console.error('Failed to parse users.json', err);
+  }
+}
+
+// STRICT SECURITY: Enforce admin username 'admin' and password 'admin045'
+const adminIdx = loadedUsers.findIndex(u => u.username.toLowerCase() === 'admin' || u.email.toLowerCase() === 'admin@codejudge.com');
+if (adminIdx !== -1) {
+  loadedUsers[adminIdx].password = 'admin045';
+  loadedUsers[adminIdx].role = 'ROLE_ADMIN';
+  loadedUsers[adminIdx].username = 'admin';
+} else {
+  loadedUsers.unshift({
+    id: 'u-admin',
+    username: 'admin',
+    email: 'admin@codejudge.com',
+    password: 'admin045',
+    role: 'ROLE_ADMIN',
+    rating: 2450,
+    solvedCount: 0
+  });
+}
+
+function saveUsersToDisk() {
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(DB.users, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[Database] Failed to save users to disk:', err.message);
   }
 }
 
@@ -85,10 +135,8 @@ if (fs.existsSync(ALL_PROBLEMS_FILE)) {
 
 // In-Memory Database Store for Problems, Submissions, and Users
 const DB = {
-  users: [
-    { id: 'u-admin', username: 'admin', email: 'admin@codejudge.com', role: 'ROLE_ADMIN', rating: 2150, solvedCount: loadedSolved['admin']?.size || 0 },
-    { id: 'u-coder', username: 'coder', email: 'coder@example.com', role: 'ROLE_USER', rating: 1620, solvedCount: loadedSolved['coder']?.size || 0 }
-  ],
+  users: loadedUsers,
+  submissions: loadedSubmissions,
   solvedByUser: loadedSolved,
   problems: loadedProblems.length > 0 ? loadedProblems : [
     {
@@ -215,7 +263,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-Email, X-User-Name'
     });
     res.end();
     return;
@@ -227,45 +275,142 @@ const server = http.createServer(async (req, res) => {
     // 1. Auth endpoints
     if (pathname === '/api/v1/auth/login' && method === 'POST') {
       const body = await parseBody(req);
-      const user = DB.users.find(u => u.username === body.usernameOrEmail || u.email === body.usernameOrEmail) || {
-        id: 'u-' + Date.now(),
-        username: body.usernameOrEmail || 'coder',
-        email: `${body.usernameOrEmail || 'coder'}@example.com`,
-        role: body.usernameOrEmail === 'admin' ? 'ROLE_ADMIN' : 'ROLE_USER',
-        rating: 1500,
-        solvedCount: 0
-      };
+      const input = (body.usernameOrEmail || '').trim();
+      const password = (body.password || '').trim();
+      const lowerInput = input.toLowerCase();
+
+      // STRICT SECURITY: ONLY username "admin" with password "admin045" can log in as admin
+      if (lowerInput === 'admin' || lowerInput === 'admin@codejudge.com') {
+        if (password !== 'admin045') {
+          return sendJson(res, 401, {
+            success: false,
+            message: 'Invalid admin credentials. Access denied.'
+          });
+        }
+        let adminUser = DB.users.find(u => u.username.toLowerCase() === 'admin');
+        if (!adminUser) {
+          adminUser = {
+            id: 'u-admin',
+            username: 'admin',
+            email: 'admin@codejudge.com',
+            role: 'ROLE_ADMIN',
+            rating: 2450,
+            solvedCount: DB.solvedByUser['admin']?.size || 0
+          };
+          DB.users.unshift(adminUser);
+          saveUsersToDisk();
+        }
+        return sendJson(res, 200, {
+          success: true,
+          message: 'Admin login successful',
+          data: {
+            accessToken: 'mock-jwt-admin-token-supersecure',
+            tokenType: 'Bearer',
+            user: {
+              id: adminUser.id,
+              username: 'admin',
+              email: adminUser.email,
+              role: 'ROLE_ADMIN',
+              rating: adminUser.rating || 2450,
+              solvedCount: DB.solvedByUser['admin']?.size || 0
+            }
+          }
+        });
+      }
+
+      // Normal User Login / Gmail Personal Account
+      if (!input) {
+        return sendJson(res, 400, { success: false, message: 'Username or Gmail address is required' });
+      }
+
+      let user = DB.users.find(u => u.username.toLowerCase() === lowerInput || u.email.toLowerCase() === lowerInput);
+      if (user) {
+        if (user.password && user.password !== password) {
+          return sendJson(res, 401, { success: false, message: 'Incorrect password for this account.' });
+        }
+      } else {
+        // Automatically create account for new Gmail/user
+        const email = lowerInput.includes('@') ? lowerInput : `${lowerInput}@gmail.com`;
+        const username = lowerInput.includes('@') ? lowerInput.split('@')[0] : input;
+        user = {
+          id: 'u-' + Date.now(),
+          username: username,
+          email: email,
+          password: password,
+          role: 'ROLE_USER',
+          rating: 1500,
+          solvedCount: 0
+        };
+        DB.users.push(user);
+        saveUsersToDisk();
+      }
+
+      const userKey = (user.email || user.username).toLowerCase();
+      const userSolvedCount = DB.solvedByUser[userKey]?.size || 0;
 
       return sendJson(res, 200, {
         success: true,
         message: 'Login successful',
         data: {
-          accessToken: 'mock-jwt-token-' + user.username,
+          accessToken: 'mock-jwt-token-' + (user.email || user.username),
           tokenType: 'Bearer',
-          user
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: 'ROLE_USER',
+            rating: user.rating || 1500,
+            solvedCount: userSolvedCount
+          }
         }
       });
     }
 
     if (pathname === '/api/v1/auth/register' && method === 'POST') {
       const body = await parseBody(req);
+      const userLower = (body.username || '').toLowerCase().trim();
+      const emailLower = (body.email || '').toLowerCase().trim();
+
+      if (userLower === 'admin' || emailLower.includes('admin')) {
+        return sendJson(res, 400, {
+          success: false,
+          message: "Username 'admin' is reserved for system administration."
+        });
+      }
+
+      if (DB.users.some(u => u.username.toLowerCase() === userLower || u.email.toLowerCase() === emailLower)) {
+        return sendJson(res, 400, {
+          success: false,
+          message: 'An account with this username or email already exists.'
+        });
+      }
+
       const newUser = {
         id: 'u-' + Date.now(),
-        username: body.username,
-        email: body.email,
-        role: body.username.toLowerCase() === 'admin' ? 'ROLE_ADMIN' : 'ROLE_USER',
+        username: body.username.trim(),
+        email: emailLower,
+        password: body.password,
+        role: 'ROLE_USER',
         rating: 1500,
         solvedCount: 0
       };
       DB.users.push(newUser);
+      saveUsersToDisk();
 
       return sendJson(res, 201, {
         success: true,
         message: 'Registration successful',
         data: {
-          accessToken: 'mock-jwt-token-' + newUser.username,
+          accessToken: 'mock-jwt-token-' + newUser.email,
           tokenType: 'Bearer',
-          user: newUser
+          user: {
+            id: newUser.id,
+            username: newUser.username,
+            email: newUser.email,
+            role: 'ROLE_USER',
+            rating: 1500,
+            solvedCount: 0
+          }
         }
       });
     }
@@ -477,13 +622,36 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
+      // Extract active user identity from request
+      const authHeader = req.headers['authorization'] || '';
+      const xUserEmail = (req.headers['x-user-email'] || '').toLowerCase().trim();
+      const xUserName = (req.headers['x-user-name'] || '').trim();
+
+      let submitEmail = (body.userEmail || xUserEmail || '').toLowerCase().trim();
+      let submitUsername = (body.username || xUserName || '').trim();
+
+      if (!submitEmail && authHeader.startsWith('Bearer mock-jwt-token-')) {
+        const tokenVal = authHeader.replace('Bearer mock-jwt-token-', '');
+        if (tokenVal.includes('@')) submitEmail = tokenVal.toLowerCase().trim();
+        else submitUsername = tokenVal;
+      }
+      if (!submitEmail && !submitUsername) {
+        submitEmail = 'coder@example.com';
+        submitUsername = 'coder';
+      }
+      if (!submitUsername) {
+        submitUsername = submitEmail.split('@')[0];
+      }
+      const userKey = (submitEmail || submitUsername).toLowerCase();
+
       const submission = {
         id: 'sub-' + Math.floor(Math.random() * 90000 + 10000),
         problemId: prob.id,
         problemNo: prob.no,
         problemSlug: prob.slug,
         problemTitle: prob.title,
-        username: 'coder',
+        username: submitUsername,
+        userEmail: submitEmail,
         language,
         status: 'COMPLETED',
         verdict: finalVerdict,
@@ -499,21 +667,21 @@ const server = http.createServer(async (req, res) => {
       DB.submissions.unshift(submission);
       saveSubmissionsToDisk();
 
-      // Track solved problem ONLY on AC verdict
+      // Track solved problem ONLY on AC verdict for the specific user/Gmail
       if (finalVerdict === 'AC') {
-        const username = 'coder';
-        if (!DB.solvedByUser[username]) {
-          DB.solvedByUser[username] = new Set();
+        if (!DB.solvedByUser[userKey]) {
+          DB.solvedByUser[userKey] = new Set();
         }
-        DB.solvedByUser[username].add(prob.id);
-        if (prob.slug) DB.solvedByUser[username].add(prob.slug);
-        if (prob.no !== undefined && prob.no !== null) DB.solvedByUser[username].add(String(prob.no));
+        DB.solvedByUser[userKey].add(prob.id);
+        if (prob.slug) DB.solvedByUser[userKey].add(prob.slug);
+        if (prob.no !== undefined && prob.no !== null) DB.solvedByUser[userKey].add(String(prob.no));
 
         saveSolvedToDisk();
 
-        const userObj = DB.users.find(u => u.username === username);
+        const userObj = DB.users.find(u => (u.email && u.email.toLowerCase() === userKey) || u.username.toLowerCase() === userKey);
         if (userObj) {
-          userObj.solvedCount = Array.from(DB.solvedByUser[username]).filter(s => s.startsWith('prob-')).length || 1;
+          userObj.solvedCount = Array.from(DB.solvedByUser[userKey]).filter(s => s.startsWith('prob-')).length || 1;
+          saveUsersToDisk();
         }
       }
 
@@ -535,6 +703,12 @@ const server = http.createServer(async (req, res) => {
       const problemId = url.searchParams.get('problemId') || url.searchParams.get('problemSlug');
       const username = url.searchParams.get('username');
       const verdict = url.searchParams.get('verdict');
+      const xUserEmail = (req.headers['x-user-email'] || '').toLowerCase().trim();
+      const authHeader = req.headers['authorization'] || '';
+      let requesterKey = xUserEmail;
+      if (!requesterKey && authHeader.startsWith('Bearer mock-jwt-token-')) {
+        requesterKey = authHeader.replace('Bearer mock-jwt-token-', '').toLowerCase().trim();
+      }
 
       let list = [...DB.submissions];
       if (problemId) {
@@ -545,7 +719,13 @@ const server = http.createServer(async (req, res) => {
         );
       }
       if (username) {
-        list = list.filter(s => s.username === username);
+        list = list.filter(s => s.username === username || (s.userEmail && s.userEmail.toLowerCase() === username.toLowerCase()));
+      } else if (requesterKey && requesterKey !== 'admin' && !authHeader.includes('admin')) {
+        // Normal user only sees their own submissions
+        list = list.filter(s => 
+          (s.userEmail && s.userEmail.toLowerCase() === requesterKey) || 
+          (s.username && s.username.toLowerCase() === requesterKey)
+        );
       }
       if (verdict && verdict !== 'ALL') {
         list = list.filter(s => s.verdict === verdict);
@@ -555,19 +735,27 @@ const server = http.createServer(async (req, res) => {
 
     // Reset user submissions & solved (fresh start)
     if (pathname === '/api/v1/user/reset' && method === 'POST') {
-      DB.submissions = [];
-      DB.solvedByUser['coder'] = new Set();
+      const xUserEmail = (req.headers['x-user-email'] || 'coder').toLowerCase().trim();
+      DB.submissions = DB.submissions.filter(s => s.userEmail !== xUserEmail && s.username !== xUserEmail);
+      DB.solvedByUser[xUserEmail] = new Set();
       saveSubmissionsToDisk();
       saveSolvedToDisk();
-      return sendJson(res, 200, { success: true, message: 'All submissions and solved states have been reset.' });
+      return sendJson(res, 200, { success: true, message: `Submissions and solved states reset for ${xUserEmail}` });
     }
 
-    // User Solved Problems API
+    // User Solved Problems API scoped to active Gmail/user
     if (pathname === '/api/v1/user/solved' && method === 'GET') {
-      const username = 'coder';
-      const coderSolved = DB.solvedByUser[username] || new Set();
+      const xUserEmail = (req.headers['x-user-email'] || '').toLowerCase().trim();
+      const authHeader = req.headers['authorization'] || '';
+      let activeUserKey = xUserEmail;
+      if (!activeUserKey && authHeader.startsWith('Bearer mock-jwt-token-')) {
+        activeUserKey = authHeader.replace('Bearer mock-jwt-token-', '').toLowerCase().trim();
+      }
+      if (!activeUserKey) activeUserKey = 'coder';
+
+      const userSolved = DB.solvedByUser[activeUserKey] || new Set();
       const solvedProblems = DB.problems.filter(p => 
-        coderSolved.has(p.id) || coderSolved.has(p.slug) || (p.no && coderSolved.has(String(p.no)))
+        userSolved.has(p.id) || userSolved.has(p.slug) || (p.no && userSolved.has(String(p.no)))
       );
       const easySolved = solvedProblems.filter(p => p.difficulty === 'EASY').length;
       const mediumSolved = solvedProblems.filter(p => p.difficulty === 'MEDIUM').length;
@@ -580,7 +768,9 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         success: true,
         data: {
-          solvedIds: Array.from(coderSolved),
+          username: activeUserKey,
+          solvedCount: userSolved.size,
+          solvedIds: Array.from(userSolved),
           count: solvedProblems.length,
           easySolved,
           mediumSolved,

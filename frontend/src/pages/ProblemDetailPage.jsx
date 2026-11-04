@@ -8,6 +8,7 @@ import { useToast } from '../context/ToastContext';
 import { fireAcceptedConfetti } from '../utils/confetti';
 import { ProblemDetailSkeleton } from '../components/Skeleton';
 import { markProblemSolved, isProblemSolved } from '../utils/solvedManager';
+import { getScopedItem, setScopedItem } from '../utils/userStorage';
 import {
   Play,
   Send,
@@ -98,9 +99,9 @@ export default function ProblemDetailPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState(null);
 
-  // Personal Notes (persisted in localStorage)
+  // Personal Notes (persisted in localStorage scoped to active Gmail/user)
   const [notes, setNotes] = useState(() => {
-    return localStorage.getItem(`codejudge_notes_${slug}`) || '';
+    return getScopedItem(`codejudge_notes_${slug}`, '');
   });
 
   // Discussions Forum state
@@ -181,10 +182,10 @@ export default function ProblemDetailPage() {
     return () => clearInterval(interval);
   }, [pomodoroActive, pomodoroSeconds, toast]);
 
-  // Auto-save notes
+  // Auto-save notes scoped to active user
   const handleSaveNotes = (val) => {
     setNotes(val);
-    localStorage.setItem(`codejudge_notes_${slug}`, val);
+    setScopedItem(`codejudge_notes_${slug}`, val);
   };
 
   // Upvote discussion

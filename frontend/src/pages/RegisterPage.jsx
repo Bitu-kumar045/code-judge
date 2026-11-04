@@ -19,6 +19,12 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
 
+    if (username.toLowerCase() === 'admin' || email.toLowerCase().includes('admin')) {
+      setError("The username and email 'admin' are reserved exclusively for the system administrator.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await api.register(username, email, password);
       if (data && data.accessToken) {

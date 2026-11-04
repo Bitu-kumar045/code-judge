@@ -49,7 +49,11 @@ public class AuthService {
             throw new BadRequestException("Email is already registered");
         }
 
-        Role role = request.getUsername().equalsIgnoreCase("admin") ? Role.ADMIN : Role.USER;
+        if (request.getUsername().equalsIgnoreCase("admin") || request.getEmail().toLowerCase().contains("admin")) {
+            throw new BadRequestException("Username and email 'admin' are reserved exclusively for the system administrator.");
+        }
+
+        Role role = Role.USER;
         User user = new User(
                 request.getUsername(),
                 request.getEmail(),
